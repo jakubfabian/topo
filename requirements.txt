@@ -1,0 +1,5 @@
+Django
+psycopg2
+django-leaflet
+django-leaflet-geojson
+
