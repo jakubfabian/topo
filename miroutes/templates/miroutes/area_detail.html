@@ -1,0 +1,69 @@
+
+<a href="/miroutes/"> Home </a> : <a href=../> {{ area.area_country.country_name }} </a> :: {{ area.area_name }}
+<br><br>
+
+You're looking at area {{ area.area_name }}
+<br><br>
+
+
+
+
+
+{% load leaflet_tags %}
+{% load geojson_tags %}
+
+{% block extra_assets %}
+  {% leaflet_js %}
+  {% leaflet_css %}
+{% endblock %}
+
+
+
+{% block content %}
+
+    <script type="text/javascript">
+      var collection = {{ area_spot_list|geojsonfeature|safe }};
+      function map_init(map, options) {
+
+        var markerArray = [];
+
+ {% for spot in area_spot_list %}
+
+        var coord = L.latLng({{ spot.geom.coordinates }});
+        var newcoord = L.latLng(coord.lng, coord.lat);
+        var mc = new L.marker(newcoord);
+        mc.bindPopup("<a href='{{spot.pk}}'>{{ spot.spot_name }}</a>");
+        markerArray.push(mc);
+
+      {% endfor %}
+
+        var group = L.featureGroup(markerArray).addTo(map);
+      map.fitBounds(group.getBounds());
+
+      }
+
+    </script>
+
+    {% leaflet_map "spots" callback="window.map_init" %}
+
+{% endblock %}
+
+
+
+
+
+
+{% if area_spot_list %}
+
+In {{ area.area_name }} there are following spots:<br><br>
+
+    <ul>
+    {% for spot in area_spot_list %}
+        <li> <a href="{{ spot.pk }}"> {{ spot.spot_name }}</a></li>
+
+
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Currently no spots are available in {{ area.area_name }}</p>
+{% endif %}

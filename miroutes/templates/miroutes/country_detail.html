@@ -1,0 +1,58 @@
+
+
+<a href="/miroutes/"> Home </a> :  {{ country.country_name }}
+<br><br>
+
+You're looking at country {{ country.country_name }}
+<br><br>
+
+
+
+
+{% load leaflet_tags %}
+{% load geojson_tags %}
+
+{% block extra_assets %}
+  {% leaflet_js %}
+  {% leaflet_css %}
+{% endblock %}
+
+
+{% block content %}
+
+    <script type="text/javascript">
+      var collection = {{ spotlist|geojsonfeature|safe }};
+      function map_init(map, options) {
+          var layer = L.geoJson(collection);
+          layer.addTo(map);
+          map.setZoom(12);
+          map.fitBounds(layer.getBounds(), {padding: [10, 10]});
+
+      }
+
+    </script>
+
+    {% leaflet_map "spots" callback="window.map_init" %}
+
+{% endblock %}
+
+
+
+
+
+
+
+<a href="/miroutes/"> Home </a> : {{ country.country_name }}
+<br><br>
+
+You're looking at country {{ country.country_name }}
+
+{% if country_area_list %}
+    <ul>
+    {% for area in country_area_list %}
+        <li><a href=" {{ area.pk }} "> {{ area.area_name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Currently no areas are available in {{ country.country_name }}</p>
+{% endif %}

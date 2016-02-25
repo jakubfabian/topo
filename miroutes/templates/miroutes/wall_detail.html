@@ -1,0 +1,148 @@
+{% load static %}
+
+<html>
+  <head>
+
+      <style>
+
+    .leaflet-container {  /* all maps */
+        width:  100%;
+        height: 600px;
+    }
+
+
+</style>
+
+     <script>
+    window.onload = function() {
+
+    map_init();
+
+    }
+    </script>
+
+
+</head>
+
+
+{% load leaflet_tags %}
+{% load geojson_tags %}
+
+{% block extra_assets %}
+  {% leaflet_js %}
+  {% leaflet_css %}
+{% endblock %}
+
+
+
+
+
+
+
+<a href="/miroutes/"> Home </a> : <a href=../../../> {{ wall.wall_spot.spot_area.area_country.country_name }} </a> :: <a href="../../" >{{ wall.wall_spot.spot_area.area_name }} </a> :: <a href="../"> {{ wall.wall_spot.spot_name }} </a> :: {{ wall.wall_name }}
+<br><br>
+
+You're looking at wall {{ wall.wall_name }}
+<br><br>
+
+  <br><br>
+
+{% if wall_route_list %}
+
+{% block content %}
+
+  <div id="wallmap"></div>
+
+    <script type="text/javascript">
+      var collection = {{ wall_route_list|geojsonfeature|safe }};
+
+
+
+      function map_init(){
+
+
+  var img_dim_string = '{{ wall.get_bg_img_size }}';
+
+        var img_dim   = img_dim_string.split(',', 4);
+        var img_dim_x = parseFloat(img_dim[0]);
+        var img_dim_y = parseFloat(img_dim[1]);
+        var xzoom     = parseFloat(img_dim[2]);
+        var yzoom     = parseFloat(img_dim[3]);
+
+        var maxzoom   = Math.max(xzoom, yzoom);
+        var minzoom   = Math.min(xzoom, yzoom);
+        var startzoom = maxzoom-minzoom;
+
+
+
+        var map = L.map('wallmap', {
+  minZoom: minzoom,
+  maxZoom: maxzoom,
+  crs: L.CRS.Simple,
+  center: [-30, 90],
+  zoom: 4,
+
+});
+
+
+
+
+
+var southWest = map.unproject([0, img_dim_y], map.getMaxZoom());
+var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
+map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
+
+
+        var wall_layer = L.tileLayer('{{ wall.get_tiles_url }}/{z}/{x}/{y}.png', {
+        minZoom: 4, maxZoom: 6,
+        noWrap: false,
+        tileSize: 256,
+        continuousWorld: true,
+      });
+
+
+      wall_layer.addTo(map);
+
+         layer =  L.geoJson(collection);
+         layer.addTo(map);
+
+
+
+      }
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}
+
+<br><br><br>
+
+In {{ wall.wall_name }} there are following routes:<br><br>
+
+<table width="100%">
+
+    {% for route in wall_route_list %}
+    <tr><td>
+        <a href="{{route.pk}}"> {{ route.route_name }}</a>
+        </td><td>
+        {{ route.route_grade }}
+        </td><td>
+        <a href="{{route.pk}}/edit"> edit </a>
+    </td></tr>
+    {% endfor %}
+
+    <tr><td><a href="addroute">Route hinzufügen</a></td><td></td><td></td></tr>
+
+    </table>
+
+{% else %}
+    <p>Currently no routes are available in {{ wall.wall_name }}</p>
+{% endif %}

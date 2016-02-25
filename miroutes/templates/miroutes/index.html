@@ -1,0 +1,80 @@
+
+<html>
+  <head>
+
+      <style>
+
+    .leaflet-container {  /* all maps */
+        width:  100%;
+        height: 600px;
+    }
+
+
+</style>
+
+</head>
+
+{% load leaflet_tags %}
+{% load geojson_tags %}
+
+{% block extra_assets %}
+  {% leaflet_js %}
+  {% leaflet_css %}
+{% endblock %}
+
+
+
+{% if country_listing %}
+
+
+
+{% block content %}
+
+    <script type="text/javascript">
+
+      function map_init(map, options) {
+
+        var markerArray = [];
+
+ {% for spot in spot_listing %}
+
+        var coord = L.latLng({{ spot.geom.coordinates }});
+        var newcoord = L.latLng(coord.lng, coord.lat);
+        var mc = new L.marker(newcoord);
+        mc.bindPopup("<a href='{{spot.spot_area.area_country.pk}}/{{spot.spot_area.pk}}/{{spot.pk}}'>{{ spot.spot_name }}</a>");
+        markerArray.push(mc);
+
+      {% endfor %}
+
+        var group = L.featureGroup(markerArray).addTo(map);
+      map.fitBounds(group.getBounds());
+
+      }
+
+    </script>
+
+    {% leaflet_map "spots" callback="window.map_init" %}
+
+{% endblock %}
+
+
+    <ul>
+    {% for country in country_listing %}
+        <li><a href="/miroutes/{{ country.id }}/">{{ country.country_name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No countries are available.</p>
+{% endif %}
+
+
+
+
+
+<b>Statistics:</b>
+<br><br>
+Countries: {{ country_listing|length }} <br>
+Areas: {{ area_listing|length }} <br>
+Spots: {{ spot_listing|length }} <br>
+Walls: {{ wall_listing|length }} <br>
+Routes: {{ route_listing|length }} <br>
