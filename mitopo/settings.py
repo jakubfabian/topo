@@ -27,7 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -37,6 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'djgeojson',
+    'leaflet',
+    'testapp',
+    'miroutes',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -123,4 +126,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
+WEB_ROOT = '/code/www/'
+MEDIA_ROOT = os.path.join( WEB_ROOT, 'media' )
+MEDIA_URL = '/media/'
+
+
+STATIC_ROOT = os.path.join( WEB_ROOT, 'static' )
 STATIC_URL = '/static/'
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder'
+    )

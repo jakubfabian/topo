@@ -13,9 +13,23 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^testapp/', include('testapp.urls')),
+    url(r'^miroutes/', include('miroutes.urls')),
 ]
+
+# if in debug mode, redirect static requests to media_ROOT
+#from django.conf import settings
+#from  django.views import static
+#if settings.DEBUG == True:
+#    urlpatterns += [
+#        url(r'^media/(?P<path>.*)$', static.serve, {
+#            'document_root': settings.MEDIA_ROOT,
+#        }),
+#        url(r'^static/(?P<path>.*)$', static.serve, {
+#            'document_root': settings.STATIC_ROOT,
+#        }),]
