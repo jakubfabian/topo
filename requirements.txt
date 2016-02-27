@@ -6,4 +6,3 @@ ipdb
 jsonfield
 Pillow
 numpy
-GDAL
