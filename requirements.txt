@@ -3,7 +3,7 @@ psycopg2
 django-leaflet
 django-geojson
 ipdb
-django-jsonfield
+jsonfield
 Pillow
 numpy
-
+GDAL
