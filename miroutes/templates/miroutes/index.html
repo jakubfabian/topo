@@ -47,7 +47,11 @@
       {% endfor %}
 
         var group = L.featureGroup(markerArray).addTo(map);
-      map.fitBounds(group.getBounds());
+	if (markerArray.length > 1){
+      		map.fitBounds(group.getBounds());
+	} else {
+		map.setView(markerArray[0].getLatLng(), 11);
+	}	
 
       }
 
