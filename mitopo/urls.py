@@ -23,13 +23,13 @@ urlpatterns = [
 ]
 
 # if in debug mode, redirect static requests to media_ROOT
-#from django.conf import settings
-#from  django.views import static
-#if settings.DEBUG == True:
-#    urlpatterns += [
-#        url(r'^media/(?P<path>.*)$', static.serve, {
-#            'document_root': settings.MEDIA_ROOT,
-#        }),
-#        url(r'^static/(?P<path>.*)$', static.serve, {
-#            'document_root': settings.STATIC_ROOT,
-#        }),]
+from django.conf import settings
+from  django.views import static
+if settings.DEBUG == True:
+    urlpatterns += [
+        url(r'^media/(?P<path>.*)$', static.serve, {
+            'document_root': settings.MEDIA_ROOT,
+        }),
+        url(r'^static/(?P<path>.*)$', static.serve, {
+            'document_root': settings.STATIC_ROOT,
+        }),]
