@@ -122,10 +122,10 @@ class Wall(models.Model):
             print(dim)
             
             #newdim = [ int(np.ceil(1.*d/tile_width)*tile_width) for d in dim ]
-            newxdim = tile_width*2**(np.ceil((np.log(dim[0] / tile_width) / np.log(2))))
+            newxdim = int(tile_width*2**(np.ceil((np.log(dim[0] / tile_width) / np.log(2)))))
             newydim = int(np.ceil(1.*dim[1]/tile_width)*tile_width)
             newdim = [newxdim, newydim]
-            import ipdb;ipdb.set_trace()
+            #import ipdb;ipdb.set_trace()
 
             wpercent = (newxdim/float(image.size[0]))
             hsize = int((float(image.size[1])*float(wpercent)))
