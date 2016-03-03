@@ -7,7 +7,7 @@
 #   insert test wall with 2 routes
 
 #setup docker images and run them 
-docker-compose build
+docker-compose build --no-cache
 docker-compose start db 
 docker-compose start web 
 
