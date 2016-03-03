@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# Script to delete the project container and the database
 docker-compose stop web
 docker-compose stop db
 docker-compose rm web
