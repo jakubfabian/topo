@@ -2,7 +2,7 @@
 from djgeojson.fields import PointField
 from djgeojson.fields import LineStringField
 from django.db import models
-
+from django.conf import settings
 
 # Create your models here.
 class Country(models.Model):
@@ -37,7 +37,7 @@ class Wall(models.Model):
     wall_name = models.CharField(max_length=100)
     wall_spot = models.ForeignKey(Spot)
     geom = PointField()
-    background_img = models.ImageField(blank = True,upload_to=get_bg_img_upload_path)
+    background_img = models.ImageField(blank = True, upload_to=get_bg_img_upload_path)
 
     def __str__(self):
         return self.wall_name
@@ -66,8 +66,8 @@ class Wall(models.Model):
             return "exists"
         try:
             #import pdb; pdb.set_trace()
-            print("tiles_file_path does not exist",storage.path(file_path),storage.path(tiles_file_path))
-            self.tile_image(storage.path(file_path),storage.path(tiles_file_path))
+            print("tiles_file_path does not exist", storage.path(file_path), storage.path(tiles_file_path))
+            self.tile_image(storage.path(file_path), storage.path(tiles_file_path))
             return "success"
         except:
             return "error"
@@ -80,9 +80,12 @@ class Wall(models.Model):
         file_path = self.background_img.name
         filename_base, filename_ext = os.path.splitext(file_path)
         tiles_file_path = u"%s_tiles" % filename_base
+	print "background_img url: {}".format(self.background_img.url)
         if storage.exists(tiles_file_path):
             return storage.url(tiles_file_path)
-        return ""
+	else:
+	    print "No tiles found for {}".format(filename_base)
+            return ""	
 
     def get_bg_img_size(self):
         import os
@@ -117,12 +120,16 @@ class Wall(models.Model):
             tile_width = 256
             dim = image.size
             print(dim)
+            
+            #newdim = [ int(np.ceil(1.*d/tile_width)*tile_width) for d in dim ]
+            newxdim = tile_width*2**(np.ceil((np.log(dim[0] / tile_width) / np.log(2))))
+            newydim = int(np.ceil(1.*dim[1]/tile_width)*tile_width)
+            newdim = [newxdim, newydim]
+            import ipdb;ipdb.set_trace()
 
-            newdim = [ int(np.ceil(1.*d/tile_width)*tile_width) for d in dim ]
-
-            wpercent = (newdim[0]/float(image.size[0]))
+            wpercent = (newxdim/float(image.size[0]))
             hsize = int((float(image.size[1])*float(wpercent)))
-            image = image.resize((newdim[0],hsize), Image.ANTIALIAS)
+            image = image.resize((newxdim, hsize), Image.ANTIALIAS)
             image.save(src)
 
             image2 = Image.new('RGBA',newdim)
@@ -135,7 +142,6 @@ class Wall(models.Model):
                 dim2 = image2.size
                 x2 = 0
                 print("zloop",dim2)
-                #import ipdb; ipdb.set_trace()
                 for x in range(0, dim2[0]- 1 , tile_width):
                     y2 = 0
                     for y in range( 0, dim2[1]- 1 , tile_width):

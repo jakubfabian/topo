@@ -6,7 +6,7 @@
       <style>
 
     .leaflet-container {  /* all maps */
-        width:  100%;
+        width:  1024px;
         height: 512px;
     }
 
@@ -70,14 +70,14 @@ You're looking at wall {{ wall.wall_name }}
         var xzoom     = parseFloat(img_dim[2]);
         var yzoom     = parseFloat(img_dim[3]);
 
-        var maxzoom   = Math.max(xzoom, yzoom);
-
-	// This value is suitable for the container height of 512 px = 2*256 px
-        var minzoom   = 1;//Math.min(xzoom, yzoom);
-
-	// We match the height to the height of the image at this zoom level
+        var maxzoom   = Math.max(xzoom, yzoom);	
+	// This value is suitable for the container width of 1024 px = 4*256 px
+        var minzoom   = 2;//Math.min(xzoom, yzoom);
 	var aspectRatio = img_dim_x/img_dim_y;	
-	document.getElementById("wallmap").style.height = 512 / aspectRatio;
+	
+	// We match the height to the height of the image at this zoom level
+	document.getElementById("wallmap").style.height = 1024/aspectRatio;
+		
 
 
         var map = L.map('wallmap', {
