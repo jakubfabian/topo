@@ -9,7 +9,6 @@ from miroutes.models import Wall
 from miroutes.models import Route
 
 
-
 # Register your models here.
 
 
@@ -21,7 +20,6 @@ class AreaAdmin(admin.ModelAdmin):
     list_filter = ['area_country']
 
 class SpotAdmin(admin.ModelAdmin):
-
     list_filter = ['spot_area']
 
 class CountryAdmin(admin.ModelAdmin):
@@ -29,7 +27,6 @@ class CountryAdmin(admin.ModelAdmin):
         (None, {'fields': ['country_name']}),
         ('Additional Info:', {'fields': ['country_code']})
         ]
-
 
 class WallAdmin(admin.ModelAdmin):
     fieldsets = [
@@ -40,10 +37,6 @@ class WallAdmin(admin.ModelAdmin):
 
 class RouteAdmin(admin.ModelAdmin):
     list_filter = ['route_wall']
-
-
-
-
 
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Area, AreaAdmin)
