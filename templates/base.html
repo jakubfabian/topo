@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+{% load static %}
+
+<head>
+        <title>	
+
+{% block title %} 
+        Mei Topo - Topos for everyone 
+{% endblock %}
+
+        </title>
+
+
+{% block main-css %}
+        <link rel="stylesheet" href={% static "miroutes/css/main2.css" %} />
+{% endblock %}
+
+
+{% block extra_assets %}
+{% endblock %}
+
+</head>
+
+<body>
+<div id="contentcontainer">
+
+{% block header %}
+
+<div id="header">
+        <img id="headerimg" src="{% static "miroutes/img/header.jpg"     %}" width="1000px"></img>
+</div>
+
+<div id="user_menu">
+    {% if user.is_anonymous %}
+            <a href="{% url 'django.contrib.auth.views.login' %}?next={{request.path}}">Login</a>
+            /
+            <a href="{% url 'users.views.register' %}">Register</a>
+    {% else %}
+            User   : <b>{{ user }}</b>  
+            (<a href="{% url 'django.contrib.auth.views.logout'%}?next={{request.path}}">logout</a>) 
+            &nbsp;&nbsp; Email  : {{user.email}} </br>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+
+	    <div id="content">
+		    {% block content %}Default template content -- there is nothing to see here...{% endblock %}
+	    </div>
+
+
+    </div>
+
+    </body>
+</html>

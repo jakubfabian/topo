@@ -1,57 +1,47 @@
+{% extends "base.html" %}
 
-<html>
-  <head>
+{% block title %} 
+	<title>Mitopo.de</title>
+{% endblock %}
 
-      <style>
+{% block extra_assets %}
 
-    .leaflet-container {  /* all maps */
-        width:  100%;
-        height: 600px;
-    }
-
-
+<style>
+.leaflet-container {  /* all maps */
+    width:  100%;
+    height: 600px;
+}
 </style>
-
-</head>
 
 {% load leaflet_tags %}
 {% load geojson_tags %}
+{% leaflet_js %}
+{% leaflet_css %}
 
-{% block extra_assets %}
-  {% leaflet_js %}
-  {% leaflet_css %}
-{% endblock %}
-
-
-
-{% if country_listing %}
-
-
+{% endblock %} 
 
 {% block content %}
-
+{% if country_listing %}
     <script type="text/javascript">
 
       function map_init(map, options) {
 
         var markerArray = [];
 
- {% for spot in spot_listing %}
-
-        var coord = L.latLng({{ spot.geom.coordinates }});
-        var newcoord = L.latLng(coord.lng, coord.lat);
-        var mc = new L.marker(newcoord);
-        mc.bindPopup("<a href='{{spot.spot_area.area_country.pk}}/{{spot.spot_area.pk}}/{{spot.pk}}'>{{ spot.spot_name }}</a>");
-        markerArray.push(mc);
-
-      {% endfor %}
+       {% for spot in spot_listing %}
+            var coord = L.latLng({{ spot.geom.coordinates }});
+            var newcoord = L.latLng(coord.lng, coord.lat);
+            var mc = new L.marker(newcoord);
+            mc.bindPopup("<a href='{{spot.spot_area.area_country.pk}}/{{spot.spot_area.pk}}/{{spot.pk}}'>{{ spot.spot_name }}</a>");
+            markerArray.push(mc);
+        {% endfor %}
 
         var group = L.featureGroup(markerArray).addTo(map);
-	if (markerArray.length > 1){
-      		map.fitBounds(group.getBounds());
-	} else {
-		map.setView(markerArray[0].getLatLng(), 11);
-	}	
+        if (markerArray.length > 1){
+                map.fitBounds(group.getBounds());
+        } else {
+            map.setView(markerArray[0].getLatLng(), 10);
+        }	
 
       }
 
@@ -59,7 +49,6 @@
 
     {% leaflet_map "spots" callback="window.map_init" %}
 
-{% endblock %}
 
 
     <ul>
@@ -82,3 +71,4 @@ Areas: {{ area_listing|length }} <br>
 Spots: {{ spot_listing|length }} <br>
 Walls: {{ wall_listing|length }} <br>
 Routes: {{ route_listing|length }} <br>
+{% endblock %}

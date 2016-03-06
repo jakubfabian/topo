@@ -41,22 +41,6 @@ def spot_detail(request, spot_id):
     context = {'spot': p, 'spot_wall_list': walllist}
     return render(request, 'miroutes/spot_detail.html', context)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 def wall_detail(request, wall_id, route_id):
     from miroutes.forms import RouteEditForm,EditRoute
     p = get_object_or_404(Wall, pk=wall_id)
@@ -71,31 +55,9 @@ def wall_detail(request, wall_id, route_id):
         #import ipdb; ipdb.set_trace()
         form.save()
 
-
-
-
     routelist = p.route_set.all()
     context = {'wall': p, 'wall_route_list': routelist}
     return render(request, 'miroutes/wall_detail.html', context)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

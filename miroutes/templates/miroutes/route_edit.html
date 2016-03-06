@@ -6,58 +6,19 @@
     {% leaflet_js plugins="forms" %}
     {% leaflet_css plugins="forms" %}
 
-
-
-      <style>
-
-    .leaflet-container {  /* all maps */
+<style>
+    .leaflet-container { /* all maps */
         width:  100%;
-        height: 600px;
-    }
-          .leaflet-draw-toolbar .leaflet-draw-draw-rectangle {
-	display: none;
-	background-position: -62px -2px;
-}
-             .leaflet-draw-toolbar .leaflet-draw-draw-polygon {
-	display: none;
-
-}
-
-
-          .leaflet-draw-toolbar .leaflet-draw-draw-circle {
-	display: none;
-
-}
-
-               .leaflet-draw-toolbar .leaflet-draw-draw-polyline {
-	display: none;
-
-}
-
-
-                       .leaflet-draw-toolbar .leaflet-draw-draw-marker {
-	display: none;
-
-}
-          .leaflet-draw-toolbar .leaflet-draw-edit-remove {
-	display: none;
-}
-
-                    .leaflet-draw-actions a {
-	display: none;
-}
-
-
-
-
-
+        height: 600px; }
+    .leaflet-draw-toolbar .leaflet-draw-draw-rectangle { display: none; background-position: -62px -2px; }
+    .leaflet-draw-toolbar .leaflet-draw-draw-polygon {	display: none; }
+    .leaflet-draw-toolbar .leaflet-draw-draw-circle { display: none; }
+    .leaflet-draw-toolbar .leaflet-draw-draw-marker { display: none; }
+    .leaflet-draw-toolbar .leaflet-draw-edit-remove {	display: none; }
+    .leaflet-draw-actions a { display: none; }
 </style>
 
-
   </head>
-
-
-
 
 <a href="/miroutes/"> Home </a> : <a href=../../../> {{ wall.wall_spot.spot_area.area_country.country_name }} </a> :: <a href="../../" >{{ wall.wall_spot.spot_area.area_name }} </a> :: <a href="../"> {{ wall.wall_spot.spot_name }} </a> :: <a href="../"> {{ wall.wall_name }} </a> :: {{ route_selected.route_name }}
 <br><br>
@@ -65,10 +26,6 @@
 You're looking at wall {{ wall.wall_name }}
 <br><br>
 {% if wall_route_list %}
-
-
-
-
 
 
  <script type="text/javascript">
@@ -84,12 +41,7 @@ You're looking at wall {{ wall.wall_name }}
         (new L.GeometryField(geodjango_geom)).addTo(map);
 
     };
-
-
 </script>
-
-
-
 
 <div id="id_geom_map" class="leaflet-container-default"></div>
 <script type="text/javascript">

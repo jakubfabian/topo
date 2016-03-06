@@ -1,0 +1,254 @@
+html {
+    background-color: #e6e9e9;
+    background-image: -webkit-linear-gradient(270deg,rgb(230,233,233) 0%,rgb(216,221,221) 100%);
+    background-image: linear-gradient(270deg,rgb(230,233,233) 0%,rgb(216,221,221) 100%);
+    -webkit-font-smoothing: antialiased;
+}
+
+
+
+#contentcontainer {
+    
+  margin: 40px auto;
+    padding: 20px 0em 0em;
+    max-width: 1000px;
+    height: 1800px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5em;
+    color: #545454;
+    background-color: #ffffff;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+    
+}
+
+
+#header {
+    
+  margin: 0 auto;
+    padding: 0em 0em 0em;
+    max-width: 1000px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5em;
+    color: #545454;
+    background-color: #ffffff;  
+}
+
+#user_menu {
+    
+    text-align: right;
+    margin: 0 0;
+    padding: 0em 2em 0em;
+    max-width: 1000px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 10px;
+    color: #ffffff;
+    background-color: #5c5c5c;  
+}
+
+
+#content {
+    
+  margin: 0 auto;
+    padding: 40px 50px 0em;
+    max-width: 1000px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5em;
+    color: #545454;
+    background-color: #ffffff;
+    
+}
+
+
+
+ #map { 
+      margin: 0 auto;
+    padding: 0px 50px 4em;
+    max-width: 1000px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5em;
+    color: #545454;
+    background-color: #ffffff;
+     width:800px; 
+     height:400px;
+ }
+
+
+
+
+#routeoverview {
+ 
+   margin: 0 auto;
+    padding: 0px 50px 4em;
+    max-width: 1000px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5em;
+    color: #545454;
+    background-color: #ffffff;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.06);
+      
+}
+
+
+
+#routedetails {
+ 
+   margin: 0 auto;
+    padding: 0px 50px 4em;
+    max-width: 1000px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5em;
+    color: #545454;
+    background-color: #ffffff;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.06);
+      
+}
+
+
+
+.routetable {
+
+width: 900px;
+
+}
+
+
+.routetd {
+font-size: 12px;
+border-bottom: 1px solid #e6e9e9;
+}
+
+.routetdhead {
+font-size: 12px;
+    font-weight: 800;
+border-bottom: 1px solid #000;
+}
+
+
+
+
+.spottable {
+
+    width: 900px;
+    background: #e6e9e9;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+
+
+
+
+
+body {
+   
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #222;
+    font-weight: 600;
+    line-height: 1.3em;
+}
+
+h2 {
+    margin-top: 1.3em;
+}
+
+a {
+    color: #000000;
+    text-decoration: none;
+}
+
+b, strong {
+    font-weight: 600;
+}
+
+samp {
+    display: none;
+}
+/*
+img {
+    -webkit-animation: colorize 2s cubic-bezier(0, 0, .78, .36) 1;
+    animation: colorize 2s cubic-bezier(0, 0, .78, .36) 1;
+    background: transparent;
+    border: 10px solid rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    display: block;
+    margin: 1.3em auto;
+    max-width: 95%;
+}
+*/
+
+#headerimg {
+
+   
+    border: 0px;
+    margin: 0px;
+    
+    
+}
+
+
+.td_wand_name {
+  font-size: 12px;
+    color: black;
+    text-align: left;
+    font-weight: bold;
+    vertical-align: middle;
+    
+}
+
+
+.td_schwer {
+font-size: 12px;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    background: black;
+        vertical-align: middle;
+}
+
+.td_mittel {
+font-size: 12px;
+        color: white;
+    text-align: center;
+    font-weight: bold;
+    background: red;
+        vertical-align: middle;
+}
+
+.td_leicht {
+font-size: 12px;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    background: blue;
+        vertical-align: middle;
+}
+
+
+
+
+
+@-webkit-keyframes colorize {
+    0% {
+        -webkit-filter: grayscale(100%);
+    }
+    100% {
+        -webkit-filter: grayscale(0%);
+    }
+}
+
+@keyframes colorize {
+    0% {
+        filter: grayscale(100%);
+    }
+    100% {
+        filter: grayscale(0%);
+    }
+}

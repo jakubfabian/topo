@@ -1,58 +1,80 @@
+{% extends "base.html" %}
 
+{% block title %} 
+	<title>Mitopo.de - Country Detail</title>
+{% endblock %}
 
-<a href="/miroutes/"> Home </a> :  {{ country.country_name }}
-<br><br>
+{% block extra_assets %}
 
-You're looking at country {{ country.country_name }}
-<br><br>
-
-
-
+<style>
+.leaflet-container {  /* all maps */
+    width:  100%;
+    height: 400px;
+}
+</style>
 
 {% load leaflet_tags %}
 {% load geojson_tags %}
+{% leaflet_js %}
+{% leaflet_css %}
 
-{% block extra_assets %}
-  {% leaflet_js %}
-  {% leaflet_css %}
-{% endblock %}
-
+{% endblock %} 
 
 {% block content %}
 
-    <script type="text/javascript">
-      var collection = {{ spotlist|geojsonfeature|safe }};
+<a href="/miroutes/"> Home </a> :  {{ country.country_name }}
+
+<br><br>
+You're looking at Country selection {{ country.country_name }}
+
+{% if spotlist %}
+
+      <script type="text/javascript">
+
       function map_init(map, options) {
-          var layer = L.geoJson(collection);
-          layer.addTo(map);
-          map.setZoom(12);
-          map.fitBounds(layer.getBounds(), {padding: [10, 10]});
 
+        var markerArray = [];
+
+        {% for spot in spot_spot_list %}
+            var coord = L.latLng({{ spot.geom.coordinates }});
+            var newcoord = L.latLng(coord.lng, coord.lat);
+            var mc = new L.marker(newcoord);
+            mc.bindPopup("<a href='{{spot.pk}}-0'>{{ spot.spot_name }}</a>");
+            markerArray.push(mc);
+        {% endfor %}
+
+        var group = L.featureGroup(markerArray).addTo(map);
+
+        if (markerArray.length > 1){
+                map.fitBounds(group.getBounds());
+        } else {
+            map.setView(markerArray[0].getLatLng(), 12);
+        }	
       }
-
     </script>
 
     {% leaflet_map "spots" callback="window.map_init" %}
 
-{% endblock %}
 
+    In {{ country.country_name }} there are following areas:<br><br>
 
-
-
-
-
-
-<a href="/miroutes/"> Home </a> : {{ country.country_name }}
-<br><br>
-
-You're looking at country {{ country.country_name }}
-
-{% if country_area_list %}
-    <ul>
     {% for area in country_area_list %}
         <li><a href=" {{ area.pk }} "> {{ area.area_name }}</a></li>
     {% endfor %}
+
+    <br>
+    <br>
+
+
+    Spots: 
+    {% for spot in spotlist %}
+    <li><a href=" {{ spot.pk }} "> {{ spot.spot_name }}  {{ spot.geom.coordinates }}</a></li>
+    {% endfor %}
     </ul>
+
+
 {% else %}
     <p>Currently no areas are available in {{ country.country_name }}</p>
 {% endif %}
+
+{% endblock %}

@@ -1,19 +1,26 @@
+{% extends "base.html" %}
 
-<html>
-  <head>
+{% block title %} 
+	<title>Mitopo.de - Spot Detail</title>
+{% endblock %}
 
-      <style>
+{% block extra_assets %}
 
-    .leaflet-container {  /* all maps */
-        width:  100%;
-        height: 600px;
-    }
-
-
+<style>
+.leaflet-container {  /* all maps */
+    width:  100%;
+    height: 600px;
+}
 </style>
 
-</head>
+{% load leaflet_tags %}
+{% load geojson_tags %}
+{% leaflet_js %}
+{% leaflet_css %}
 
+{% endblock %} 
+
+{% block content %}
 
 <a href="/miroutes/"> Home </a> : <a href=../../> {{ spot.spot_area.area_country.country_name }} </a> :: <a href="../" >{{ spot.spot_area.area_name }} </a> :: {{ spot.spot_name }}
 <br><br>
@@ -21,22 +28,8 @@
 You're looking at spot {{ spot.spot_name }}
 <br><br>
 
-
-{% load leaflet_tags %}
-{% load geojson_tags %}
-
-{% block extra_assets %}
-  {% leaflet_js %}
-  {% leaflet_css %}
-{% endblock %}
-
-
-
-
 {% if spot_wall_list %}
 
-
-{% block content %}
 
       <script type="text/javascript">
 
@@ -44,43 +37,37 @@ You're looking at spot {{ spot.spot_name }}
 
         var markerArray = [];
 
- {% for wall in spot_wall_list %}
-
-        var coord = L.latLng({{ wall.geom.coordinates }});
-        var newcoord = L.latLng(coord.lng, coord.lat);
-        var mc = new L.marker(newcoord);
-        mc.bindPopup("<a href='{{wall.pk}}-0'>{{ wall.wall_name }}</a>");
-        markerArray.push(mc);
-
-      {% endfor %}
+        {% for wall in spot_wall_list %}
+            var coord = L.latLng({{ wall.geom.coordinates }});
+            var newcoord = L.latLng(coord.lng, coord.lat);
+            var mc = new L.marker(newcoord);
+            mc.bindPopup("<a href='{{wall.pk}}-0'>{{ wall.wall_name }}</a>");
+            markerArray.push(mc);
+        {% endfor %}
 
         var group = L.featureGroup(markerArray).addTo(map);
-	if (markerArray.length > 1){
-      		map.fitBounds(group.getBounds());
-	} else {
-		map.setView(markerArray[0].getLatLng(), 12);
-	}	
 
+        if (markerArray.length > 1){
+                map.fitBounds(group.getBounds());
+        } else {
+            map.setView(markerArray[0].getLatLng(), 12);
+        }	
       }
-
     </script>
 
     {% leaflet_map "spots" callback="window.map_init" %}
 
+
+
+    In {{ spot.spot_name }} there are following walls:<br><br>
+
+        <ul>
+        {% for wall in spot_wall_list %}
+            <li> <a href="{{wall.pk}}-0"> {{ wall.wall_name }} </a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Currently no walls are available in {{ spot.spot_name }}</p>
+    {% endif %}
+
 {% endblock %}
-
-
-
-
-
-
-In {{ spot.spot_name }} there are following walls:<br><br>
-
-    <ul>
-    {% for wall in spot_wall_list %}
-        <li> <a href="{{wall.pk}}-0"> {{ wall.wall_name }} </a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>Currently no walls are available in {{ spot.spot_name }}</p>
-{% endif %}
