@@ -34,11 +34,6 @@
 {% endblock %}
 
 
-
-
-
-
-
 <a href="/miroutes/"> Home </a> : <a href=../../../> {{ wall.wall_spot.spot_area.area_country.country_name }} </a> :: <a href="../../" >{{ wall.wall_spot.spot_area.area_name }} </a> :: <a href="../"> {{ wall.wall_spot.spot_name }} </a> :: {{ wall.wall_name }}
 <br><br>
 
@@ -54,76 +49,51 @@ You're looking at wall {{ wall.wall_name }}
   <div id="wallmap"></div>
 
     <script type="text/javascript">
-      var collection = {{ wall_route_list|geojsonfeature|safe }};
+        var collection = {{ wall_route_list|geojsonfeature|safe }};
+
+        function map_init(){
+
+                var img_dim_string = '{{ wall.get_bg_img_size }}';
+
+                var img_dim   = img_dim_string.split(',', 4);
+                var img_dim_x = parseFloat(img_dim[0]);
+                var img_dim_y = parseFloat(img_dim[1]);
+                var xzoom     = parseFloat(img_dim[2]);
+                var yzoom     = parseFloat(img_dim[3]);
+
+                var maxzoom   = Math.max(xzoom, yzoom);	
+                // This value is suitable for the container width of 1024 px = 4*256 px
+                var minzoom   = 2;//Math.min(xzoom, yzoom);
+                var aspectRatio = img_dim_x/img_dim_y;	
+
+                // We match the height to the height of the image at this zoom level
+                document.getElementById("wallmap").style.height = 1024/aspectRatio;
+
+                var map = L.map('wallmap', {
+                    minZoom: minzoom,
+                    maxZoom: maxzoom,
+                    crs: L.CRS.Simple,
+                    center: [0, 0],
+                    zoom: minzoom,
+                });
+
+                var southWest = map.unproject([0, img_dim_y], map.getMaxZoom());
+                var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
+                map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
+
+                var wall_layer = L.tileLayer('{{ wall.get_tiles_url }}/{z}/{x}/{y}.png', {
+                    minZoom: minzoom, maxZoom: maxzoom,
+                    noWrap: false,
+                    tileSize: 256,
+                    continuousWorld: true,
+                });
 
 
-
-      function map_init(){
-
-
-  var img_dim_string = '{{ wall.get_bg_img_size }}';
-	
-	
-        var img_dim   = img_dim_string.split(',', 4);
-        var img_dim_x = parseFloat(img_dim[0]);
-        var img_dim_y = parseFloat(img_dim[1]);
-        var xzoom     = parseFloat(img_dim[2]);
-        var yzoom     = parseFloat(img_dim[3]);
-
-        var maxzoom   = Math.max(xzoom, yzoom);	
-	// This value is suitable for the container width of 1024 px = 4*256 px
-        var minzoom   = 2;//Math.min(xzoom, yzoom);
-	var aspectRatio = img_dim_x/img_dim_y;	
-	
-	// We match the height to the height of the image at this zoom level
-	document.getElementById("wallmap").style.height = 1024/aspectRatio;
-		
-
-
-        var map = L.map('wallmap', {
-  minZoom: minzoom,
-  maxZoom: maxzoom,
-  crs: L.CRS.Simple,
-  center: [0, 0],
-  zoom: minzoom,
-
-});
-
-
-
-
-
-var southWest = map.unproject([0, img_dim_y], map.getMinZoom());
-var northEast = map.unproject([img_dim_x, 0], map.getMinZoom());
-map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
-
-        var wall_layer = L.tileLayer('{{ wall.get_tiles_url }}/{z}/{x}/{y}.png', {
-        minZoom: minzoom, maxZoom: maxzoom,
-        noWrap: false,
-        tileSize: 256,
-        continuousWorld: true,
-      });
-
-
-      wall_layer.addTo(map);
-      //map.fitWorld();
-         layer =  L.geoJson(collection);
-         layer.addTo(map);
-
-
-
-      }
+                wall_layer.addTo(map);
+                layer =  L.geoJson(collection);
+                layer.addTo(map);
+            }
     </script>
-
-
-
-
-
-
-
-
-
-
 
 {% endblock %}
 
