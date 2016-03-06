@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{# Overwrite title block #}
+{% block title %} 
+	<title>Mitopo.de - User Registration</title>
+{% endblock %}
+
+{% block content %}
+
+{% if has_account %}
+Has already an account( {{has_account}})<br>
+{%endif%}
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <input type="submit" value="Submit" />
+</form>
+
+<br><br><br><br>
+{% if register_successfully %}
+Registration was a success: {{register_successfully}}<br><br>
+Benutzername ist jetzt: {{form.data.username}}<br>
+Email ist jetzt: {{form.data.email}}<br>
+{%endif%}
+
+{% endblock %} 

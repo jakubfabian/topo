@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %} 
+	<title>Mitopo.de - User Registration -- confirmation</title>
+{% endblock %}
+
+{% block content %}
+
+{% if has_account %}
+Sie waren bereits eingeloggt....<br>
+{%endif%}
+
+{% if expired %}
+Der Aktivierungsschluessel ist leider bereits ausgelaufen....<br>
+Bitte registrieren Sie sich erneut.
+{%endif%}
+
+{% if success %}
+<br>
+Registrierung war erfolgreich. <br><br>
+Sie koennen sich nun mit dem Benutzernamen {{user_account}} anmelden.<br>
+Die hinterlegte Email ist: {{user_account.email}}<br>
+{%endif%}
+
+{% endblock %} 

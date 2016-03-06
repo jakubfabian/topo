@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+AUTH_PROFILE_MODULE = 'users.UserProfile'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -40,6 +42,7 @@ INSTALLED_APPS = [
     'leaflet',
     'testapp',
     'miroutes',
+    'users',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -139,3 +142,12 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder'
     )
+
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'mitopo.de@gmail.com'
+EMAIL_HOST_PASSWORD = '****'
+DEFAULT_FROM_EMAIL = 'noreply@mitopo.de'
+DEFAULT_TO_EMAIL = 'mitopo.de@gmail.com'

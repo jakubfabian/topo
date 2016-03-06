@@ -20,6 +20,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^testapp/', include('testapp.urls')),
     url(r'^miroutes/', include('miroutes.urls')),
+    url(r'^users/', include('users.urls')),
 ]
 
 # if in debug mode, redirect static requests to media_ROOT
