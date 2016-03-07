@@ -63,7 +63,7 @@ You're looking at spot {{ spot.spot_name }}
 
         <ul>
         {% for wall in spot_wall_list %}
-            <li> <a href="{{wall.pk}}-0"> {{ wall.wall_name }} </a></li>
+            <li> <a href="{{wall.pk}}-0"> {{ wall.wall_name }} :: {{ wall.geom.coordinates }}</a></li>
         {% endfor %}
         </ul>
     {% else %}
