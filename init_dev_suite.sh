@@ -33,12 +33,14 @@ a = Area(area_name="testArea", area_country=c)
 a.save()
 
 gKochel = {u'coordinates': [11.344199180603026, 47.632660340454386], u'type': u'Point'}
+gWiesenwand = {u'coordinates': [11.347973048686981, 47.63621916824778], u'type': u'Point'}
+gKeltenwand = {u'coordinates': [11.346226930618286, 47.634681075868414], u'type': u'Point'}
 
 s = Spot(spot_name="testSpot", spot_area=a, geom=gKochel)
 s.save()
 
 fname_image = "/code/misc/kochel_seewand_pano.png"
-w = Wall(wall_name="testWall", wall_spot=s, geom=gKochel)
+w = Wall(wall_name="Wiesenwand", wall_spot=s, geom=gWiesenwand)
 w.background_img.save('fname_from_function.png', File(open(fname_image)))
 
 route_geom = { u'coordinates':[ [90, -i] for i in xrange(9,25) ], u'type': u'LineString'}
@@ -49,6 +51,13 @@ route_geom = { u'coordinates':[ [80, -i] for i in xrange(9,25) ], u'type': u'Lin
 r = Route(route_name="testRoute1", route_grade="5b", route_wall=w, geom=route_geom)
 r.save()
 
+fname_image = "/code/misc/lost_arrow.png"
+w = Wall(wall_name="Keltenwand", wall_spot=s, geom=gKeltenwand)
+w.background_img.save('fname_from_function.png', File(open(fname_image)))
+
+route_geom = { u'coordinates':[ [90, -i] for i in xrange(9,25) ], u'type': u'LineString'}
+r = Route(route_name="testRoute1", route_grade="6b", route_wall=w, geom=route_geom)
+r.save()
 
 EOF
 
