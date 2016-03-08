@@ -1,112 +1,135 @@
 {% extends "base.html" %}
 
 {% block title %} 
-	<title>Mitopo.de - Wall page</title>
+  <title>Mitopo.de - Wall page</title>
 {% endblock %}
 
 {% block extra_assets %}
-
-<style>
-.leaflet-container {  /* all maps */
+  <style>
+    .leaflet-container {  /* all maps */
     width:  100%;
     height: 512px;
-}
-</style>
+    }
+  </style>
 
-
-{% load leaflet_tags %}
-{% load geojson_tags %}
-{% leaflet_js %}
-{% leaflet_css %}
-
+  {% load leaflet_tags %}
+  {% load geojson_tags %}
+  {% leaflet_js %}
+  {% leaflet_css %}
 {% endblock %} 
-
+                                                                                     
 {% block content %} 
-     <script>
-        window.onload = function() { map_init(); }
-    </script>
+  <script>
+    window.onload = function() { map_init(); }
+  </script>
 
-    <a href="/miroutes/"> Home </a> : <a href=../../../> {{ wall.wall_spot.spot_area.area_country.country_name }} </a> :: <a href="../../" >{{ wall.wall_spot.spot_area.area_name }} </a> :: <a href="../"> {{ wall.wall_spot.spot_name }} </a> :: {{ wall.wall_name }}
+  <a href="/miroutes/"> Home </a> : <a href=../../../> {{ wall.wall_spot.spot_area.area_country.country_name }} </a> :: <a href="../../" >{{ wall.wall_spot.spot_area.area_name }} </a> :: <a href="../"> {{ wall.wall_spot.spot_name }} </a> :: {{ wall.wall_name }}
 
-    <br><br>
+  <br><br>
 
-    You're looking at wall {{ wall.wall_name }}
-    <br><br>
-    wall.get_bg_img_size :: {{ wall.get_bg_img_size }}
+  You're looking at wall {{ wall.wall_name }}
+  <br><br>
+  wall.get_bg_img_size :: {{ wall.get_bg_img_size }}
 
-    <br><br>
+  <br><br>
 
-    {% if wall_route_list %}
+  <div id="wallmap"></div>
 
-      <div id="wallmap"></div>
+  <script type="text/javascript">
 
-      <script type="text/javascript">
+    function map_init(){
+
+        var img_dim_string = '{{ wall.get_bg_img_size }}';
+
+        var img_dim   = img_dim_string.split(',', 4);
+        var img_dim_x = parseFloat(img_dim[0]);
+        var img_dim_y = parseFloat(img_dim[1]);
+        var xzoom     = parseFloat(img_dim[2]);
+        var yzoom     = parseFloat(img_dim[3]);
+
+        var maxzoom   = Math.max(xzoom, yzoom);	
+
+        // we choose a default zoom level of 2 that matches either the width (approx.) or the
+        // height of the container
+        var minzoom   = 2;
+        var startzoom = minzoom;
+
+        var aspectRatio = img_dim_x/img_dim_y;
+        if (aspectRatio < 1){
+            // we resize the container to fit an image with aspectRatio < 1
+            // the height is then fixed to 1024px              
+            var wall_width = 1024*aspectRatio;              
+            // document.getElementById('wallmap').setAttribute("style","display:block;width:500px");
+            document.getElementById('wallmap').style.width = wall_width + "px";
+            document.getElementById('wallmap').style.height = 1024 + "px";
+        }
+
+        var map = L.map('wallmap', {
+            minZoom: minzoom,
+            maxZoom: maxzoom,
+            crs: L.CRS.Simple,
+            center: [0, 0],
+            zoom: startzoom,
+        });
+
+        var southWest = map.unproject([0, img_dim_y], map.getMaxZoom());
+        var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
+        map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
+
+        var wall_layer = L.tileLayer('{{ wall.get_tiles_url }}/{z}/{x}/{y}.png', {
+            minZoom: 1, maxZoom: maxzoom,
+            noWrap: false,
+            tileSize: 256,
+            continuousWorld: true,
+        });
+
+        wall_layer.addTo(map);
+
+        // If there is a route list we add it to the map
+        {% if wall_route_list %}                
         var collection = {{ wall_route_list|geojsonfeature|safe }};
+        layer =  L.geoJson(collection);
+        layer.addTo(map);
+        {% endif %}                  
+    }
+  </script>
+  <br>
+  <br>
+  <br>
 
-        function map_init(){
-
-                var img_dim_string = '{{ wall.get_bg_img_size }}';
-
-                var img_dim   = img_dim_string.split(',', 4);
-                var img_dim_x = parseFloat(img_dim[0]);
-                var img_dim_y = parseFloat(img_dim[1]);
-                var xzoom     = parseFloat(img_dim[2]);
-                var yzoom     = parseFloat(img_dim[3]);
-
-                var maxzoom   = Math.max(xzoom, yzoom);	
-                var minzoom   = Math.min(xzoom, yzoom);
-                var startzoom = maxzoom-minzoom;
-
-                var aspectRatio = img_dim_x/img_dim_y;	
-
-                var map = L.map('wallmap', {
-                    minZoom: 1,
-                    maxZoom: maxzoom,
-                    crs: L.CRS.Simple,
-                    center: [0, 0],
-                    zoom: startzoom,
-                });
-
-                var southWest = map.unproject([0, img_dim_y], map.getMaxZoom());
-                var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
-                map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
-
-                var wall_layer = L.tileLayer('{{ wall.get_tiles_url }}/{z}/{x}/{y}.png', {
-                    minZoom: 1, maxZoom: maxzoom,
-                    noWrap: false,
-                    tileSize: 256,
-                    continuousWorld: true,
-                });
-
-                wall_layer.addTo(map);
-                layer =  L.geoJson(collection);
-                layer.addTo(map);
-            }
-      </script>
-
-
-    <br><br><br>
-
-    In {{ wall.wall_name }} there are following routes:<br><br>
-
+  {% if wall_route_list %}    
+    In {{ wall.wall_name }} there are following routes:
+    <br>
+    <br>
+  
     <table width="100%">
 
-        {% for route in wall_route_list %}
-        <tr><td>
+      {% for route in wall_route_list %}
+        <tr>
+          <td>
             <a href="{{route.pk}}"> {{ route.route_name }}</a>
-            </td><td>
+          </td>
+          <td>
             {{ route.route_grade }}
-            </td><td>
+          </td>
+          <td>
             <a href="{{route.pk}}/edit"> edit </a>
-        </td></tr>
-        {% endfor %}
+          </td>
+        </tr>
+      {% endfor %}
 
-        <tr><td><a href="addroute">Route hinzufügen</a></td><td></td><td></td></tr>
+      <tr>
+        <td><a href="addroute">Route hinzufügen</a></td>
+        <td></td>
+        <td></td>
+      </tr>
 
-        </table>
+    </table>
 
-    {% else %}
-        <p>Currently no routes are available in {{ wall.wall_name }}</p>
-    {% endif %}
+  {% else %}
+    <p>Currently no routes are available in {{ wall.wall_name }}</p>
+    <p><a href="addroute">Route hinzufügen</a></p>    
+  {% endif %}
 
 {% endblock %}
+
