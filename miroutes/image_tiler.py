@@ -14,7 +14,7 @@ def tile_image(src, dst, tile_width=256):
 
         # If we are dealing with a jpeg we read the exif data to see if it should be
         # rotated
-        if os.path.splitext(src)[1] == ".jpeg":
+        if os.path.splitext(src)[1].lower() in [".jpeg", ".jpg"]:
             try:
                 for orientation in ExifTags.TAGS.keys():
                     if ExifTags.TAGS[orientation] == 'Orientation':
