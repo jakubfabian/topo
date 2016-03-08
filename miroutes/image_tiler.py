@@ -14,22 +14,21 @@ def tile_image(src, dst, tile_width=256):
 
         # If we are dealing with a jpeg we read the exif data to see if it should be
         # rotated
-        if os.path.splitext(src)[1].lower() in [".jpeg", ".jpg"]:
-            try:
-                for orientation in ExifTags.TAGS.keys():
-                    if ExifTags.TAGS[orientation] == 'Orientation':
-                        break
-                    exif = dict(image._getexif().items())
+        try:
+            for orientation in ExifTags.TAGS.keys():
+                if ExifTags.TAGS[orientation] == 'Orientation':
+                    break
+                exif = dict(image._getexif().items())
 
-                if exif[orientation] == 3:
-                    image = image.rotate(180, expand=True)
-                elif exif[orientation] == 6:
-                    image = image.rotate(270, expand=True)
-                elif exif[orientation] == 8:
-                    image = image.rotate(90, expand=True)
+            if exif[orientation] == 3:
+                image = image.rotate(180, expand=True)
+            elif exif[orientation] == 6:
+                image = image.rotate(270, expand=True)
+            elif exif[orientation] == 8:
+                image = image.rotate(90, expand=True)
 
-            except:
-                print "Could not read EXIF data from image {}.".format(src)
+        except:
+            print "Could not read EXIF data from image {}.".format(src)
 
 
         width, height = image.size
