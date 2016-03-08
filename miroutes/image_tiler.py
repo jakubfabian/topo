@@ -5,20 +5,47 @@ def tile_image(src, dst, tile_width=256):
     Files will be save at dst/zoomlvl/x_direction/y_direction.png
     """
     try:
-        from PIL import Image
+        from PIL import Image, ExifTags
         import os
         import numpy as np
         #import ipdb;ipdb.set_trace()
 
         image = Image.open(src)
 
+        # If we are dealing with a jpeg we read the exif data to see if it should be
+        # rotated
+        if os.path.splitext(src)[1] == ".jpeg":
+            try:
+                for orientation in ExifTags.TAGS.keys():
+                    if ExifTags.TAGS[orientation] == 'Orientation':
+                        break
+                    exif = dict(image._getexif().items())
+
+                if exif[orientation] == 3:
+                    image = image.rotate(180, expand=True)
+                elif exif[orientation] == 6:
+                    image = image.rotate(270, expand=True)
+                elif exif[orientation] == 8:
+                    image = image.rotate(90, expand=True)
+
+            except:
+                print "Could not read EXIF data from image {}.".format(src)
+
+
         width, height = image.size
         print(width, height)
-        
-        # Compute new dimensions being a power of 2 in width while maintaining aspect ratio
-        newwidth = np.int(2**np.ceil(np.log2(width)))
-        wpercent = (newwidth/float(width))
-        newheight = np.int(height*wpercent)
+
+        if width >= height:
+            # Compute new dimensions being a power of 2 in width while maintaining aspect ratio
+            newwidth = np.int(2**np.ceil(np.log2(width)))
+            wpercent = (newwidth/float(width))
+            newheight = np.int(height*wpercent)
+        else:
+            # Compute new dimensions being a power of 2 in height while maintaining aspect ratio
+            newheight = np.int(2**np.ceil(np.log2(height)))
+            hpercent = (newheight/float(height))
+            newwidth = np.int(width*hpercent)
+            
         image = image.resize((newwidth, newheight), Image.ANTIALIAS)
 
         # Overwrite image with enlarged version
