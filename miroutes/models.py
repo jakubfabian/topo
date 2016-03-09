@@ -41,6 +41,7 @@ def get_bg_img_upload_path(instance, filename):
 class Wall(models.Model):
     wall_name = models.CharField(max_length=100)
     wall_spot = models.ForeignKey(Spot)
+    is_active = models.BooleanField(default=False)
     geom = PointField()
     background_img = models.ImageField(blank = True, upload_to=get_bg_img_upload_path)
 

@@ -16,7 +16,7 @@ def index(request):
     country_listing = Country.objects.order_by('country_name')[:5]
     area_listing = Area.objects.order_by('area_name')
     spot_listing = Spot.objects.order_by('spot_name')
-    wall_listing = Wall.objects.order_by('wall_name')
+    wall_listing = Wall.objects.filter(is_active=True).order_by('wall_name')
     route_listing = Route.objects.order_by('route_name')
     context = {'country_listing': country_listing, 'area_listing': area_listing, 'spot_listing': spot_listing, 'wall_listing': wall_listing, 'route_listing': route_listing}
     return render(request, 'miroutes/index.html', context)
@@ -37,7 +37,8 @@ def area_detail(request, area_id):
 
 def spot_detail(request, spot_id):
     p = get_object_or_404(Spot, pk=spot_id)
-    walllist = p.wall_set.all()
+    wall_listing = Wall.objects
+    walllist = p.wall_set.filter(is_active=True).order_by('wall_name')
     context = {'spot': p, 'spot_wall_list': walllist}
     return render(request, 'miroutes/spot_detail.html', context)
 

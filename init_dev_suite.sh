@@ -40,7 +40,7 @@ s = Spot(spot_name="testSpot", spot_area=a, geom=gKochel)
 s.save()
 
 fname_image = "/code/misc/kochel_seewand_pano.png"
-w = Wall(wall_name="Wiesenwand", wall_spot=s, geom=gWiesenwand)
+w = Wall(wall_name="Wiesenwand", is_active=True ,wall_spot=s, geom=gWiesenwand)
 w.background_img.save('fname_from_function.png', File(open(fname_image)))
 
 route_geom = { u'coordinates':[ [90, -i] for i in xrange(9,25) ], u'type': u'LineString'}
