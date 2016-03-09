@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %} 
+Mitopo.de - Upload wall image
+{% endblock %}
+                                               
+{% block content %}
+ <script type="text/javascript">
+   // Check for the various File API support.
+   if (window.File && window.FileReader && window.FileList && window.Blob) {
+       // Great success! All the File APIs are supported.
+   } else {
+       alert('The File APIs are not fully supported in this browser.');
+   }
+ </script>
+  
+<form method="post" enctype="multipart/form-data">{% csrf_token %}
+  <p>
+    <input id="id_image" type="file" class="" name="image">
+  </p>
+  <input type="submit" value="Submit" />
+</form>
+{% endblock %}
+
+
+

@@ -117,19 +117,18 @@
           </td>
         </tr>
       {% endfor %}
-
-      <tr>
-        <td><a href="addroute">Route hinzufügen</a></td>
-        <td></td>
-        <td></td>
-      </tr>
-
     </table>
 
   {% else %}
     <p>Currently no routes are available in {{ wall.wall_name }}</p>
-    <p><a href="addroute">Route hinzufügen</a></p>    
   {% endif %}
+    <p><a href="addroute">Add route</a></p>    
+    <p><a href="providewallimg">Propose a new wall image.</a></p>
 
 {% endblock %}
+
+
+
+
+
 

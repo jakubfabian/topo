@@ -1,6 +1,8 @@
 import ipdb
 
 from django.shortcuts import get_object_or_404, render
+from django.views.generic.edit import UpdateView
+
 from django.http import HttpResponse
 
 from miroutes.models import Country
@@ -8,6 +10,8 @@ from miroutes.models import Area
 from miroutes.models import Spot
 from miroutes.models import Wall
 from miroutes.models import Route
+
+from miroutes.forms import WallImgUploadForm
 
 
 
@@ -111,4 +115,20 @@ def route_add(request, wall_id):
 
     context = {'wall': wall, 'wall_route_list': routelist, 'form': form}
     return render(request, 'miroutes/route_add.html', context)
+
+
+def wall_img_provide(request, wall_id):
+    old_wall = get_object_or_404(Wall, pk=wall_id)
+
+    if request.POST:
+        form = WallImgUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            w = Wall(wall_name=old_wall.wall_name, wall_spot=old_wall.wall_spot, geom=old_wall.geom)
+            w.background_img = form.cleaned_data['image']
+            w.save()
+            context = {'wall': w, 'wall_route_list': []}
+            return render(request, 'miroutes/wall_detail.html', context)
+    else:
+        form = WallImgUploadForm()
+        return render(request, 'miroutes/wall_upload.html', {'form': form})
 

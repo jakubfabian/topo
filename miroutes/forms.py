@@ -3,6 +3,7 @@ from django.views.generic import UpdateView
 from leaflet.forms.widgets import LeafletWidget
 
 from .models import Route
+from .models import Wall
 
 class RouteEditForm(forms.ModelForm):
   class Meta:
@@ -16,3 +17,10 @@ class EditRoute(UpdateView):
   form_class = RouteEditForm
   template_name = 'miroutes/route_edit.html'
 
+class WallImgUploadForm(forms.Form):
+  """
+  Form to upload an image file for a specific wall.
+  """
+  image = forms.ImageField()
+
+  
