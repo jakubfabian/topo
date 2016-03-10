@@ -10,7 +10,9 @@ urlpatterns = [ url(r'^$', views.index, name='index'),
                 url(r'^\d+/\d+/\d+/(?P<wall_id>\d+)-\d+/(?P<route_id>\d+)/edit$', views.route_edit, name='edit route'),
                 url(r'^\d+/\d+/\d+/(?P<wall_id>\d+)-\d+/addroute$', views.route_add, name='add route'),
                 url(r'^\d+/\d+/\d+/\d+-\d+/(?P<route_id>\d+)$', views.route_detail, name='route detail'),
-                url(r'^\d+/\d+/\d+/(?P<wall_id>\d+)-\d+/providewallimg$', views.wall_img_provide, name='provide wall image')]
+                url(r'^\d+/\d+/\d+/(?P<wall_id>\d+)-\d+/providewallimg$', views.wall_img_provide, name='provide wall image'),
+                url(r'toggle_show_inactive', views.toggle_show_inactive, name='toggle_show_inactive'),
+                ]
 
 
 

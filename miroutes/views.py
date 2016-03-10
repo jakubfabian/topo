@@ -40,16 +40,39 @@ def area_detail(request, area_id):
     return render(request, 'miroutes/area_detail.html', context)
 
 def spot_detail(request, spot_id):
+    """
+    For a specific spot, get a list of walls that are contained within.
+    Decide if all or just active ones are given to the template to render.
+    """
     p = get_object_or_404(Spot, pk=spot_id)
-    wall_listing = Wall.objects
-    walllist = p.wall_set.filter(is_active=True).order_by('wall_name')
+    walllist = p.wall_set
+
+    if not request.session.get('show_inactive', False):
+        walllist = walllist.filter(is_active=True)
+
+    walllist = walllist.order_by('wall_name')
+
     context = {'spot': p, 'spot_wall_list': walllist}
     return render(request, 'miroutes/spot_detail.html', context)
+
+def toggle_show_inactive(request):
+    """
+    Save a value called show_inactive in session dict
+    which is used to blend in blend out inactive spots and walls
+    i.e. controls if you are in manage mode or just a regular visitor
+
+    Once we changed the value of show_inactive,
+    just return to the url that was given with 
+    the request tag ''from''
+    or if none was given, go back too root
+    """
+    from django.shortcuts import redirect
+    request.session['show_inactive'] = not request.session.get('show_inactive', False)
+    return redirect( request.GET.get('from', '/') )
 
 def wall_detail(request, wall_id, route_id):
     from miroutes.forms import RouteEditForm,EditRoute
     p = get_object_or_404(Wall, pk=wall_id)
-
 
     if request.POST:
         if route_id != '0':

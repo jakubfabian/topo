@@ -21,6 +21,15 @@
 {% endblock %} 
 
 {% block content %}
+Show_inactive :: 
+{% if request.session.show_inactive == True %}
+<a href="{% url 'toggle_show_inactive' %}?from={{request.path|urlencode}}">true</a>
+{% else %}
+<a href="{% url 'toggle_show_inactive' %}?from={{request.path|urlencode}}">false</a>
+{% endif %}
+<br><br>
+
+
 
 <a href="/miroutes/"> Home </a> : <a href=../../> {{ spot.spot_area.area_country.country_name }} </a> :: <a href="../" >{{ spot.spot_area.area_name }} </a> :: {{ spot.spot_name }}
 <br><br>
