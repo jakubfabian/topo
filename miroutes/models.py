@@ -37,7 +37,6 @@ def get_bg_img_upload_path(instance, filename):
     return os.path.join("wall_pictures",'{}'.format(instance.wall_name),"background",str(time))
 
 
-
 class Wall(models.Model):
     wall_name = models.CharField(max_length=100)
     wall_spot = models.ForeignKey(Spot)
@@ -123,9 +122,7 @@ class Wall(models.Model):
             return ' ,'.join( [ str(d) for d in res ] )
         return ''
 
-
-
-
+    
 class Route(models.Model):
 
     GRADE_CHOICES = (
@@ -133,15 +130,31 @@ class Route(models.Model):
         ('5b', '5b'),
         ('5c', '5c'),
         ('6a', '6a'),
-        ('6b', '6b')
-    )
+        ('6b', '6b'))
 
-
+    # Every route is located at a climbing spot
+    route_spot = models.ForeignKey(Spot, default=None)
+    # The relation to one or many walls is via the geometry of the route
+    route_walls = models.ManyToManyField(Wall, through='RouteGeometry')
 
     route_name = models.CharField(max_length=100)
-    route_grade = models.CharField(max_length=2, choices=GRADE_CHOICES, default="5b")
-    route_wall = models.ForeignKey(Wall)
-    geom = LineStringField()
+    route_grade = models.CharField(max_length=2,
+                                   choices=GRADE_CHOICES,
+                                   default="5b")
+    
     def __str__(self):
         return self.route_name
+
+
+class RouteGeometry(models.Model):
+    """
+    The geometry of a route that is specific to a wall.
+    """
+    on_wall = models.ForeignKey(Wall)
+    route = models.ForeignKey(Route)
+    geom = LineStringField()
+
+
+
+
 
