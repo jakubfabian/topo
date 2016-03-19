@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %} 
-  <title>Mitopo.de - Wall page</title>
+  Mitopo.de - Wall page
 {% endblock %}
 
 {% block extra_assets %}
@@ -86,8 +86,8 @@
         wall_layer.addTo(map);
 
         // If there is a route list we add it to the map
-        {% if wall_route_list %}                
-        var collection = {{ wall_route_list|geojsonfeature|safe }};
+        {% if wall_route_geom_list %}                
+        var collection = {{ wall_route_geom_list|geojsonfeature|safe }};
         layer =  L.geoJson(collection);
         layer.addTo(map);
         {% endif %}                  
@@ -97,23 +97,23 @@
   <br>
   <br>
 
-  {% if wall_route_list %}    
+  {% if wall_route_geom_list %}    
     In {{ wall.wall_name }} there are following routes:
     <br>
     <br>
   
     <table width="100%">
 
-      {% for route in wall_route_list %}
+      {% for routegeom in wall_route_geom_list %}
         <tr>
           <td>
-            <a href="{{route.pk}}"> {{ route.route_name }}</a>
+            <a href="{{routegeom.route.pk}}"> {{ routegeom.route.route_name }}</a>
           </td>
           <td>
-            {{ route.route_grade }}
+            {{ routegeom.route.route_grade }}
           </td>
           <td>
-            <a href="{{route.pk}}/edit"> edit </a>
+            <a href="{{routegeom.route.pk}}/edit"> edit </a>
           </td>
         </tr>
       {% endfor %}

@@ -83,8 +83,8 @@ def wall_detail(request, wall_id, route_id):
         #import ipdb; ipdb.set_trace()
         form.save()
 
-    routelist = p.route_set.all()
-    context = {'wall': p, 'wall_route_list': routelist}
+    routegeomlist = p.routegeometry_set.all()
+    context = {'wall': p, 'wall_route_geom_list': routegeomlist}
     return render(request, 'miroutes/wall_detail.html', context)
 
 
