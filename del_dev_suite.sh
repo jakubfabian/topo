@@ -7,3 +7,4 @@ docker-compose rm web
 docker-compose rm db
 
 docker ps -a | awk '{print $1}' | xargs --no-run-if-empty docker rm -f
+docker rmi $(docker images -q)
