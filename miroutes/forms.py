@@ -3,12 +3,11 @@ from django.views.generic import UpdateView
 from leaflet.forms.widgets import LeafletWidget
 
 from .models import Route
-from .models import Wall
 
 class RouteEditForm(forms.ModelForm):
   class Meta:
     model = Route
-    fields = ('geom', 'route_name', 'route_grade', 'route_wall')
+    fields = ('route_name', 'route_grade', 'route_walls')
     w = LeafletWidget()
     #widgets = {'geom': forms.HiddenInput}
 
