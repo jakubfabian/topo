@@ -2,7 +2,12 @@ Django
 psycopg2
 django-geojson
 django-leaflet
+django-reversion
 ipdb
 jsonfield
 Pillow
 numpy
+
+
+
+

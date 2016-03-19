@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'testapp',
     'miroutes',
     'users',
+    'reversion',
 ]
 
 MIDDLEWARE_CLASSES = [
