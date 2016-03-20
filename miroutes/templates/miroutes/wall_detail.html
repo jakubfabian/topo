@@ -29,7 +29,7 @@
 
   You're looking at wall {{ wall.wall_name }}
   <br><br>
-  wall.get_bg_img_size :: {{ wall.get_bg_img_size }}
+  wall.wall_image.get_bg_img_size :: {{ wall.wall_image.get_bg_img_size }}
 
   <br><br>
 
@@ -39,7 +39,7 @@
 
     function map_init(){
 
-        var img_dim_string = '{{ wall.get_bg_img_size }}';
+        var img_dim_string = '{{ wall.wall_image.get_bg_img_size }}';
 
         var img_dim   = img_dim_string.split(',', 4);
         var img_dim_x = parseFloat(img_dim[0]);
@@ -76,7 +76,7 @@
         var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
         map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
 
-        var wall_layer = L.tileLayer('{{ wall.get_tiles_url }}/{z}/{x}/{y}.png', {
+        var wall_layer = L.tileLayer('{{ wall.wall_image.get_tiles_url }}/{z}/{x}/{y}.png', {
             minZoom: 1, maxZoom: maxzoom,
             noWrap: false,
             tileSize: 256,

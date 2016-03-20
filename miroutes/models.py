@@ -27,32 +27,23 @@ class Spot(models.Model):
         return self.spot_name
 
 
-def get_bg_img_upload_path(instance, filename):
+def get_bg_img_upload_path(wallimage, filename):
     """
     Define default basename for where to put wall background images inside media dir
+    Args:
+      filename: Filename of image
     """
     import os
     from time import gmtime, strftime
     time = strftime("%Y-%m-%d-%H-%M-%S", gmtime())+'_'+filename
-    return os.path.join("wall_pictures",'{}'.format(instance.wall_name),"background",str(time))
+    return os.path.join("wall_pictures", "background",str(time))
 
 
-class Wall(models.Model):
-    wall_name = models.CharField(max_length=100)
-    wall_spot = models.ForeignKey(Spot)
-    is_active = models.BooleanField(default=False)
-    geom = PointField()
+class WallImage(models.Model):
     background_img = models.ImageField(blank = True, upload_to=get_bg_img_upload_path)
 
-    def __str__(self):
-        return self.wall_name
-
-    @property
-    def popupContent(self):
-        return "Test"
-
     def save(self, *args, **kwargs):
-        super(Wall, self).save(*args, **kwargs)
+        super(WallImage, self).save(*args, **kwargs)
         self.create_tiles()
 
     def create_tiles(self):
@@ -123,6 +114,22 @@ class Wall(models.Model):
         return ''
 
     
+class Wall(models.Model):
+    wall_name = models.CharField(max_length=100)
+    wall_spot = models.ForeignKey(Spot)
+    wall_image = models.ForeignKey(WallImage)
+    geom = PointField()
+    is_active = models.BooleanField(default=False)
+    devWall = models.OneToOneField('Wall', blank=True, null=True)
+    
+    def __str__(self):
+        return self.wall_name
+
+    @property
+    def popupContent(self):
+        return "Test"
+
+
 class Route(models.Model):
 
     GRADE_CHOICES = (
@@ -153,6 +160,14 @@ class RouteGeometry(models.Model):
     on_wall = models.ForeignKey(Wall)
     route = models.ForeignKey(Route)
     geom = LineStringField()
+
+
+
+
+
+
+
+
 
 
 
