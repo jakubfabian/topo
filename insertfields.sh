@@ -17,7 +17,9 @@ s.save()
 
 fname_image = "/code/misc/kochel_seewand_pano.png"
 wi = WallImage()
+wi.save()
 wi.background_img.save('seewand_pano.png', File(open(fname_image)))
+wi.save()
 
 w = Wall(wall_name="Wiesenwand", is_active=True, wall_spot=s, geom=gWiesenwand, wall_image=wi)
 w.save()
