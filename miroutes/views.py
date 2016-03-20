@@ -27,20 +27,20 @@ def index(request):
     return render(request, 'miroutes/index.html', context)
 
 
-def country_detail(request, country_id):
+def country_detail(request, country_id, **kwargs):
     p = get_object_or_404(Country, pk=country_id)
     arealist = p.area_set.all()
     spotlist = Spot.objects.filter(spot_area__area_country=country_id)
     context = {'country': p, 'country_area_list': arealist, 'spotlist': spotlist}
     return render(request, 'miroutes/country_detail.html', context)
 
-def area_detail(request, area_id):
+def area_detail(request, area_id, **kwargs):
     p = get_object_or_404(Area, pk=area_id)
     spotlist = p.spot_set.all()
     context = {'area': p, 'area_spot_list': spotlist}
     return render(request, 'miroutes/area_detail.html', context)
 
-def spot_detail(request, spot_id):
+def spot_detail(request, spot_id, **kwargs):
     """
     For a specific spot, get a list of walls that are contained within.
     Decide if all or just active ones are given to the template to render.
@@ -57,7 +57,7 @@ def spot_detail(request, spot_id):
     return render(request, 'miroutes/spot_detail.html', context)
 
 
-def add_wall(request, spot_id):
+def add_wall(request, spot_id, **kwargs):
     """
     """
     spot = get_object_or_404(Spot, pk=spot_id)
@@ -91,7 +91,7 @@ def toggle_show_inactive(request):
     return redirect( request.GET.get('from', '/') )
 
 
-def wall_detail(request, wall_id):
+def wall_detail(request, wall_id, **kwargs):
     from miroutes.forms import RouteEditForm
     wall = get_object_or_404(Wall, pk=wall_id)
 
@@ -100,13 +100,13 @@ def wall_detail(request, wall_id):
     return render(request, 'miroutes/wall_detail.html', context)
 
 
-def route_detail(request, route_id):
+def route_detail(request, route_id, **kwargs):
     p = get_object_or_404(Route, pk=route_id)
     context = {'route': p}
     return render(request, 'miroutes/route_detail.html', context)
 
 
-def route_edit(request, wall_id, route_id):
+def route_edit(request, wall_id, route_id, **kwargs):
     from miroutes.forms import RouteEditForm, RouteGeometryEditForm
 
     wall = get_object_or_404(Wall, pk=wall_id)
@@ -133,24 +133,26 @@ def route_edit(request, wall_id, route_id):
 
 
 
-def route_add(request, wall_id):
-    from miroutes.forms import RouteEditForm
+def route_add(request, wall_id, **kwargs):
+    from django.core.urlresolvers import reverse
+    from django.http import HttpResponseRedirect
 
     wall = get_object_or_404(Wall, pk=wall_id)
-    routelist = wall.route_set.all()
+    newroute = Route(route_spot=wall.wall_spot,
+                     route_name='Insert Route Name Here!')
+    newroute.save()
+
+    geom = {"type":"LineString","coordinates":[[116,-12.1875],[100,-10.1875]]}
+    routegeom = RouteGeometry(on_wall=wall, route=newroute, geom=geom)
+    routegeom.save()
+
+    kwargs['route_id'] = newroute.id
+    kwargs['wall_id'] = wall_id
+
+    return HttpResponseRedirect(reverse('route_edit', kwargs=kwargs))
 
 
-    if request.POST:
-        pass
-
-    else:
-         form = RouteEditForm()
-
-    context = {'wall': wall, 'wall_route_list': routelist, 'form': form}
-    return render(request, 'miroutes/route_add.html', context)
-
-
-def wall_img_provide(request, wall_id):
+def wall_img_provide(request, wall_id, **kwargs):
     old_wall = get_object_or_404(Wall, pk=wall_id)
 
     if request.POST:
