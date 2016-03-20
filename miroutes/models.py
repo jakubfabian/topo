@@ -117,7 +117,7 @@ class WallImage(models.Model):
 class Wall(models.Model):
     wall_name = models.CharField(max_length=100)
     wall_spot = models.ForeignKey(Spot)
-    wall_image = models.ForeignKey(WallImage)
+    wall_image = models.ForeignKey(WallImage, default=None)
     geom = PointField()
     is_active = models.BooleanField(default=False)
     devWall = models.OneToOneField('Wall', blank=True, null=True)
