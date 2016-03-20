@@ -2,7 +2,7 @@ import ipdb
 
 from django.shortcuts import get_object_or_404, render
 from django.views.generic.edit import UpdateView
-
+from django.contrib import messages
 from django.http import HttpResponse
 
 from miroutes.models import Country
@@ -121,7 +121,8 @@ def route_edit(request, wall_id, route_id):
         if routeform.is_valid() and routegeomform.is_valid:
             routeform.save()
             routegeomform.save()
-
+            messages.add_message(request, messages.SUCCESS, 'Successfully saved route.')
+            
         
     routeform = RouteEditForm(instance=routegeom.route)
     routegeomform = RouteGeometryEditForm(instance=routegeom)
