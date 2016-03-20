@@ -50,7 +50,7 @@ You're looking at spot {{ spot.spot_name }}
             var coord = L.latLng({{ wall.geom.coordinates }});
             var newcoord = L.latLng(coord.lng, coord.lat);
             var mc = new L.marker(newcoord);
-            mc.bindPopup("<a href='{{wall.pk}}-0'>{{ wall.wall_name }}</a>");
+            mc.bindPopup("<a href='route{{wall.pk}}'>{{ wall.wall_name }}</a>");
             markerArray.push(mc);
         {% endfor %}
 
