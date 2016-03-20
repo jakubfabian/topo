@@ -2,7 +2,8 @@ from django import forms
 from django.views.generic import UpdateView
 from leaflet.forms.widgets import LeafletWidget
 
-from .models import Route
+from .models import Route, Spot
+
 
 class RouteEditForm(forms.ModelForm):
   class Meta:
@@ -15,6 +16,17 @@ class EditRoute(UpdateView):
   model = Route
   form_class = RouteEditForm
   template_name = 'miroutes/route_edit.html'
+
+class SpotEditForm(forms.ModelForm):
+  class Meta:
+    model = Spot
+    fields = ('spot_name','geom')
+    widgets = {'geom': LeafletWidget()}
+
+class EditSpot(UpdateView):
+  model = Spot
+  form_class = SpotEditForm
+  template_name = 'miroutes/spot_edit.html'
 
 class WallImgUploadForm(forms.Form):
   """

@@ -11,9 +11,7 @@ from miroutes.models import Spot
 from miroutes.models import Wall
 from miroutes.models import Route
 
-from miroutes.forms import WallImgUploadForm
-
-
+from miroutes.forms import WallImgUploadForm, SpotEditForm
 
 
 def index(request):
@@ -54,6 +52,21 @@ def spot_detail(request, spot_id):
 
     context = {'spot': p, 'spot_wall_list': walllist}
     return render(request, 'miroutes/spot_detail.html', context)
+
+def spot_edit(request, spot_id):
+    """
+    Edit an existing spot.
+    """
+    spot = get_object_or_404(Spot, pk=spot_id)
+
+    if request.POST:
+       form = SpotEditForm(request.POST,instance=spot)
+       form.save()
+    else:
+        form = SpotEditForm(instance = spot)
+
+    context = {'spot': spot, 'form': form}
+    return render(request, 'miroutes/spot_edit.html', context)
 
 def toggle_show_inactive(request):
     """
