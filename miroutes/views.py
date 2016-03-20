@@ -10,6 +10,7 @@ from miroutes.models import Area
 from miroutes.models import Spot
 from miroutes.models import Wall
 from miroutes.models import Route
+from miroutes.models import RouteGeometry
 
 from miroutes.forms import WallImgUploadForm
 
@@ -55,6 +56,25 @@ def spot_detail(request, spot_id):
     context = {'spot': p, 'spot_wall_list': walllist}
     return render(request, 'miroutes/spot_detail.html', context)
 
+
+def add_wall(request, spot_id):
+    """
+    """
+    spot = get_object_or_404(Spot, pk=spot_id)
+    walllist = spot.wall_set
+
+    if not request.session.get('show_inactive', False):
+        walllist = walllist.filter(is_active=True)
+
+    walllist = walllist.order_by('wall_name')
+
+    if request.POST:
+        pass
+
+    context = {'spot': spot, 'spot_wall_list': walllist}
+    return render(request, 'miroutes/add_wall.html', context)
+
+
 def toggle_show_inactive(request):
     """
     Save a value called show_inactive in session dict
@@ -70,55 +90,44 @@ def toggle_show_inactive(request):
     request.session['show_inactive'] = not request.session.get('show_inactive', False)
     return redirect( request.GET.get('from', '/') )
 
-def wall_detail(request, wall_id, route_id):
-    from miroutes.forms import RouteEditForm,EditRoute
-    p = get_object_or_404(Wall, pk=wall_id)
 
-    if request.POST:
-        if route_id != '0':
-            route = get_object_or_404(Route, pk=route_id)
-            form = RouteEditForm(request.POST,instance=route)
-        else:
-            form = RouteEditForm(request.POST)
-        #import ipdb; ipdb.set_trace()
-        form.save()
+def wall_detail(request, wall_id):
+    from miroutes.forms import RouteEditForm
+    wall = get_object_or_404(Wall, pk=wall_id)
 
-    routegeomlist = p.routegeometry_set.all()
-    context = {'wall': p, 'wall_route_geom_list': routegeomlist}
+    routegeomlist = wall.routegeometry_set.all()
+    context = {'wall': wall, 'wall_route_geom_list': routegeomlist}
     return render(request, 'miroutes/wall_detail.html', context)
 
 
-
 def route_detail(request, route_id):
-
     p = get_object_or_404(Route, pk=route_id)
     context = {'route': p}
     return render(request, 'miroutes/route_detail.html', context)
 
 
 def route_edit(request, wall_id, route_id):
-    from miroutes.forms import RouteEditForm,EditRoute
+    from miroutes.forms import RouteEditForm, RouteGeometryEditForm
 
     wall = get_object_or_404(Wall, pk=wall_id)
-    routelist = wall.route_set.all()
-    routelistdraw = routelist.exclude(pk=route_id)
+    routegeomlist = wall.routegeometry_set.all()
 
-
-    route = get_object_or_404(Route, pk=route_id)
-
+    routegeomlistdraw = routegeomlist.exclude(route__id=route_id)
+    routegeom = get_object_or_404(RouteGeometry, route__id=route_id)
 
     if request.POST:
-       form = RouteEditForm(request.POST,instance=route)
-       #import ipdb; ipdb.set_trace()
-       form.save()
+        routeform = RouteEditForm(request.POST,instance=routegeom.route)
+        routegeomform = RouteGeometryEditForm(request.POST,instance=routegeom)
+        if routeform.is_valid() and routegeomform.is_valid:
+            routeform.save()
+            routegeomform.save()
+
+        
+    routeform = RouteEditForm(instance=routegeom.route)
+    routegeomform = RouteGeometryEditForm(instance=routegeom)
 
 
-
-    else:
-        form = RouteEditForm(instance = route)
-
-
-    context = {'wall': wall, 'wall_route_list_draw': routelistdraw, 'wall_route_list': routelist, 'route_selected': route, 'form': form}
+    context = {'wall': wall, 'wall_routegeom_list_draw': routegeomlistdraw, 'wall_routegeom_list': routegeomlist, 'routegeom_selected': routegeom, 'route_form': routeform, 'routegeom_form':routegeomform}
     return render(request, 'miroutes/route_edit.html', context)
 
 
