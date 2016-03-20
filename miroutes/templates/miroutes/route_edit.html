@@ -33,8 +33,6 @@
 
     You're looking at wall {{ wall.wall_name }}
     <br><br>
-    {% if wall_routegeom_list %}
-
 
 <script type="text/javascript">
     var geodjango_geom = {};
@@ -188,7 +186,4 @@
         </table>
     </form>
 
-    {% else %}
-        <p>Currently no routes are available in {{ wall.wall_name }}</p>
-    {% endif %}
 {% endblock %}
