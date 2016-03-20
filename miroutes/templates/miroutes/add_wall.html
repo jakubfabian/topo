@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %} 
+	<title>Mitopo.de - Add new Wall</title>
+{% endblock %}
+
+{% block extra_assets %}
+
+<style>
+.leaflet-container {  /* all maps */
+    width:  100%;
+    height: 600px;
+}
+</style>
+
+{% load leaflet_tags %}
+{% load geojson_tags %}
+{% leaflet_js %}
+{% leaflet_css %}
+
+{% endblock %} 
+
+{% block content %}
+Show_inactive :: 
+{% if request.session.show_inactive == True %}
+<a href="{% url 'toggle_show_inactive' %}?from={{request.path|urlencode}}">true</a>
+{% else %}
+<a href="{% url 'toggle_show_inactive' %}?from={{request.path|urlencode}}">false</a>
+{% endif %}
+<br><br>
+
+
+
+<a href="/miroutes/"> Home </a> : <a href=../../> {{ spot.spot_area.area_country.country_name }} </a> :: <a href="../" >{{ spot.spot_area.area_name }} </a> :: {{ spot.spot_name }}
+<br><br>
+
+You're looking at spot {{ spot.spot_name }}
+<br><br>
+
+{% if spot_wall_list %}
+
+      <script type="text/javascript">
+
+      function map_init(map, options) {
+
+        var markerArray = [];
+
+        {% for wall in spot_wall_list %}
+            var coord = L.latLng({{ wall.geom.coordinates }});
+            var newcoord = L.latLng(coord.lng, coord.lat);
+            var mc = new L.marker(newcoord);
+            mc.bindPopup("<a href='{{wall.pk}}-0'>{{ wall.wall_name }}</a>");
+            markerArray.push(mc);
+        {% endfor %}
+
+        var group = L.featureGroup(markerArray).addTo(map);
+
+        if (markerArray.length > 1){
+                map.fitBounds(group.getBounds());
+        } else {
+            map.setView(markerArray[0].getLatLng(), 12);
+        }	
+      }
+    </script>
+
+    {% leaflet_map "spots" callback="window.map_init" %}
+
+
+
+    In {{ spot.spot_name }} there are following walls:<br><br>
+
+        <ul>
+        {% for wall in spot_wall_list %}
+            <li> <a href="{{wall.pk}}-0"> {{ wall.wall_name }} :: {{ wall.geom.coordinates }}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Currently no walls are available in {{ spot.spot_name }}</p>
+    {% endif %}
+
+{% endblock %}
