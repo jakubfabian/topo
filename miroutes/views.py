@@ -12,7 +12,7 @@ from miroutes.models import Wall
 from miroutes.models import Route
 from miroutes.models import RouteGeometry
 
-from miroutes.forms import WallImgUploadForm
+from miroutes.forms import WallImgUploadForm, SpotEditForm
 
 
 
@@ -55,6 +55,21 @@ def spot_detail(request, spot_id, **kwargs):
 
     context = {'spot': p, 'spot_wall_list': walllist}
     return render(request, 'miroutes/spot_detail.html', context)
+
+def spot_edit(request, spot_id, **kwargs):
+    """
+    Edit an existing spot.
+    """
+    spot = get_object_or_404(Spot, pk=spot_id)
+
+    if request.POST:
+       form = SpotEditForm(request.POST,instance=spot)
+       form.save()
+    else:
+        form = SpotEditForm(instance = spot)
+
+    context = {'spot': spot, 'form': form}
+    return render(request, 'miroutes/spot_edit.html', context)
 
 
 def add_wall(request, spot_id, **kwargs):
@@ -122,8 +137,8 @@ def route_edit(request, wall_id, route_id, **kwargs):
             routeform.save()
             routegeomform.save()
             messages.add_message(request, messages.SUCCESS, 'Successfully saved route.')
-            
-        
+
+
     routeform = RouteEditForm(instance=routegeom.route)
     routegeomform = RouteGeometryEditForm(instance=routegeom)
 
