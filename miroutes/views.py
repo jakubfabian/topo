@@ -61,6 +61,7 @@ def spot_edit(request, spot_id, **kwargs):
     Edit an existing spot.
     """
     spot = get_object_or_404(Spot, pk=spot_id)
+    spot_list = spot.spot_area.spot_set.all()
 
     if request.POST:
        form = SpotEditForm(request.POST,instance=spot)
@@ -68,7 +69,7 @@ def spot_edit(request, spot_id, **kwargs):
     else:
         form = SpotEditForm(instance = spot)
 
-    context = {'spot': spot, 'form': form}
+    context = {'spot': spot, 'form': form, 'spot_list': spot_list}
     return render(request, 'miroutes/spot_edit.html', context)
 
 
@@ -76,17 +77,17 @@ def add_wall(request, spot_id, **kwargs):
     """
     """
     spot = get_object_or_404(Spot, pk=spot_id)
-    walllist = spot.wall_set
+    wall_list = spot.wall_set
 
     if not request.session.get('show_inactive', False):
-        walllist = walllist.filter(is_active=True)
+        wall_list = wall_list.filter(is_active=True)
 
-    walllist = walllist.order_by('wall_name')
+    wall_list = wall_list.order_by('wall_name')
 
     if request.POST:
         pass
 
-    context = {'spot': spot, 'spot_wall_list': walllist}
+    context = {'spot': spot, 'spot_wall_list': wall_list}
     return render(request, 'miroutes/add_wall.html', context)
 
 

@@ -9,11 +9,16 @@ a = Area(area_name="testArea", area_country=c)
 a.save()
 
 gKochel = {u'coordinates': [11.344199180603026, 47.632660340454386], u'type': u'Point'}
+gKochel2 = {u'coordinates': [11.644199180603026, 47.632660340454386], u'type': u'Point'}
+
 gWiesenwand = {u'coordinates': [11.347973048686981, 47.63621916824778], u'type': u'Point'}
 gKeltenwand = {u'coordinates': [11.346226930618286, 47.634681075868414], u'type': u'Point'}
 
 s = Spot(spot_name="testSpot", spot_area=a, geom=gKochel)
 s.save()
+
+s2 = Spot(spot_name="testSpot2", spot_area=a, geom=gKochel2)
+s2.save()
 
 fname_image = "/code/misc/kochel_seewand_pano.png"
 wi = WallImage()

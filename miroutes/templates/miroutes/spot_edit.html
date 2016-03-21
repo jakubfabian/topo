@@ -11,6 +11,37 @@
     {% leaflet_js plugins="forms" %}
     {% leaflet_css plugins="forms" %}
 
+<script type="text/javascript">
+    /*function map_init_basic (map, options) {
+
+        var otherSpots = {{ spot_list|geojsonfeature|safe }};
+        var newSpot = {{ spot|geojsonfeature|safe }}
+
+        otherSpotsLayer = L.geoJson(otherSpots);
+        otherSpotsLayer.addTo(map);
+
+        newSpotLayer = L.geoJson(newSpot);
+        newSpotLayer.addTo(map)
+
+        var drawControl = new L.Control.Draw({
+            edit: {
+                featureGroup: newSpotLayer
+            }
+        });
+
+        map.addControl(drawControl);
+
+        var toolbar;
+        for (var toolbarId in drawControl._toolbars) {
+            toolbar = drawControl._toolbars[toolbarId];
+            if (toolbar instanceof L.EditToolbar) {
+                toolbar._modes.edit.handler.enable();
+            }
+        }
+
+    }*/
+
+</script>
 {% endblock %} 
 
 {% block content %}
