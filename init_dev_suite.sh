@@ -21,4 +21,6 @@ echo "from django.contrib.auth.models import User; User.objects.create_superuser
 docker-compose restart
 sleep 3
 
+sh insertfields.sh
+
 docker-compose ps
