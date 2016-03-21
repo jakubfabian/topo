@@ -161,27 +161,24 @@
             <tr><td>Name:</td><td>Schwierigkeit</td><td>Aktionen</td></tr>
 
             {% for routegeom in wall_routegeom_list %}
-
                 {% if routegeom.pk == routegeom_selected.pk %}
                     <tr><td>
-                            {{ route_form.route_name }}
-                        </td><td>
-                            {{ route_form.route_grade }}
-
-                            <input type="hidden" id="id_route_wall" name="route_wall" value="{{ wall.id }}">
-
-                        </td><td>
-                            <input type="submit" value="speichern"/>
-
-                        </td></tr>
+                        {{ route_form.route_name }}
+                    </td><td>
+                        {{ route_form.route_grade }}
+                        <input type="hidden" id="id_route_wall" name="route_wall" value="{{ wall.id }}">
+                    </td><td>
+                        <input type="submit" value="speichern"/>
+                        &nbsp;
+                        <input type="submit" value="löschen" name="delete"/>
+                    </td></tr>
                 {% else %}
                     <tr><td>
                         {{ routegeom.route.route_name }}
                     </td><td>
                         {{ routegeom.route.route_grade }}
                     </td><td>
-
-                        <a href="../route{{ routegeom.route.pk}}/edit"> edit </a>
+                        <a href="../route{{routegeom.route.pk}}/edit"> edit </a>
                     </td></tr>
                 {% endif %}
             {% endfor %}

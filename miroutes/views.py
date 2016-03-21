@@ -124,6 +124,9 @@ def route_detail(request, route_id, **kwargs):
 def route_edit(request, wall_id, route_id, **kwargs):
     from miroutes.forms import RouteEditForm, RouteGeometryEditForm
 
+    if request.POST.get('delete'):
+        return route_del(request, wall_id, route_id, **kwargs)    
+
     wall = get_object_or_404(Wall, pk=wall_id)
     routegeomlist = wall.routegeometry_set.all()
 
@@ -165,6 +168,18 @@ def route_add(request, wall_id, **kwargs):
     kwargs['wall_id'] = wall_id
 
     return HttpResponseRedirect(reverse('route_edit', kwargs=kwargs))
+
+
+def route_del(request, wall_id, route_id, **kwargs):
+    from django.core.urlresolvers import reverse
+    from django.http import HttpResponseRedirect
+
+    geom = get_object_or_404(RouteGeometry, route__pk=route_id, on_wall__pk=wall_id)
+    geom.delete()
+
+    from django.shortcuts import redirect
+    kwargs['wall_id'] = wall_id
+    return HttpResponseRedirect(reverse('wall_detail', kwargs=kwargs))
 
 
 def wall_img_provide(request, wall_id, **kwargs):
