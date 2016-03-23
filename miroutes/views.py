@@ -180,16 +180,20 @@ def wall_edit(request, spot_id, wall_id, **kwargs):
     spot = get_object_or_404(Spot, pk=spot_id)
     wall = get_object_or_404(Wall, pk=wall_id)
 
-    # we modify the devWall if the wall itself is active
+    # we modify the development version of the wall
+    # if the wall is active
     if wall.is_active:
         # ... and create the wall if it does not exist
-        if wall.devWall is None:
-            wall.create_devwall()
-        wall = wall.devWall
+        if wall.theOtherWall is None:
+            wall.copyme_to_theOtherWall()
+        wall = wall.theOtherWall
     spotroutelist = spot.route_set.all()
+    wallroutegeomlist = wall.routegeometry_set.all()
 
-    context = {'wall': wall, 'spot_routelist': spotroutelist}
-
+    context = {'wall': wall,
+               'spot_routelist': spotroutelist,
+               'wall_routegeomlist': wallroutegeomlist}
+    
     return render(request, 'miroutes/wall_edit.html', context)
 
 def route_add(request, spot_id, **kwargs):

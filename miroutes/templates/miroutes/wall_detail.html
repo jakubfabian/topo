@@ -27,7 +27,10 @@
 
   <br><br>
 
-  You're looking at wall {{ wall.wall_name }}
+  You're looking at wall {{ wall.wall_name }}.
+  <!-- if you are the owner or a manager -->
+  <a href=edit>Edit {{ wall.wall_name }}</a>
+
   <br><br>
   wall.wall_image.get_bg_img_size :: {{ wall.wall_image.get_bg_img_size }}
 
