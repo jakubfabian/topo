@@ -101,41 +101,91 @@
         wall_layer.addTo(map);
 
         var otherroutes = {{ wall_routegeom_list_draw|geojsonfeature|safe }};
-        var editableRoute = {{ routegeom_selected|geojsonfeature|safe }}
-
         oldlayer =  L.geoJson(otherroutes);
         oldlayer.addTo(map);
 
+        var editableRoute = {{ routegeom_selected|geojsonfeature|safe }};
         newlayer = L.geoJson(editableRoute);
         newlayer.addTo(map);
 
+        function layer2geom(layer) {
+            // convert layer information to route geometry as used in geom field
+            // if no route information is available, returns null
+            var msg = JSON.stringify(layer.toGeoJSON());
+            var cut1 = msg.match(/{"type":"LineString.+]]}/, 3);
+            if (cut1==null) {
+                return null
+            } else {
+                return cut1[0];
+            }
+        };
+
+        function set_editing_active(drawctl){
+            // set toolbars in drawctl active
+            // this is used to highlight, which route the user should edit
+            for (var toolbarId in drawctl._toolbars) {
+                toolbar = drawctl._toolbars[toolbarId];
+                if (toolbar instanceof L.EditToolbar) {
+                    toolbar._modes.edit.handler.enable();
+                }
+            }
+        };
+
         var drawControl = new L.Control.Draw({
             edit: {
-                featureGroup: newlayer
-            }
+                featureGroup: newlayer,
+            },
+            draw: {
+                polyline: layer2geom(newlayer)==null, // only allow to draw a new line if there is none yet
+            },
         });
 
         map.addControl(drawControl);
-
-        var toolbar;
-        for (var toolbarId in drawControl._toolbars) {
-            toolbar = drawControl._toolbars[toolbarId];
-            if (toolbar instanceof L.EditToolbar) {
-                toolbar._modes.edit.handler.enable();
-            }
-        }
+        set_editing_active(drawControl);
 
         map.on('mousemove', function(e) {
-            var msg = JSON.stringify(newlayer.toGeoJSON());
-            var cut1 = msg.match(/{"type":"LineString.+]]}/, 3);
-            document.getElementById("id_geom").value = cut1[0];
+            var geom = layer2geom(newlayer);
+            if (geom!=null) {
+                document.getElementById("id_geom").value = geom;
+            }
         });
 
         map.on('draw:edited', function(e) {
-            var msg = JSON.stringify(newlayer.toGeoJSON());
-            var cut1 = msg.match(/{"type":"LineString.+]]}/, 3);
-            document.getElementById("id_geom").value = cut1[0];
+            document.getElementById("id_geom").value = layer2geom(newlayer);
         });
+
+
+        // if no route is specified yet... allow to create a new one
+        map.on('draw:created', function (e) {
+            map.removeControl(drawControl);
+            var type = e.layerType, layer = e.layer;
+            var fg = new L.featureGroup([layer]);
+            fg.addTo(map);
+            var newDrawControl = new L.Control.Draw({
+                draw: {
+                    polyline: false,
+                },
+                edit: {
+                    featureGroup: fg,
+                    polyline: false
+                }
+            });
+            map.addControl(newDrawControl);
+
+            set_editing_active(newDrawControl);
+
+            map.on('mousemove', function(e) {
+                var geom = layer2geom(layer);
+                if (geom!=null) {
+                    document.getElementById("id_geom").value = geom;
+                }
+            });
+
+            map.on('draw:edited', function(e) {
+                document.getElementById("id_geom").value = layer2geom(layer);
+            });
+        });
+
     } //loadmap
 
     var loadevents = ["load"];

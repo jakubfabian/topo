@@ -161,8 +161,7 @@ def route_add(request, wall_id, **kwargs):
                      route_name='Insert Route Name Here!')
     newroute.save()
 
-    geom = {"type":"LineString","coordinates":[[116,-12.1875],[100,-10.1875]]}
-    routegeom = RouteGeometry(on_wall=wall, route=newroute, geom=geom)
+    routegeom = RouteGeometry(on_wall=wall, route=newroute)
     routegeom.save()
 
     kwargs['route_id'] = newroute.id

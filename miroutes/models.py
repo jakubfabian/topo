@@ -159,4 +159,4 @@ class RouteGeometry(models.Model):
     """
     on_wall = models.ForeignKey(Wall)
     route = models.ForeignKey(Route)
-    geom = LineStringField()
+    geom = LineStringField(blank=True, null=True)
