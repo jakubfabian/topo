@@ -113,14 +113,33 @@ class WallImage(models.Model):
             return ' ,'.join( [ str(d) for d in res ] )
         return ''
 
-    
+
 class Wall(models.Model):
+    """
+    A wall hosts geometrical representations of routes. 
+    The relation is mediated by the RouteGeometry object.
+    Every wall is linked to a wall image object which hosts the 
+    image being characteristic to a wall and its development version.
+    The development/publish versions of a wall are linked by the theOtherWall field.
+
+    Note:
+        The many-to-many relation to the routes on the wall is defined 
+        on the side of the routes.
+    
+    Attributes:
+        wall_name (str): Human readable string describing the wall.
+        wall_spot (Spot): The spot the wall is associated to.
+        wall_image (WallImage): Hosts the image associated with the wall.
+        geom (djgeojson.fields.PointField): JSON of the location of the wall on the map.
+        is_active (boolean): Flags active walls.
+        theOtherWall (Wall): The development/published partner of the wall.
+    """
     wall_name = models.CharField(max_length=100)
     wall_spot = models.ForeignKey(Spot)
     wall_image = models.ForeignKey(WallImage, default=None)
     geom = PointField()
     is_active = models.BooleanField(default=False)
-    devWall = models.OneToOneField('Wall', blank=True, null=True)
+    theOtherWall = models.OneToOneField('self', blank=True, null=True)
     
     def __str__(self):
         return self.wall_name
@@ -129,6 +148,47 @@ class Wall(models.Model):
     def popupContent(self):
         return "Test"
 
+    def copyme_to_theOtherWall(self):
+        """
+        Creates a copy of the wall and saves the reference in the theOtherWall field.
+        This is intended to work both ways, i.e., when publishing a dev-wall, the current
+        dev-wall is copied and the currently published wall is deleted.
+        When creating a dev version of a wall, the current dev version is deleted and
+        the new dev-wall is initialized from the current state of the wall.
+        """
+        import copy
+        # If the other wall exists it is deleted
+        if self.theOtherWall is not None:
+            self.theOtherWall.delete()
+
+        # Create a shallow copy of the wall object and save it
+        theOtherWall = copy.copy(self)
+        theOtherWall.pk = None
+        theOtherWall.save()
+
+        # Copy the RouteGeometry objects
+        for routegeom in self.routegeometry_set.all():
+            new_routegeom = RouteGeometry(route=routegeom.route,
+                                          on_wall=theOtherWall,
+                                          geom=routegeom.geom)
+            new_routegeom.save()
+            
+        # the other wall has always the opposite state
+        theOtherWall.is_active = not self.is_active
+
+        # ... and finally set the reference in the OneToOne field
+        self.theOtherWall = theOtherWall
+
+        # note that the circular reference self.theOtherWall.theOtherWall=self
+        # is created when the object is saved to avoid infinite save loops.
+        self.save()
+
+    def save(self, checkTheOtherWall=True, *args, **kwargs):
+        super(Wall, self).save()
+        if self.theOtherWall and checkTheOtherWall:
+            self.theOtherWall.theOtherWall = self
+            self.theOtherWall.save(checkTheOtherWall=False)
+            
 
 class Route(models.Model):
 
@@ -159,4 +219,4 @@ class RouteGeometry(models.Model):
     """
     on_wall = models.ForeignKey(Wall)
     route = models.ForeignKey(Route)
-    geom = LineStringField(blank=True, null=True)
+    geom = LineStringField()
