@@ -198,13 +198,12 @@ def route_add(request, spot_id, **kwargs):
     from django.core.urlresolvers import reverse
     from django.http import HttpResponseRedirect
 
-    wall = get_object_or_404(Wall, pk=wall_id)
-    newroute = Route(route_spot=wall.wall_spot,
+    spot = get_object_or_404(Spot, id=spot_id)
+    newroute = Route(route_spot=spot,
                      route_name='Insert Route Name Here!')
     newroute.save()
 
     kwargs['route_id'] = newroute.id
-    kwargs['wall_id'] = wall_id
 
     return HttpResponseRedirect(reverse('route_edit', kwargs=kwargs))
     
