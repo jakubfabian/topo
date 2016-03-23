@@ -122,37 +122,79 @@ def route_detail(request, route_id, **kwargs):
     return render(request, 'miroutes/route_detail.html', context)
 
 
-def route_edit(request, wall_id, route_id, **kwargs):
-    from miroutes.forms import RouteEditForm, RouteGeometryEditForm
+def route_edit(request, route_id, **kwargs):
+    """
+    Edit route object. Accessible via spot details and wall details.
+    In this view, only the metadata of a route object should be
+    edited (not its geometry).
 
-    if request.POST.get('delete'):
-        return route_del(request, wall_id, route_id, **kwargs)    
+    Args:
+      request: HTTP request
+      route_id: the id of the route to edit
 
-    wall = get_object_or_404(Wall, pk=wall_id)
-    routegeomlist = wall.routegeometry_set.all()
+    Returns:
+      A form that allows to modify the properties of a route.
+    
+    """
+    from miroutes.forms import RouteEditForm
 
-    routegeomlistdraw = routegeomlist.exclude(route__id=route_id)
-    routegeom = get_object_or_404(RouteGeometry, route__id=route_id)
+    route = get_object_or_404(Route, id=route_id)
 
     if request.POST:
-        routeform = RouteEditForm(request.POST,instance=routegeom.route)
-        routegeomform = RouteGeometryEditForm(request.POST,instance=routegeom)
-        if routeform.is_valid() and routegeomform.is_valid:
+        routeform = RouteEditForm(request.POST,instance=route)
+        if routeform.is_valid():
             routeform.save()
-            routegeomform.save()
             messages.add_message(request, messages.SUCCESS, 'Successfully saved route.')
 
+    routeform = RouteEditForm(instance=route)
 
-    routeform = RouteEditForm(instance=routegeom.route)
-    routegeomform = RouteGeometryEditForm(instance=routegeom)
-
-
-    context = {'wall': wall, 'wall_routegeom_list_draw': routegeomlistdraw, 'wall_routegeom_list': routegeomlist, 'routegeom_selected': routegeom, 'route_form': routeform, 'routegeom_form':routegeomform}
+    context = {'route': route, 'route_form': routeform}
     return render(request, 'miroutes/route_edit.html', context)
 
 
 
-def route_add(request, wall_id, **kwargs):
+def wall_edit(request, spot_id, wall_id, **kwargs):
+    """
+    Edit the route geometries on a wall.
+    If the wall is active, all changes are made on the development
+    version of the wall.
+    We select one existing route or
+    create a new one and draw the geometry.
+
+    Args:
+      request: the http request object
+      spot_id: the id of the spot as given in the url, see urls.py
+      wall_id: the id of the wall as given in the url, see urls.py
+
+    Returns:
+      A HTML web page generated from the wall_edit.html template
+    """
+    spot = get_object_or_404(Spot, pk=spot_id)
+    wall = get_object_or_404(Wall, pk=wall_id)
+
+    # we modify the devWall if the wall itself is active
+    if wall.is_active:
+        # ... and create the wall if it does not exist
+        if wall.devWall is None:
+            wall.create_devwall()
+        wall = wall.devWall
+    spotroutelist = spot.route_set.all()
+
+    context = {'wall': wall, 'spot_routelist': spotroutelist}
+
+    return render(request, 'miroutes/wall_edit.html', context)
+
+def route_add(request, spot_id, **kwargs):
+    """
+    Add a route to a spot.
+
+    Args:
+      request: http request
+      spot_id: the id of the spot as given by the url
+    
+    Returns:
+      A template generated from a form to enter route details
+    """
     from django.core.urlresolvers import reverse
     from django.http import HttpResponseRedirect
 
@@ -161,13 +203,11 @@ def route_add(request, wall_id, **kwargs):
                      route_name='Insert Route Name Here!')
     newroute.save()
 
-    routegeom = RouteGeometry(on_wall=wall, route=newroute)
-    routegeom.save()
-
     kwargs['route_id'] = newroute.id
     kwargs['wall_id'] = wall_id
 
     return HttpResponseRedirect(reverse('route_edit', kwargs=kwargs))
+    
 
 
 def route_del(request, wall_id, route_id, **kwargs):
