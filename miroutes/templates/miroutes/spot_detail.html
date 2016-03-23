@@ -34,7 +34,9 @@ Show_inactive ::
 <a href="/miroutes/"> Home </a> : <a href=../../> {{ spot.spot_area.area_country.country_name }} </a> :: <a href="../" >{{ spot.spot_area.area_name }} </a> :: {{ spot.spot_name }}
 <br><br>
 
-You're looking at spot {{ spot.spot_name }}
+You're looking at spot {{ spot.spot_name }}.
+<!-- if you are a spot manager -->
+<a href=edit>Edit {{ spot.spot_name }}</a>
 <br><br>
 
 {% if spot_wall_list %}
@@ -80,3 +82,18 @@ You're looking at spot {{ spot.spot_name }}
     {% endif %}
 
 {% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

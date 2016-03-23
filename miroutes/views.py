@@ -62,14 +62,18 @@ def spot_edit(request, spot_id, **kwargs):
     """
     spot = get_object_or_404(Spot, pk=spot_id)
     spot_list = spot.spot_area.spot_set.all()
+    route_list = spot.route_set.all()
 
     if request.POST:
-       form = SpotEditForm(request.POST,instance=spot)
-       form.save()
+        form = SpotEditForm(request.POST, instance=spot)
+        form.save()
     else:
-        form = SpotEditForm(instance = spot)
+        form = SpotEditForm(instance=spot)
 
-    context = {'spot': spot, 'form': form, 'spot_list': spot_list}
+    context = {'spot': spot,
+               'form': form,
+               'spot_list': spot_list,
+               'route_list': route_list}
     return render(request, 'miroutes/spot_edit.html', context)
 
 
@@ -137,18 +141,22 @@ def route_edit(request, route_id, **kwargs):
     
     """
     from miroutes.forms import RouteEditForm
-
+    from django.shortcuts import redirect
+    
     route = get_object_or_404(Route, id=route_id)
 
     if request.POST:
         routeform = RouteEditForm(request.POST,instance=route)
+        next = request.GET.get('next', None)
         if routeform.is_valid():
             routeform.save()
             messages.add_message(request, messages.SUCCESS, 'Successfully saved route.')
+            if next:
+                return redirect(next)
 
     routeform = RouteEditForm(instance=route)
 
-    context = {'route': route, 'route_form': routeform}
+    context = {'route': route, 'route_form': routeform, 'from': request.GET.get('from', None)}
     return render(request, 'miroutes/route_edit.html', context)
 
 
@@ -204,21 +212,34 @@ def route_add(request, spot_id, **kwargs):
     newroute.save()
 
     kwargs['route_id'] = newroute.id
+    kwargs['spot_id'] = spot_id
 
-    return HttpResponseRedirect(reverse('route_edit', kwargs=kwargs))
+    return HttpResponseRedirect("{}?from={}".format(
+        reverse('route_edit', kwargs=kwargs), request.GET.get('from', None)))
     
 
-
-def route_del(request, wall_id, route_id, **kwargs):
-    from django.core.urlresolvers import reverse
-    from django.http import HttpResponseRedirect
-
-    geom = get_object_or_404(RouteGeometry, route__pk=route_id, on_wall__pk=wall_id)
-    geom.delete()
-
+def route_del(request, route_id, **kwargs):
+    """
+    Delete route from route list and redirect to the page
+    provided in the from tag.
+    
+    Args:
+      request: HTTP request
+      route_id: id of route to delete
+    Returns:
+      Redirect to the page url saved in the from tag of the HTTP GET request.
+    """
     from django.shortcuts import redirect
-    kwargs['wall_id'] = wall_id
-    return HttpResponseRedirect(reverse('wall_detail', kwargs=kwargs))
+
+    route = get_object_or_404(Route, pk=route_id)
+    for routegeom in route.routegeometry_set.all():
+        routegeom.delete()
+    routename = route.route_name
+    route.delete()
+
+    messages.add_message(request, messages.SUCCESS, 'Successfully deleted route {}.'.format(routename))
+
+    return redirect(request.GET.get('from', '/'))
 
 
 def wall_img_provide(request, wall_id, **kwargs):

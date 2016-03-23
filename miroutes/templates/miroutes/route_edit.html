@@ -12,7 +12,7 @@
     You're looking at route "{{ route.route_name }}"
     <br><br>
 
-    <form method="POST" action="{{request.path}}">
+    <form method="POST" action="{% if from %}?next={{ from }}{% endif %}">
 
         {% csrf_token %}
 
