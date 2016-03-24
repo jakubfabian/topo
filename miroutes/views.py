@@ -18,6 +18,9 @@ from miroutes.forms import WallImgUploadForm, SpotEditForm
 
 
 def index(request):
+    """
+    Main view for landing page
+    """
     country_listing = Country.objects.order_by('country_name')[:5]
     area_listing = Area.objects.order_by('area_name')
     spot_listing = Spot.objects.order_by('spot_name')
