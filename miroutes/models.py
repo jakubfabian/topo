@@ -14,6 +14,15 @@ class Country(models.Model):
         return self.country_name
 
 class Area(models.Model):
+    GRADE_SYSTEMS = (
+        (0, 'France'),
+        (1, 'UIAA'),
+        (2, 'UK'),
+        (3, 'Sierra'))
+
+    area_grade_system = models.IntegerField(choices=GRADE_SYSTEMS,
+                                            default=1)
+    
     area_name = models.CharField(max_length=100)
     area_country = models.ForeignKey(Country)
     def __str__(self):

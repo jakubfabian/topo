@@ -5,7 +5,7 @@ from django.core.files import File
 c = Country(country_name="TestCountry", country_code=1234)
 c.save()
 
-a = Area(area_name="testArea", area_country=c)
+a = Area(area_name="testArea", area_country=c, area_grade_system=0)
 a.save()
 
 gKochel = {u'coordinates': [11.344199180603026, 47.632660340454386], u'type': u'Point'}
