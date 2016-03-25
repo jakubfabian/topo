@@ -48,15 +48,15 @@ def spot_detail(request, spot_id, **kwargs):
     For a specific spot, get a list of walls that are contained within.
     Decide if all or just active ones are given to the template to render.
     """
-    p = get_object_or_404(Spot, pk=spot_id)
-    walllist = p.wall_set
+    spot = get_object_or_404(Spot, pk=spot_id)
+    walllist = spot.wall_set
 
     if not request.session.get('show_inactive', False):
         walllist = walllist.filter(is_active=True)
 
     walllist = walllist.order_by('wall_name')
 
-    context = {'spot': p, 'spot_wall_list': walllist}
+    context = {'spot': spot, 'spot_wall_list': walllist}
     return render(request, 'miroutes/spot_detail.html', context)
 
 def spot_edit(request, spot_id, **kwargs):
@@ -124,8 +124,8 @@ def wall_detail(request, wall_id, **kwargs):
 
 
 def route_detail(request, route_id, **kwargs):
-    p = get_object_or_404(Route, pk=route_id)
-    context = {'route': p}
+    route = get_object_or_404(Route, pk=route_id)
+    context = {'route': route}
     return render(request, 'miroutes/route_detail.html', context)
 
 
@@ -164,7 +164,7 @@ def route_edit(request, route_id, **kwargs):
 
 
 
-def wall_edit(request, spot_id, wall_id, **kwargs):
+def wall_edit(request, wall_id, **kwargs):
     """
     Edit the route geometries on a wall.
     If the wall is active, all changes are made on the development
@@ -180,8 +180,8 @@ def wall_edit(request, spot_id, wall_id, **kwargs):
     Returns:
       A HTML web page generated from the wall_edit.html template
     """
-    spot = get_object_or_404(Spot, pk=spot_id)
     wall = get_object_or_404(Wall, pk=wall_id)
+    spot = wall.wall_spot
 
     # we modify the development version of the wall
     # if the wall is active

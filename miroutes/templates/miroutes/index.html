@@ -32,7 +32,7 @@
             var coord = L.latLng({{ spot.geom.coordinates }});
             var newcoord = L.latLng(coord.lng, coord.lat);
             var mc = new L.marker(newcoord);
-            mc.bindPopup("<a href='{{spot.spot_area.area_country.pk}}/{{spot.spot_area.pk}}/{{spot.pk}}'>{{ spot.spot_name }}</a>");
+            mc.bindPopup("<a href={% url "spot_detail" spot_id=spot.id %}>{{spot.spot_name}}</a>");
             markerArray.push(mc);
         {% endfor %}
 
@@ -53,7 +53,7 @@
 
     <ul>
     {% for country in country_listing %}
-        <li><a href="/miroutes/{{ country.id }}/">{{ country.country_name }}</a></li>
+    <li><a href="{% url "country_detail" country_id=country.id%}">{{ country.country_name }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
