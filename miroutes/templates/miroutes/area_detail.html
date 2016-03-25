@@ -61,8 +61,11 @@ You're looking at area selection {{ area.area_name }}
     {% endfor %}
     </ul>
 
+    <form action="{% url 'spot_add' country_id=area.area_country.id area_id=area.id %}">
+        <input type="submit" value="Add new spot">
+    </form>
 
-{% else %}
+    {% else %}
     <p>Currently no spots are available in {{ area.area_name }}</p>
 {% endif %}
 

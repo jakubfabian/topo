@@ -1,6 +1,7 @@
 import ipdb
+from django.core.urlresolvers import reverse
 
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic.edit import UpdateView
 from django.contrib import messages
 from django.http import HttpResponse
@@ -59,25 +60,31 @@ def spot_detail(request, spot_id, **kwargs):
     context = {'spot': spot, 'spot_wall_list': walllist}
     return render(request, 'miroutes/spot_detail.html', context)
 
-def spot_edit(request, spot_id, **kwargs):
+
+def spot_add(request, area_id, **kwargs):
     """
-    Edit an existing spot.
+    Adding a new spot.
     """
-    spot = get_object_or_404(Spot, pk=spot_id)
-    spot_list = spot.spot_area.spot_set.all()
-    route_list = spot.route_set.all()
+    area = get_object_or_404(Area, pk=area_id)
 
     if request.POST:
-        form = SpotEditForm(request.POST, instance=spot)
-        form.save()
-    else:
-        form = SpotEditForm(instance=spot)
+        new_spot = Spot()
+        new_spot.spot_name = request.POST.get('spot_name')
+        new_spot.spot_area = area
+        new_spot.geom = {'coordinates': [
+            request.POST.get('spot_lng'), request.POST.get('spot_lat')]
+            , 'type': 'Point'}
+        new_spot.save()
 
-    context = {'spot': spot,
-               'form': form,
-               'spot_list': spot_list,
-               'route_list': route_list}
-    return render(request, 'miroutes/spot_edit.html', context)
+        return redirect(reverse('area_detail', args=(area_id)))
+
+    spot_list = area.spot_set.all()
+
+    context = {
+        'area': area,
+        'spot_list': spot_list
+    }
+    return render(request, 'miroutes/spot_add.html', context)
 
 
 def add_wall(request, spot_id, **kwargs):
@@ -146,7 +153,7 @@ def route_edit(request, route_id, **kwargs):
     from miroutes.forms import RouteEditForm
     from django.shortcuts import redirect
     from django import forms
-    
+
     route = get_object_or_404(Route, id=route_id)
 
     if request.POST:
