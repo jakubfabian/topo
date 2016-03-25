@@ -29,14 +29,9 @@ Show_inactive ::
 {% endif %}
 <br><br>
 
-
-
-<a href="/miroutes/"> Home </a> : <a href=../../> {{ spot.spot_area.area_country.country_name }} </a> :: <a href="../" >{{ spot.spot_area.area_name }} </a> :: {{ spot.spot_name }}
-<br><br>
-
 You're looking at spot {{ spot.spot_name }}.
 <!-- if you are a spot manager -->
-<a href=edit>Edit {{ spot.spot_name }}</a>
+<a href={% url "spot_edit" spot_id=spot.id%}>Edit {{ spot.spot_name }}</a>
 <br><br>
 
 {% if spot_wall_list %}
@@ -52,7 +47,7 @@ You're looking at spot {{ spot.spot_name }}.
             var coord = L.latLng({{ wall.geom.coordinates }});
             var newcoord = L.latLng(coord.lng, coord.lat);
             var mc = new L.marker(newcoord);
-            mc.bindPopup("<a href='{{wall.pk}}'>{{ wall.wall_name }}</a>");
+            mc.bindPopup("<a href={% url "wall_detail" wall_id=wall.pk%}>{{ wall.wall_name }}</a>");
             markerArray.push(mc);
         {% endfor %}
 
@@ -74,7 +69,7 @@ You're looking at spot {{ spot.spot_name }}.
 
         <ul>
         {% for wall in spot_wall_list %}
-            <li> <a href="{{wall.pk}}"> {{ wall.wall_name }} :: {{ wall.geom.coordinates }}</a></li>
+            <li> <a href="{% url "wall_detail" wall_id=wall.pk %}"> {{ wall.wall_name }} :: {{ wall.geom.coordinates }}</a></li>
         {% endfor %}
         </ul>
     {% else %}

@@ -23,13 +23,10 @@
     window.onload = function() { map_init(); }
   </script>
 
-  <a href="/miroutes/"> Home </a> : <a href=../../../> {{ wall.wall_spot.spot_area.area_country.country_name }} </a> :: <a href="../../" >{{ wall.wall_spot.spot_area.area_name }} </a> :: <a href="../"> {{ wall.wall_spot.spot_name }} </a> :: {{ wall.wall_name }}
-
-  <br><br>
-
   You're looking at wall {{ wall.wall_name }}.
   <!-- if you are the owner or a manager -->
-  <a href=edit>Edit {{ wall.wall_name }}</a>
+  <br><br>
+  <a href={% url "wall_edit" wall_id=wall.id%}>Edit {{ wall.wall_name }}</a>
 
   <br><br>
   wall.wall_image.get_bg_img_size :: {{ wall.wall_image.get_bg_img_size }}
@@ -110,13 +107,13 @@
       {% for routegeom in wall_route_geom_list %}
         <tr>
           <td>
-            <a href="{{routegeom.route.pk}}"> {{ routegeom.route.route_name }}</a>
+            <a href="{% url "route_detail" route_id=routegeom.route.pk%}"> {{ routegeom.route.route_name }}</a>
           </td>
           <td>
             {{ routegeom.route.route_grade }}
           </td>
           <td>
-            <a href="route{{routegeom.route.pk}}/edit"> edit </a>
+              <a href={% url "route_edit" wall_id=wall.id route_id=routegeom.route.pk%}> edit </a>
           </td>
         </tr>
       {% endfor %}
@@ -125,9 +122,8 @@
   {% else %}
     <p>Currently no routes are available in {{ wall.wall_name }}</p>
   {% endif %}
-    <p><a href="route_add">Add route</a></p>    
+  <p><a href="{% url 'route_add' spot_id=wall.wall_spot.id %}">Add route</a></p>    
     <p><a href="providewallimg">Propose a new wall image.</a></p>
-
 {% endblock %}
 
 

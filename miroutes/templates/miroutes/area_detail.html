@@ -22,8 +22,6 @@
 
 {% block content %}
 
-<a href="/miroutes/"> Home </a> : <a href=../../> {{ area.area_country.country_name }} </a> :: <a href="../" >{{ area.area_name }}
-
 <br><br>
 You're looking at area selection {{ area.area_name }}
 
@@ -39,7 +37,7 @@ You're looking at area selection {{ area.area_name }}
             var coord = L.latLng({{ spot.geom.coordinates }});
             var newcoord = L.latLng(coord.lng, coord.lat);
             var mc = new L.marker(newcoord);
-            mc.bindPopup("<a href='{{spot.pk}}-0'>{{ spot.spot_name }}</a>");
+            mc.bindPopup("<a href={% url "spot_detail" spot_id=spot.id %}>{{ spot.spot_name }}</a>");
             markerArray.push(mc);
         {% endfor %}
 
@@ -59,7 +57,7 @@ You're looking at area selection {{ area.area_name }}
     In {{ area.area_name }} there are following spots:<br><br>
 
     {% for spot in area_spot_list %}
-    <li><a href=" {{ spot.pk }} "> {{ spot.spot_name }}  {{ spot.geom.coordinates }}</a></li>
+    <li><a href=" {% url "spot_detail" spot_id=spot.pk %} "> {{ spot.spot_name }}  {{ spot.geom.coordinates }}</a></li>
     {% endfor %}
     </ul>
 
