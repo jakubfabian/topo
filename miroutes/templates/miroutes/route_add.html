@@ -5,11 +5,7 @@
   <head>
     {% leaflet_js plugins="forms" %}
     {% leaflet_css plugins="forms" %}
-
-
-
       <style>
-
     .leaflet-container {  /* all maps */
         width:  100%;
         height: 600px;
@@ -22,15 +18,10 @@
 	display: none;
 
 }
-
-
           .leaflet-draw-toolbar .leaflet-draw-draw-circle {
 	display: none;
 
 }
-
-
-
                        .leaflet-draw-toolbar .leaflet-draw-draw-marker {
 	display: none;
 
@@ -38,23 +29,11 @@
           .leaflet-draw-toolbar .leaflet-draw-edit-remove {
 	display: none;
 }
-
                               .leaflet-draw-actions a {
 	display: none;
 }
-
-
-
 </style>
-
-
   </head>
-
-
-
-
-<a href="/miroutes/"> Home </a> : <a href=../../../> {{ wall.wall_spot.spot_area.area_country.country_name }} </a> :: <a href="../../" >{{ wall.wall_spot.spot_area.area_name }} </a> :: <a href="../"> {{ wall.wall_spot.spot_name }} </a> :: <a href="../"> {{ wall.wall_name }} </a> :: {{ route_selected.route_name }}
-<br><br>
 
 You're looking at wall {{ wall.wall_name }}
 <br><br>

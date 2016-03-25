@@ -29,11 +29,6 @@ Show_inactive ::
 {% endif %}
 <br><br>
 
-
-
-<a href="/miroutes/"> Home </a> : <a href=../../> {{ spot.spot_area.area_country.country_name }} </a> :: <a href="../" >{{ spot.spot_area.area_name }} </a> :: {{ spot.spot_name }}
-<br><br>
-
 You're looking at spot {{ spot.spot_name }}.
 <!-- if you are a spot manager -->
 <a href={% url "spot_edit" spot_id=spot.id%}>Edit {{ spot.spot_name }}</a>
