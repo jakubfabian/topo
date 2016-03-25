@@ -201,25 +201,45 @@ class Wall(models.Model):
 
 class Route(models.Model):
 
-    GRADE_CHOICES = (
-        ('5', '5b'),
-        ('5b', '5b'),
-        ('5c', '5c'),
-        ('6a', '6a'),
-        ('6b', '6b'))
+    GRADE_CHOICES = [(('5a', '5a'),
+                      ('5b', '5b'),
+                      ('5c', '5c'),
+                      ('6a', '6a'),
+                      ('6b', '6b'),
+                      ('6c', '6c'),
+                      ('7a', '7a')),
+                     (('5-', '5-'),
+                      ('5', '5'),
+                      ('5+', '5+'))]
 
+    RATING_CHOICES = ((1, 'poor'),
+                      (2, 'ok'),
+                      (3, 'not bad'),
+                      (4, 'good'),
+                      (5, 'excellent'))
+                      
+    
     # Every route is located at a climbing spot
-    route_spot = models.ForeignKey(Spot, default=None)
+    route_spot = models.ForeignKey(Spot, default=None, editable=False)
     # The relation to one or many walls is via the geometry of the route
     route_walls = models.ManyToManyField(Wall, through='RouteGeometry')
 
     route_name = models.CharField(max_length=100)
-    route_grade = models.CharField(max_length=2,
-                                   choices=GRADE_CHOICES,
-                                   default="5b")
+
+    route_grade = models.CharField(max_length=4, blank=True, null=True)
+
+    route_rating = models.IntegerField(default='1',
+                                       choices=RATING_CHOICES)
+
+    route_length = models.IntegerField(blank=True, null=True)
+    route_first_ascent = models.CharField(max_length=100, blank=True, null=True)
+    route_number_of_bolts = models.IntegerField(blank=True, null=True)
+    route_security_rating = models.IntegerField(default=3)
+    route_description = models.TextField(blank=True, null=True)
     
     def __str__(self):
         return self.route_name
+
 
 
 class RouteGeometry(models.Model):

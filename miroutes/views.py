@@ -145,11 +145,15 @@ def route_edit(request, route_id, **kwargs):
     """
     from miroutes.forms import RouteEditForm
     from django.shortcuts import redirect
+    from django import forms
     
     route = get_object_or_404(Route, id=route_id)
 
     if request.POST:
-        routeform = RouteEditForm(request.POST,instance=route)
+        routeform = RouteEditForm(request.POST, instance=route)
+        routeform.fields['route_grade'] = forms.ChoiceField(
+            required=True,
+            choices=Route.GRADE_CHOICES[route.route_spot.spot_grade_system])
         next = request.GET.get('next', None)
         if routeform.is_valid():
             routeform.save()
