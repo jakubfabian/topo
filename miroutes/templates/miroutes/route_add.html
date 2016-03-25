@@ -90,10 +90,7 @@ You're looking at wall {{ wall.wall_name }}
 (function () {
 
     function loadmap() {
-
-
-  var img_dim_string = '{{ wall.get_bg_img_size }}';
-
+        var img_dim_string = '{{ wall.get_bg_img_size }}';
         var img_dim   = img_dim_string.split(',', 4);
         var img_dim_x = parseFloat(img_dim[0]);
         var img_dim_y = parseFloat(img_dim[1]);
@@ -104,132 +101,84 @@ You're looking at wall {{ wall.wall_name }}
         var minzoom   = Math.min(xzoom, yzoom);
         var startzoom = maxzoom-minzoom;
 
-
-
         var map = L.map('id_geom_map', {
-  minZoom: minzoom,
-  maxZoom: maxzoom,
-  crs: L.CRS.Simple,
-  center: [-30, 90],
-  zoom: 4,
+            minZoom: minzoom,
+            maxZoom: maxzoom,
+            crs: L.CRS.Simple,
+            center: [-30, 90],
+            zoom: 4,
 
-});
+        });
 
-
-
-
-
-var southWest = map.unproject([0, img_dim_y], map.getMaxZoom());
-var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
-map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
-
+        var southWest = map.unproject([0, img_dim_y], map.getMaxZoom());
+        var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
+        map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
 
         var wall_layer = L.tileLayer('{{ wall.get_tiles_url }}/{z}/{x}/{y}.png', {
-        minZoom: 4, maxZoom: 6,
-        noWrap: false,
-        tileSize: 256,
-        continuousWorld: true,
-      });
+            minZoom: 4, maxZoom: 6,
+            noWrap: false,
+            tileSize: 256,
+            continuousWorld: true,
+        });
+
+        wall_layer.addTo(map);
+        var collection = {{ wall_route_list|geojsonfeature|safe }};
+        oldlayer =  L.geoJson(collection);
+        oldlayer.addTo(map);
+
+        var drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
 
 
-      wall_layer.addTo(map);
-    var collection = {{ wall_route_list|geojsonfeature|safe }};
-    oldlayer =  L.geoJson(collection);
-    oldlayer.addTo(map);
+        var drawControl = new L.Control.Draw({
+            edit: {
+                featureGroup: drawnItems
+            }
+        });
+        map.addControl(drawControl);
 
-    var drawnItems = new L.FeatureGroup();
-    map.addLayer(drawnItems);
+        // react on newly drawn item
+        map.on('draw:created', function (e) {
+            map.removeControl(drawControl);
+            var type = e.layerType,
+            layer = e.layer;
+            var fg = new L.featureGroup([layer]);
+            fg.addTo(map);
+            var newDrawControl = new L.Control.Draw({
+                draw: {
+                    polyline: false,
+                },
+                edit: {
+                    featureGroup: fg,
+                    polyline: false
+                }
+            });
 
+            map.addControl(newDrawControl);
 
-    var drawControl = new L.Control.Draw({
-    edit: {
-        featureGroup: drawnItems
+            var toolbar;
+            for (var toolbarId in newDrawControl._toolbars) {
+                toolbar = newDrawControl._toolbars[toolbarId];
+                if (toolbar instanceof L.EditToolbar) {
+                    toolbar._modes.edit.handler.enable();
+                }
+            }
+
+            var msg = JSON.stringify(layer.toGeoJSON());
+
+            var cut1 = msg.match(/{"type":"LineString.+]]}/, 3);
+            document.getElementById("id_geom").value = cut1[0];
+
+            map.on('mousemove', function(e) {
+                var msg = JSON.stringify(layer.toGeoJSON());
+                var cut1 = msg.match(/{"type":"LineString.+]]}/, 3);
+                document.getElementById("id_geom").value = cut1[0];
+            });
+        });
     }
-});
-map.addControl(drawControl);
-
-
-// react on newly drawn item
-map.on('draw:created', function (e) {
-
-      map.removeControl(drawControl);
-
-
-    var type = e.layerType,
-        layer = e.layer;
-
-
-    var fg = new L.featureGroup([layer]);
-
-    fg.addTo(map);
-
-   var newDrawControl = new L.Control.Draw({
-
-    draw: {
-        polyline: false,
-    },
-
-    edit: {
-        featureGroup: fg,
-        polyline: false
-
-    }
-});
-
-map.addControl(newDrawControl);
-
-var toolbar;
-for (var toolbarId in newDrawControl._toolbars) {
-    toolbar = newDrawControl._toolbars[toolbarId];
-    if (toolbar instanceof L.EditToolbar) {
-        toolbar._modes.edit.handler.enable();
-    }
-}
-
-
-
-
-
-
-
-
-var msg = JSON.stringify(layer.toGeoJSON());
-
-    var cut1 = msg.match(/{"type":"LineString.+]]}/, 3);
-    document.getElementById("id_geom").value = cut1[0];
-
-
-
-    map.on('mousemove', function(e) {
-
-
-
- var msg = JSON.stringify(layer.toGeoJSON());
-
-    var cut1 = msg.match(/{"type":"LineString.+]]}/, 3);
-    document.getElementById("id_geom").value = cut1[0];
-
-
-});
-
-
-
-
-});
-
-
-
-    }
-
 
     function switchToModify() {
-
-
-
-
     }
-
-
 
     var loadevents = ["load"];
     if (loadevents.length === 0) loadmap();
