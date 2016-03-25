@@ -59,8 +59,8 @@ Routes in {{ spot.spot_name }}:
   {% for route in route_list %}
     <tr>
       <td>{{ route.route_name }}</td>
-      <td><a href="route{{route.pk}}/edit?from={{ request.path|urlencode }}"> edit </a>
-      <td><a href="route{{route.pk}}/del?from={{ request.path|urlencode }}"> delete </a>
+      <td><a href="{% url "route_edit" route_id=route.pk %}?from={{ request.path|urlencode }}"> edit </a>
+      <td><a href="{% url "route_del" route_id=route.pk %}?from={{ request.path|urlencode }}"> delete </a>
     </tr>
   {% endfor %}
 </table>

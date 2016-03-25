@@ -113,7 +113,7 @@
             {{ routegeom.route.route_grade }}
           </td>
           <td>
-              <a href={% url "route_edit" wall_id=wall.id route_id=routegeom.route.pk%}> edit </a>
+              <a href={% url "route_edit" route_id=routegeom.route.pk%}> edit </a>
           </td>
         </tr>
       {% endfor %}
@@ -122,7 +122,6 @@
   {% else %}
     <p>Currently no routes are available in {{ wall.wall_name }}</p>
   {% endif %}
-  <p><a href="{% url 'route_add' spot_id=wall.wall_spot.id %}">Add route</a></p>    
     <p><a href="providewallimg">Propose a new wall image.</a></p>
 {% endblock %}
 

@@ -6,7 +6,7 @@
 
 {% block content %} 
 
-    You're looking at route "{{ route.route_name }}"
+    You're looking at route "{{ route.route_name }}" on spot <a href="{% url "spot_detail" spot_id=route.route_spot.id %}">{{ route.route_spot.spot_name }}</a>
     <br><br>
 
     <form method="POST" action="{% if from %}?next={{ from }}{% endif %}">
@@ -25,6 +25,5 @@
         
     </form>
 
-    <p><a href="{% url 'route_add' wall_id=wall.id %}">Add route</a></p>    
 
 {% endblock %}

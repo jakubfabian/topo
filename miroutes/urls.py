@@ -17,8 +17,8 @@ url(r'^wall(?P<wall_id>\d+)/edit$', views.wall_edit, name='wall_edit'),
 
 url(r'^route(?P<route_id>\d+)$', views.route_detail, name='route_detail'),
 url(r'^spot(?P<spot_id>\d+)/route_add$', views.route_add, name='route_add'),
-url(r'^wall(?P<wall_id>\d+)/route(?P<route_id>\d+)/edit$', views.route_edit, name='route_edit'),
-url(r'^wall(?P<wall_id>\d+)/route(?P<route_id>\d+)/del$', views.route_del, name='route_del'),
+url(r'^route(?P<route_id>\d+)/edit$', views.route_edit, name='route_edit'),
+url(r'^route(?P<route_id>\d+)/del$', views.route_del, name='route_del'),
 
 url(r'^(?P<country_id>\d+)/(?P<area_id>\d+)\/(?P<spot_id>\d+)/(?P<wall_id>\d+)/providewallimg$', views.wall_img_provide, name='provide wall image'),
 
