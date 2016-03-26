@@ -14,12 +14,9 @@ class RouteGeometryEditForm(forms.ModelForm):
 class RouteEditForm(forms.ModelForm):
     class Meta:
         model = Route
-        exclude = ('route_wall',)
+        exclude = ('route_walls',)
 
-    def __init__(self, spotGradeSystem=0, *args, **kwargs):
-        super(RouteEditForm, self).__init__(*args, **kwargs)
-        self.fields['route_grade'] = forms.ChoiceField(choices = Route.GRADE_CHOICES[spotGradeSystem])    
-
+        
 
 class SpotEditForm(forms.ModelForm):
     class Meta:

@@ -158,9 +158,7 @@ def route_edit(request, route_id, **kwargs):
 
     if request.POST:
         routeform = RouteEditForm(request.POST, instance=route)
-        routeform.fields['route_grade'] = forms.ChoiceField(
-            required=True,
-            choices=Route.GRADE_CHOICES[route.route_spot.spot_grade_system])
+
         next = request.GET.get('next', None)
         if routeform.is_valid():
             routeform.save()
@@ -169,7 +167,9 @@ def route_edit(request, route_id, **kwargs):
                 return redirect(next)
 
     routeform = RouteEditForm(instance=route)
-
+    routeform.fields['route_grade'] = forms.ChoiceField(
+        choices=Route.GRADE_CHOICES[route.route_spot.spot_area.area_grade_system])
+    
     context = {'route': route, 'route_form': routeform, 'from': request.GET.get('from', None)}
     return render(request, 'miroutes/route_edit.html', context)
 
