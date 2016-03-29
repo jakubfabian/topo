@@ -19,16 +19,22 @@
     <br><br>
     <!-- css styles for the selectable list. TODO: put tags in css files -->
     <style>
+        #wrapper_select {
+            width: 800px;
+            border: 1px solid black;
+            overflow: hidden; /* will contain if #first is longer than #second */
+        }
+
         #feedback { font-size: 1.4em; }
         #selectable .ui-selecting { background: #FECA40; }
         #selectable .ui-selected { background: #F39814; color: white; }
-        #selectable { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+        #selectable { display: inline-block; list-style-type: none; width: 300px; border: 1px solid red;}
         #selectable li { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px; }
 
         #selected_routes .ui-selecting { background: #FECA40; }
         #selected_routes .ui-selected { background: #F39814; color: black; }
-        #selected_routes { list-style-type: none; margin: 0; padding: 0; width: 60%; }
-        #selected_routes li { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px; }
+        #selected_routes { display: inline-block; list-style-type: none; width: 300px; overflow: hidden; border: 1px solid green; }
+        #selected_routes li { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px;}
     </style>
 
 <script type="text/javascript">
@@ -81,19 +87,21 @@
 </script>
 
 <!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
-<ol id="selectable">
-    {% for route in spot_routelist %}
-        <li class="ui-widget-content" name="route_onspot" value="{{ route.id }}">{{ route.route_name }}</li>
-    {% endfor %}
-</ol>
-<br>
-
-<!-- This list contains the routes that are selected -->
-<ol id="selected_routes">
-    {% for geom in wall_routegeomlist %}
-        <li class="ui-widget-content" name="route_selected" value="{{ geom.route.id }}">{{ geom.route.route_name }}</li>
-    {% endfor %}
-</ol>
+<div id="wrapper_select">
+  <ol id="selectable">
+      {% for route in spot_routelist %}
+          <li class="ui-widget-content" name="route_onspot" value="{{ route.id }}">{{ route.route_name }}</li>
+      {% endfor %}
+  </ol>
+  <br>
+  
+  <!-- This list contains the routes that are selected -->
+  <ol id="selected_routes">
+      {% for route in wall_routelist %}
+          <li class="ui-widget-content" name="route_selected" value="{{ route.id }}">{{ route.route_name }}</li>
+      {% endfor %}
+  </ol>
+</div>
 
 <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
 <form method="POST" action="{{request.path|urlencode}}">

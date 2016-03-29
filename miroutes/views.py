@@ -203,13 +203,22 @@ def wall_edit(request, wall_id, **kwargs):
         if wall.theOtherWall is None:
             wall.copyme_to_theOtherWall()
         wall = wall.theOtherWall
-    # TODO: filter route lists by wall
-    # probably better do this in the template 
+
     spotroutelist = spot.route_set.all()
+    wallroutelist = wall.route_set.all()
+
+    # take relative complement for spotroutelist:
+    # i.e. remove all routes in spotroutelist that are already at wall
+    spotroutelist = spotroutelist.exclude(pk=wallroutelist.values_list('pk',flat=True))
+
+    # also get all geoms asociated with wall routes 
     wallroutegeomlist = wall.routegeometry_set.all()
+
+    #TODO: in order to use them consecutively in template, shouldnt we order them by something?
 
     context = {'wall': wall,
                'spot_routelist': spotroutelist,
+               'wall_routelist': wallroutelist,
                'wall_routegeomlist': wallroutegeomlist}
     
     return render(request, 'miroutes/wall_edit.html', context)
