@@ -5,19 +5,6 @@
 {% endblock %}
 
 {% block extra_assets %}
-  <style>
-    .leaflet-container {  /* all maps */
-    width:  100%;
-    height: 512px;
-    }
-    .leaflet-draw-toolbar .leaflet-draw-draw-rectangle { display: none; background-position: -62px -2px; }
-    .leaflet-draw-toolbar .leaflet-draw-draw-polygon {	display: none; }
-    .leaflet-draw-toolbar .leaflet-draw-draw-circle { display: none; }
-    .leaflet-draw-toolbar .leaflet-draw-draw-marker { display: none; }
-    .leaflet-draw-toolbar .leaflet-draw-edit-remove {	display: none; }
-    .leaflet-draw-actions a { display: none; }
-  </style>
-
   {% load leaflet_tags %}
   {% load geojson_tags %}
   {% leaflet_js %}
@@ -30,206 +17,88 @@
 
     You're looking at wall {{ wall.wall_name }}
     <br><br>
+    <!-- css styles for the selectable list. TODO: put tags in css files -->
+    <style>
+        #feedback { font-size: 1.4em; }
+        #selectable .ui-selecting { background: #FECA40; }
+        #selectable .ui-selected { background: #F39814; color: white; }
+        #selectable { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+        #selectable li { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px; }
+
+        #selected_routes .ui-selecting { background: #FECA40; }
+        #selected_routes .ui-selected { background: #F39814; color: black; }
+        #selected_routes { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+        #selected_routes li { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px; }
+    </style>
 
 <script type="text/javascript">
-    var geodjango_geom = {};
-    geodjango_geom.fieldid = 'id_geom';
-    geodjango_geom.modifiable = true;
-    geodjango_geom.geom_type = 'Geometry';
-    geodjango_geom.srid = 4326;
+ $(document).ready(function() {
+     function update_form() {
 
-    function id_geom_map_callback(map, options) {
-        geodjango_geom.store_class = L.FieldStore;
-        (new L.GeometryField(geodjango_geom)).addTo(map);
-    };
-</script>
+         // remove all entries from the list of chosen routes to re-populate
+         $(".route_chooser").children().each(function() {
+            $(this).remove()
+         });
 
-<div id="id_geom_map" class="leaflet-container-default"></div>
+         // populate list with input elements
+        $("#selected_routes").children().each(function() {
+            var val = $(this).val();
 
-<script type="text/javascript">
-    (function () {
-
-    function loadmap() {
-
-        var img_dim_string = '{{ wall.wall_image.get_bg_img_size }}';
-
-        var img_dim   = img_dim_string.split(',', 4);
-        var img_dim_x = parseFloat(img_dim[0]);
-        var img_dim_y = parseFloat(img_dim[1]);
-        var xzoom     = parseFloat(img_dim[2]);
-        var yzoom     = parseFloat(img_dim[3]);
-
-        var maxzoom   = Math.max(xzoom, yzoom);
-
-        // we choose a default zoom level of 2 that matches either the width (approx.) or the
-        // height of the container
-        var minzoom   = 2;
-        var startzoom = minzoom;
-
-        var aspectRatio = img_dim_x/img_dim_y;
-        if (aspectRatio < 1){
-            // we resize the container to fit an image with aspectRatio < 1
-            // the height is then fixed to 1024px              
-            var wall_width = 1024*aspectRatio;              
-            // document.getElementById('wallmap').setAttribute("style","display:block;width:500px");
-            document.getElementById('id_geom_map').style.width = wall_width + "px";
-            document.getElementById('id_geom_map').style.height = 1024 + "px";
+            // the value in the input elements is given by the route id
+            var text = '<input type="text" name="routes_onwall" value="'.concat(val).concat('" />');
+            $(".route_chooser").append(text);
+        })
+     };
+ 
+     // the list of selected routes on the wall
+     $("#selected_routes").selectable({
+         // on select we pop the element from the list
+        selected: function(event,ui) {
+            var s = $(ui.selected);
+            s.remove();
+            // mark it as non-selected
+            s.removeClass('ui-selected');
+            // and put it back to the list of selectable routes
+            $("#selectable").append(s);
+            // the list of hidden input elements is updated as well
+            update_form();
         }
+     });
 
-        var map = L.map('id_geom_map', {
-            minZoom: minzoom,
-            maxZoom: maxzoom,
-            crs: L.CRS.Simple,
-            center: [0, 0],
-            zoom: startzoom,
-        });
-
-        var southWest = map.unproject([0, img_dim_y], map.getMaxZoom());
-        var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
-        map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
-
-        var wall_layer = L.tileLayer('{{ wall.wall_image.get_tiles_url }}/{z}/{x}/{y}.png', {
-            minZoom: 1, maxZoom: maxzoom,
-            noWrap: false,
-            tileSize: 256,
-            continuousWorld: true,
-        });
-
-        wall_layer.addTo(map);
-
-        var otherroutes = {{ wall_routegeom_list_draw|geojsonfeature|safe }};
-        oldlayer =  L.geoJson(otherroutes);
-        oldlayer.addTo(map);
-
-        var editableRoute = {{ routegeom_selected|geojsonfeature|safe }};
-        newlayer = L.geoJson(editableRoute);
-        newlayer.addTo(map);
-
-        function layer2geom(layer) {
-            // convert layer information to route geometry as used in geom field
-            // if no route information is available, returns null
-            var msg = JSON.stringify(layer.toGeoJSON());
-            var cut1 = msg.match(/{"type":"LineString.+]]}/, 3);
-            if (cut1==null) {
-                return null
-            } else {
-                return cut1[0];
-            }
-        };
-
-        function set_editing_active(drawctl){
-            // set toolbars in drawctl active
-            // this is used to highlight, which route the user should edit
-            for (var toolbarId in drawctl._toolbars) {
-                toolbar = drawctl._toolbars[toolbarId];
-                if (toolbar instanceof L.EditToolbar) {
-                    toolbar._modes.edit.handler.enable();
-                }
-            }
-        };
-
-        var drawControl = new L.Control.Draw({
-            edit: {
-                featureGroup: newlayer,
-            },
-            draw: {
-                polyline: layer2geom(newlayer)==null, // only allow to draw a new line if there is none yet
-            },
-        });
-
-        map.addControl(drawControl);
-        set_editing_active(drawControl);
-
-        map.on('mousemove', function(e) {
-            var geom = layer2geom(newlayer);
-            if (geom!=null) {
-                document.getElementById("id_geom").value = geom;
-            }
-        });
-
-        map.on('draw:edited', function(e) {
-            document.getElementById("id_geom").value = layer2geom(newlayer);
-        });
-
-
-        // if no route is specified yet... allow to create a new one
-        map.on('draw:created', function (e) {
-            map.removeControl(drawControl);
-            var type = e.layerType, layer = e.layer;
-            var fg = new L.featureGroup([layer]);
-            fg.addTo(map);
-            var newDrawControl = new L.Control.Draw({
-                draw: {
-                    polyline: false,
-                },
-                edit: {
-                    featureGroup: fg,
-                    polyline: false
-                }
-            });
-            map.addControl(newDrawControl);
-
-            set_editing_active(newDrawControl);
-
-            map.on('mousemove', function(e) {
-                var geom = layer2geom(layer);
-                if (geom!=null) {
-                    document.getElementById("id_geom").value = geom;
-                }
-            });
-
-            map.on('draw:edited', function(e) {
-                document.getElementById("id_geom").value = layer2geom(layer);
-            });
-        });
-
-    } //loadmap
-
-    var loadevents = ["load"];
-    if (loadevents.length === 0) loadmap();
-    else if (window.addEventListener) for (var i=0; i<loadevents.length; i++) window.addEventListener(loadevents[i], loadmap, false);
-    else if (window.jQuery) jQuery(window).on(loadevents.join(' '), loadmap);
-
-    })();
+     // the list of selectable routes on the spot
+     $("#selectable").selectable({
+         // on select we pop the route from the list and add it to the 
+         // list of selected routes
+        selected: function(event,ui) {
+            var s = $(ui.selected);
+            s.remove();
+            s.removeClass('ui-selected');
+            $("#selected_routes").append(s);
+            update_form();
+        }
+     });
+ });
 </script>
 
-    <form method="POST" action="{{request.path}}">
+<!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
+<ol id="selectable">
+    {% for route in spot_routelist %}
+        <li class="ui-widget-content" name="route_onspot" value="{{ route.id }}">{{ route.route_name }}</li>
+    {% endfor %}
+</ol>
+<br>
 
-        {% csrf_token %}
+<!-- This list contains the routes that are selected -->
+<ol id="selected_routes">
+    {% for geom in wall_routegeomlist %}
+        <li class="ui-widget-content" name="route_selected" value="{{ geom.route.id }}">{{ geom.route.route_name }}</li>
+    {% endfor %}
+</ol>
 
-        {{ routegeom_form.geom }}
-
-        {{ route_form.non_field_errors }}
-        {{ route_form.route_name.errors }}
-        {{ route_form.name_of_field.errors }}
-
-        <table width="100%">
-
-            <tr><td>Name:</td><td>Schwierigkeit</td><td>Aktionen</td></tr>
-
-            {% for routegeom in wall_routegeom_list %}
-                {% if routegeom.pk == routegeom_selected.pk %}
-                    <tr><td>
-                        {{ route_form.route_name }}
-                    </td><td>
-                        {{ route_form.route_grade }}
-                        <input type="hidden" id="id_route_wall" name="route_wall" value="{{ wall.id }}">
-                    </td><td>
-                        <input type="submit" value="speichern"/>
-                        &nbsp;
-                        <input type="submit" value="löschen" name="delete"/>
-                    </td></tr>
-                {% else %}
-                    <tr><td>
-                        {{ routegeom.route.route_name }}
-                    </td><td>
-                        {{ routegeom.route.route_grade }}
-                    </td><td>
-                        <a href="../route{{routegeom.route.pk}}/edit"> edit </a>
-                    </td></tr>
-                {% endif %}
-            {% endfor %}
-        </table>
-    </form>
-
+<!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
+<form method="POST" action="{{request.path|urlencode}}">
+  {% csrf_token %}
+    <div class="route_chooser"></div>
+    <input type="submit" value="speichern"/>
+</form>
 {% endblock %}

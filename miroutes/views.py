@@ -194,6 +194,8 @@ def wall_edit(request, wall_id, **kwargs):
     wall = get_object_or_404(Wall, pk=wall_id)
     spot = wall.wall_spot
 
+    if request.POST:
+        print request.POST
     # we modify the development version of the wall
     # if the wall is active
     if wall.is_active:
@@ -201,6 +203,8 @@ def wall_edit(request, wall_id, **kwargs):
         if wall.theOtherWall is None:
             wall.copyme_to_theOtherWall()
         wall = wall.theOtherWall
+    # TODO: filter route lists by wall
+    # probably better do this in the template 
     spotroutelist = spot.route_set.all()
     wallroutegeomlist = wall.routegeometry_set.all()
 
