@@ -48,12 +48,101 @@ def get_bg_img_upload_path(wallimage, filename):
     return os.path.join("wall_pictures", "background",str(time))
 
 
-class WallImage(models.Model):
+class ActiveWallViewManager(models.Manager):
+    """
+    This manager filters all currently active views excluding the dev views.
+    """
+    def get_queryset(self):
+        return super(ActiveWallViewManager, self).get_queryset().filter(wall__is_active=True).filter(is_dev=False)
+    
+
+class WallView(models.Model):
+    """
+    A wallview hosts meta information that can be changed/improved
+    within the lifecycle of a wall.
+    It is related to a route through a RouteGeometry object.
+    Currently, we statically create two views for each wall,
+    one view that is used for publication and one that is used
+    for further editing (development).
+
+    Note:
+        The many-to-many relation to the routes on the wallview is defined
+        on the side of the routes.
+    
+    Attributes:
+        is_dev (boolean): Flags the development version of the wall.
+        wall (Wall): The wall object the view is bound to.
+        approach (models.TextField): Details on the approach to the wall
+        objects (models.Manager): The generic manager of the model.
+        active_objects (ActiveWallViewManager): 
+            A manager that filters the wallviews which are associated with
+            active walls. The development views are excluded.
+    """
+
+    wall = models.ForeignKey('Wall')
+    is_dev = models.BooleanField(default=False)
+    approach = models.TextField(blank=True, null=True)
+
+    objects = models.Manager()
+    active_objects = ActiveWallViewManager()
+
+    
+class ActiveWallManager(models.Manager):
+    """
+    The active wall manager is used to access the active walls.
+    """
+    def get_queryset(self):
+        return super(ActiveWallManager, self).get_queryset().filter(is_active=True)
+
+    
+class Wall(models.Model):
+    """
+    Hosts basic informations on a wall. The informations that are put
+    in the wall model are considered static, i.e., 
+    they are not updated by users.
+    
+    Attributes:
+        is_active (Boolean): Flags active (visible) walls.
+        wall_spot (Spot): The spot the wall is associated to.
+        wall_name (str): Human readable string describing the wall.
+        background_img (ImageField): Hosts the image associated with the wall.
+        geom (djgeojson.fields.PointField): JSON of the location of the wall on the map.
+        objects (Manager): The generic model manager.
+        active_objects (ActiveWallManager): Filters for walls with is_active=True.
+
+    Properties:
+        dev_view (WallView): Accesses the WallView with is_dev=True.
+        pub_view (WallView): Accesses the WallView with is_dev=False.
+    """
+    wall_name = models.CharField(max_length=100)
+    wall_spot = models.ForeignKey(Spot)
+    geom = PointField()
+    is_active = models.BooleanField(default=False)
+    
+    objects = models.Manager()
+    active_objects = ActiveWallManager()
+
     background_img = models.ImageField(blank = True, upload_to=get_bg_img_upload_path)
 
+    @property
+    def dev_view(self):
+        return self.wallview_set.filter(is_dev=True)[0]
+
+    @property
+    def pub_view(self):
+        return self.wallview_set.filter(is_dev=False)[0]
+
+    def __str__(self):
+        return self.wall_name
+    
     def save(self, *args, **kwargs):
-        super(WallImage, self).save(*args, **kwargs)
+        super(Wall, self).save(*args, **kwargs)
         self.create_tiles()
+        if not self.wallview_set.all():
+            dev_view = WallView(wall=self, is_dev=True)
+            dev_view.save()
+            pub_view = WallView(wall=self, is_dev=False)
+            pub_view.save()
 
     def create_tiles(self):
         """
@@ -122,86 +211,52 @@ class WallImage(models.Model):
             return ' ,'.join( [ str(d) for d in res ] )
         return ''
 
-
-class Wall(models.Model):
-    """
-    A wall hosts geometrical representations of routes. 
-    The relation is mediated by the RouteGeometry object.
-    Every wall is linked to a wall image object which hosts the 
-    image being characteristic to a wall and its development version.
-    The development/publish versions of a wall are linked by the theOtherWall field.
-
-    Note:
-        The many-to-many relation to the routes on the wall is defined 
-        on the side of the routes.
-    
-    Attributes:
-        wall_name (str): Human readable string describing the wall.
-        wall_spot (Spot): The spot the wall is associated to.
-        wall_image (WallImage): Hosts the image associated with the wall.
-        geom (djgeojson.fields.PointField): JSON of the location of the wall on the map.
-        is_active (boolean): Flags active walls.
-        is_dev (boolean): Flags the development version of the wall.
-        theOtherWall (Wall): The development/published partner of the wall.
-    """
-    wall_name = models.CharField(max_length=100)
-    wall_spot = models.ForeignKey(Spot)
-    wall_image = models.ForeignKey(WallImage, default=None)
-    geom = PointField()
-
-    is_active = models.BooleanField(default=False)
-    is_dev = models.BooleanField(default=False)
-    
-    theOtherWall = models.OneToOneField('self', blank=True, null=True)
-    
-    def __str__(self):
-        return self.wall_name
-
-    @property
-    def popupContent(self):
-        return "Test"
-
-    def copyme_to_theOtherWall(self):
+    def publish_dev_view(self):
         """
-        Creates a copy of the wall and saves the reference in the theOtherWall field.
-        This is intended to work both ways, i.e., when publishing a dev-wall, the current
-        dev-wall is copied and the currently published wall is deleted.
-        When creating a dev version of a wall, the current dev version is deleted and
-        the new dev-wall is initialized from the current state of the wall.
+        Deletes the current pub_view and copies the dev_view over the pub_view
         """
-        import copy
-        # If the other wall exists it is deleted
-        if self.theOtherWall is not None:
-            self.theOtherWall.delete()
+        # delete the old pub_view
+        self.pub_view.delete()
 
-        # Create a shallow copy of the wall object and save it
-        theOtherWall = copy.copy(self)
-        theOtherWall.pk = None
-        theOtherWall.save()
+        devview = self.dev_view
+        
+        # copy the devview
+        devview.pk = None
+        # and make it the new pub_view
+        old_pubview.is_dev = False
+        devview.save()
 
-        # Copy the RouteGeometry objects
-        for routegeom in self.routegeometry_set.all():
+        # Now we still have to update the RouteGeometries on the
+        # new pub_view
+        for routegeom in self.dev_view.routegeometry_set.all():
             new_routegeom = RouteGeometry(route=routegeom.route,
-                                          on_wall=theOtherWall,
+                                          on_wallview=self.pub_view,
                                           geom=routegeom.geom)
             new_routegeom.save()
-            
-        # the other wall has always the opposite state
-        theOtherWall.is_active = not self.is_dev
+        
+    def reset_dev_view(self):
+        """
+        Deletes the current dev_view and copies the pub_view over the dev_view.
+        """
+        # delete the old dev_view
+        self.dev_view.delete()
 
-        # ... and finally set the reference in the OneToOne field
-        self.theOtherWall = theOtherWall
+        pubview = self.pub_view
+        
+        # copy the pub_view
+        pubview.pk = None
+        # and make it the new dev_view
+        pubview.is_dev = True
+        pubview.save()
 
-        # note that the circular reference self.theOtherWall.theOtherWall=self
-        # is created when the object is saved to avoid infinite save loops.
-        self.save()
-
-    def save(self, checkTheOtherWall=True, *args, **kwargs):
-        super(Wall, self).save()
-        if self.theOtherWall and checkTheOtherWall:
-            self.theOtherWall.theOtherWall = self
-            self.theOtherWall.save(checkTheOtherWall=False)
-            
+        # Now we still have to update the RouteGeometries on the
+        # new dev_view
+        for routegeom in self.pub_view.routegeometry_set.all():
+            new_routegeom = RouteGeometry(route=routegeom.route,
+                                          on_wallview=self.dev_view,
+                                          geom=routegeom.geom)
+            new_routegeom.save()
+    
 
 class Route(models.Model):
 
@@ -226,7 +281,7 @@ class Route(models.Model):
     # Every route is located at a climbing spot
     route_spot = models.ForeignKey(Spot, default=None, editable=False)
     # The relation to one or many walls is via the geometry of the route
-    route_walls = models.ManyToManyField(Wall, through='RouteGeometry')
+    route_walls = models.ManyToManyField(WallView, through='RouteGeometry')
 
     route_name = models.CharField(max_length=100)
 
@@ -250,6 +305,6 @@ class RouteGeometry(models.Model):
     """
     The geometry of a route that is specific to a wall.
     """
-    on_wall = models.ForeignKey(Wall)
+    on_wallview = models.ForeignKey(WallView)
     route = models.ForeignKey(Route)
     geom = LineStringField()
