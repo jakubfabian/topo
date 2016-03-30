@@ -41,7 +41,7 @@ fname_image = "/code/misc/lost_arrow.png"
 wi = WallImage()
 wi.background_img.save('lost_arrow.png', File(open(fname_image)))
 
-w = Wall(wall_name="Keltenwand", wall_spot=s, geom=gKeltenwand, wall_image=wi)
+w = Wall(wall_name="Keltenwand", is_active=False, wall_spot=s, geom=gKeltenwand, wall_image=wi)
 w.save()
 
 r = Route(route_name="testRoute1", route_grade="6b", route_spot=s)

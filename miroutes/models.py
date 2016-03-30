@@ -141,13 +141,17 @@ class Wall(models.Model):
         wall_image (WallImage): Hosts the image associated with the wall.
         geom (djgeojson.fields.PointField): JSON of the location of the wall on the map.
         is_active (boolean): Flags active walls.
+        is_dev (boolean): Flags the development version of the wall.
         theOtherWall (Wall): The development/published partner of the wall.
     """
     wall_name = models.CharField(max_length=100)
     wall_spot = models.ForeignKey(Spot)
     wall_image = models.ForeignKey(WallImage, default=None)
     geom = PointField()
+
     is_active = models.BooleanField(default=False)
+    is_dev = models.BooleanField(default=False)
+    
     theOtherWall = models.OneToOneField('self', blank=True, null=True)
     
     def __str__(self):
@@ -183,7 +187,7 @@ class Wall(models.Model):
             new_routegeom.save()
             
         # the other wall has always the opposite state
-        theOtherWall.is_active = not self.is_active
+        theOtherWall.is_active = not self.is_dev
 
         # ... and finally set the reference in the OneToOne field
         self.theOtherWall = theOtherWall

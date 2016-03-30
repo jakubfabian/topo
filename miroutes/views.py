@@ -197,24 +197,22 @@ def wall_edit(request, wall_id, **kwargs):
     if request.POST:
         print request.POST
     # we modify the development version of the wall
-    # if the wall is active
-    if wall.is_active:
-        # ... and create the wall if it does not exist
-        if wall.theOtherWall is None:
-            wall.copyme_to_theOtherWall()
-        wall = wall.theOtherWall
+    # ... and create the wall if it does not exist
+    if wall.theOtherWall is None:
+        wall.copyme_to_theOtherWall()
+    wall = wall.theOtherWall
 
     spotroutelist = spot.route_set.all()
     wallroutelist = wall.route_set.all()
 
     # take relative complement for spotroutelist:
     # i.e. remove all routes in spotroutelist that are already at wall
-    spotroutelist = spotroutelist.exclude(pk=wallroutelist.values_list('pk',flat=True))
+    spotroutelist = spotroutelist.exclude(pk=wallroutelist.values_list('pk', flat=True))
 
-    # also get all geoms asociated with wall routes 
+    # also get all geoms asociated with wall routes
     wallroutegeomlist = wall.routegeometry_set.all()
 
-    #TODO: in order to use them consecutively in template, shouldnt we order them by something?
+    # TODO: in order to use them consecutively in template, shouldnt we order them by something?
 
     context = {'wall': wall,
                'spot_routelist': spotroutelist,
