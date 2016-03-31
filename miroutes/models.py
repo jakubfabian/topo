@@ -6,6 +6,13 @@ from django.conf import settings
 
 from miroutes.image_tiler import tile_image
 
+RATING_CHOICES = ((1, 'poor'),
+                  (2, 'ok'),
+                  (3, 'not bad'),
+                  (4, 'good'),
+                  (5, 'excellent'))
+
+
 # Create your models here.
 class Country(models.Model):
     country_name = models.CharField(max_length=100)
@@ -79,9 +86,24 @@ class WallView(models.Model):
             active walls. The development views are excluded.
     """
 
+    DIRECTIONS = ((0, 'North'),
+                  (1, 'North-East'),
+                  (2, 'East'),
+                  (3, 'South-East'),
+                  (4, 'South'),
+                  (5, 'South-West'),
+                  (6, 'West'),
+                  (7, 'North-West'))
+    
     wall = models.ForeignKey('Wall')
     is_dev = models.BooleanField(default=False)
     approach = models.TextField(blank=True, null=True)
+    approach_time = models.DurationField(blank=True, null=True)
+    exposure = models.IntegerField(blank=True, null=True, choices=DIRECTIONS)
+    children_friendly = models.IntegerField(blank=True, null=True, choices=RATING_CHOICES)
+    bolt_quality = models.IntegerField(blank=True, null=True, choices=RATING_CHOICES)
+    wall_height = models.IntegerField(blank=True, null=True)
+    
 
     objects = models.Manager()
     active_objects = ActiveWallViewManager()
@@ -210,7 +232,7 @@ class Wall(models.Model):
             res = list(dim)+zoom_levels
             return ' ,'.join( [ str(d) for d in res ] )
         return ''
-
+    
     def publish_dev_view(self):
         """
         Deletes the current pub_view and copies the dev_view over the pub_view
@@ -233,7 +255,8 @@ class Wall(models.Model):
                                           on_wallview=self.pub_view,
                                           geom=routegeom.geom)
             new_routegeom.save()
-        
+
+            
     def reset_dev_view(self):
         """
         Deletes the current dev_view and copies the pub_view over the dev_view.
@@ -271,11 +294,6 @@ class Route(models.Model):
                       ('5', '5'),
                       ('5+', '5+'))]
 
-    RATING_CHOICES = ((1, 'poor'),
-                      (2, 'ok'),
-                      (3, 'not bad'),
-                      (4, 'good'),
-                      (5, 'excellent'))
                       
     
     # Every route is located at a climbing spot
