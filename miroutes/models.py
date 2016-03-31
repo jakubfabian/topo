@@ -79,7 +79,14 @@ class WallView(models.Model):
     Attributes:
         is_dev (boolean): Flags the development version of the wall.
         wall (Wall): The wall object the view is bound to.
-        approach (models.TextField): Details on the approach to the wall
+        approach (TextField): Details on the approach to the wall
+        approach_time (DurationField): How long does the approach take?
+        exposure (IntegerField): The exposure of the wall.
+        children_friendly (IntegerField): A children-friendly rating (5 choices).
+        bolt_quality (IntegerField): A choice field with a bolt quality rating (5 choices).
+        wall_height (IntegerField): The approximate height of the wall in meters.
+        DIRECTIONS (tuple): The choices for 8 possible orientations of the wall.
+
         objects (models.Manager): The generic manager of the model.
         active_objects (ActiveWallViewManager): 
             A manager that filters the wallviews which are associated with
