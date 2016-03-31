@@ -10,6 +10,7 @@ from miroutes.models import Country
 from miroutes.models import Area
 from miroutes.models import Spot
 from miroutes.models import Wall
+from miroutes.models import WallView
 from miroutes.models import Route
 from miroutes.models import RouteGeometry
 
@@ -25,23 +26,33 @@ def index(request):
     country_listing = Country.objects.order_by('country_name')[:5]
     area_listing = Area.objects.order_by('area_name')
     spot_listing = Spot.objects.order_by('spot_name')
-    wall_listing = Wall.objects.filter(is_active=True).order_by('wall_name')
+    wall_listing = Wall.active_objects.order_by('wall_name')
     route_listing = Route.objects.order_by('route_name')
-    context = {'country_listing': country_listing, 'area_listing': area_listing, 'spot_listing': spot_listing, 'wall_listing': wall_listing, 'route_listing': route_listing}
+    context = {'country_listing': country_listing,
+               'area_listing': area_listing,
+               'spot_listing': spot_listing,
+               'wall_listing': wall_listing,
+               'route_listing': route_listing}
     return render(request, 'miroutes/index.html', context)
 
 
 def country_detail(request, country_id, **kwargs):
-    p = get_object_or_404(Country, pk=country_id)
-    arealist = p.area_set.all()
+    """
+    Country detail view.
+    """
+    country = get_object_or_404(Country, pk=country_id)
+    arealist = country.area_set.all()
     spotlist = Spot.objects.filter(spot_area__area_country=country_id)
-    context = {'country': p, 'country_area_list': arealist, 'spotlist': spotlist}
+    context = {'country': country, 'country_area_list': arealist, 'spotlist': spotlist}
     return render(request, 'miroutes/country_detail.html', context)
 
 def area_detail(request, area_id, **kwargs):
-    p = get_object_or_404(Area, pk=area_id)
-    spotlist = p.spot_set.all()
-    context = {'area': p, 'area_spot_list': spotlist}
+    """
+    Area detail view.
+    """
+    area = get_object_or_404(Area, pk=area_id)
+    spotlist = area.spot_set.all()
+    context = {'area': area, 'area_spot_list': spotlist}
     return render(request, 'miroutes/area_detail.html', context)
 
 def spot_detail(request, spot_id, **kwargs):
@@ -89,6 +100,7 @@ def spot_add(request, area_id, **kwargs):
 
 def add_wall(request, spot_id, **kwargs):
     """
+    Add a wall to a spot.
     """
     spot = get_object_or_404(Spot, pk=spot_id)
     wall_list = spot.wall_set
@@ -122,17 +134,27 @@ def toggle_show_inactive(request):
 
 
 def wall_detail(request, wall_id, **kwargs):
+    """
+    Details of a wall and the public view on the wall.
+    """
     from miroutes.forms import RouteEditForm
     wall = get_object_or_404(Wall, pk=wall_id)
+    wallview = wall.pub_view
 
-    routegeomlist = wall.routegeometry_set.all()
-    context = {'wall': wall, 'wall_route_geom_list': routegeomlist}
+    routegeomlist = wallview.routegeometry_set.all()
+    context = {'wall': wall,
+               'wallview': wallview,
+               'wall_route_geom_list': routegeomlist}
     return render(request, 'miroutes/wall_detail.html', context)
 
 
 def route_detail(request, route_id, **kwargs):
+    """
+    Details of a route object.
+    """
     route = get_object_or_404(Route, pk=route_id)
-    context = {'route': route}
+    route_geometries = route.routegeometry_set.all()
+    context = {'route': route, 'route_geometries': route_geometries}
     return render(request, 'miroutes/route_detail.html', context)
 
 
@@ -177,9 +199,7 @@ def route_edit(request, route_id, **kwargs):
 
 def wall_edit(request, wall_id, **kwargs):
     """
-    Edit the route geometries on a wall.
-    If the wall is active, all changes are made on the development
-    version of the wall.
+    Edit the development WallView of a wall.
     We select one existing route or
     create a new one and draw the geometry.
 
@@ -192,30 +212,40 @@ def wall_edit(request, wall_id, **kwargs):
       A HTML web page generated from the wall_edit.html template
     """
     wall = get_object_or_404(Wall, pk=wall_id)
+    wallview = wall.dev_view
+
     spot = wall.wall_spot
 
     if request.POST:
         print request.POST
-    # we modify the development version of the wall
-    # ... and create the wall if it does not exist
-    if wall.theOtherWall is None:
-        wall.copyme_to_theOtherWall()
-    wall = wall.theOtherWall
 
+    # routes on the dev view
+    wallroutelist = wallview.route_set.all()
+    # all routes on the spot
     spotroutelist = spot.route_set.all()
-    wallroutelist = wall.route_set.all()
-
+    
     # take relative complement for spotroutelist:
     # i.e. remove all routes in spotroutelist that are already at wall
     spotroutelist = spotroutelist.exclude(pk=wallroutelist.values_list('pk', flat=True))
 
+    # all active walls on the spot without the currently selected wall
+    spotwalllist = Wall.active_objects.all()
+    spotwalllist = spotwalllist.exclude(pk=wall.id)
+
+    # routes that are not on an active wall
+    spotroutesnotonwall = spotroutelist.exclude(pk=spotwalllist.values_list('routes__pk', flat=True))
+    
     # also get all geoms asociated with wall routes
-    wallroutegeomlist = wall.routegeometry_set.all()
+    wallroutegeomlist = wallview.routegeometry_set.all()
 
     # TODO: in order to use them consecutively in template, shouldnt we order them by something?
 
-    context = {'wall': wall,
+    context = {'spot': wall.wall_spot,
+               'spot_walllist': spotwalllist,
+               'wall': wall,
+               'wallview': wallview,
                'spot_routelist': spotroutelist,
+               'spot_routes_noton_wall': spotroutesnotonwall,
                'wall_routelist': wallroutelist,
                'wall_routegeomlist': wallroutegeomlist}
     
