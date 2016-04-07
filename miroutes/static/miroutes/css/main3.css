@@ -18,6 +18,7 @@ html,body
     height: 97px;
     width: 100%;
     background: url('../../img/header2.jpg');
+    background-position: right;
     border-bottom: 3px solid black;
 }
 .leaflet-control-container .leaflet-top {
@@ -116,8 +117,8 @@ html,body
     display: inline-block;
     border-radius: 5px;
     border: solid 2px black;
-    padding: 8px 12px 8px 12px;
-    width: 80px;
+    padding: 5px 12px 5px 12px;
+    width: 67px;
     margin: 0;
     text-align: center;
     background: white;
