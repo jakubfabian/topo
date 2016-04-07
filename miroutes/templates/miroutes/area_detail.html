@@ -1,72 +1,68 @@
 {% extends "base.html" %}
 
-{% block title %} 
-	<title>Mitopo.de - Area Detail</title>
+{% block title %}
+    <title>Mitopo.de - Area Detail</title>
 {% endblock %}
 
 {% block extra_assets %}
 
-<style>
-.leaflet-container {  /* all maps */
-    width:  100%;
-    height: 400px;
-}
-</style>
+    {% load leaflet_tags %}
+    {% load geojson_tags %}
+    {% leaflet_js %}
+    {% leaflet_css %}
 
-{% load leaflet_tags %}
-{% load geojson_tags %}
-{% leaflet_js %}
-{% leaflet_css %}
-
-{% endblock %} 
+{% endblock %}
 
 {% block content %}
 
-<br><br>
-You're looking at area selection {{ area.area_name }}
+    <br><br>
+    You're looking at area selection {{ area.area_name }}
 
-{% if area_spot_list %}
+    {% if area_spot_list %}
 
-      <script type="text/javascript">
+        <script type="text/javascript">
 
-      function map_init(map, options) {
+            function map_init(map, options) {
 
-        var markerArray = [];
+                var markerArray = [];
 
-        {% for spot in area_spot_list %}
-            var coord = L.latLng({{ spot.geom.coordinates }});
-            var newcoord = L.latLng(coord.lng, coord.lat);
-            var mc = new L.marker(newcoord);
-            mc.bindPopup("<a href={% url "spot_detail" spot_id=spot.id %}>{{ spot.spot_name }}</a>");
-            markerArray.push(mc);
-        {% endfor %}
+                {% for spot in area_spot_list %}
+                    var coord = L.latLng({{ spot.geom.coordinates }});
+                    var newcoord = L.latLng(coord.lng, coord.lat);
+                    var mc = new L.marker(newcoord);
+                    mc.bindPopup("<a href={% url "spot_detail" spot_id=spot.id %}>{{ spot.spot_name }}</a>");
+                    markerArray.push(mc);
+                {% endfor %}
 
-        var group = L.featureGroup(markerArray).addTo(map);
+                var group = L.featureGroup(markerArray).addTo(map);
 
-        if (markerArray.length > 1){
-                map.fitBounds(group.getBounds());
-        } else {
-            map.setView(markerArray[0].getLatLng(), 12);
-        }	
-      }
-    </script>
+                if (markerArray.length > 1) {
+                    map.fitBounds(group.getBounds());
+                } else {
+                    map.setView(markerArray[0].getLatLng(), 12);
+                }
+            }
+        </script>
 
-    {% leaflet_map "spots" callback="window.map_init" %}
+        {% leaflet_map "spots" callback="window.map_init" %}
+        {% block mapobjects_info %}
 
 
-    In {{ area.area_name }} there are following spots:<br><br>
+            In {{ area.area_name }} there are following spots:<br><br>
 
-    {% for spot in area_spot_list %}
-    <li><a href=" {% url "spot_detail" spot_id=spot.pk %} "> {{ spot.spot_name }}  {{ spot.geom.coordinates }}</a></li>
-    {% endfor %}
-    </ul>
+            {% for spot in area_spot_list %}
+                <li>
+                    <a href=" {% url "spot_detail" spot_id=spot.pk %} "> {{ spot.spot_name }} {{ spot.geom.coordinates }}</a>
+                </li>
+            {% endfor %}
+            </ul>
 
-    <form action="{% url 'spot_add' country_id=area.area_country.id area_id=area.id %}">
-        <input type="submit" value="Add new spot">
-    </form>
-
+            <form action="{% url 'spot_add' country_id=area.area_country.id area_id=area.id %}">
+                <input type="submit" value="Add new spot">
+            </form>
+        {% endblock %}
     {% else %}
-    <p>Currently no spots are available in {{ area.area_name }}</p>
-{% endif %}
+        <p>Currently no spots are available in {{ area.area_name }}</p>
+    {% endif %}
 
 {% endblock %}

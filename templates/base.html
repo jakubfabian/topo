@@ -4,68 +4,89 @@
 {% load static %}
 
 <head>
-        <title>	
+    <title>
 
-{% block title %} 
-        Mei Topo - Topos for everyone 
-{% endblock %}
+        {% block title %}
+            Mei Topo - Topos for everyone
+        {% endblock %}
 
-        </title>
+    </title>
 
 
-{% block main-css %}
-        <link rel="stylesheet" href={% static "miroutes/css/main2.css" %} />
-{% endblock %}
 
-{% block jquery_import %}
-    <script type="text/javascript" src={% static "miroutes/js/jquery-2.2.2.js" %}></script>
-    <script type="text/javascript" src={% static "miroutes/js/jquery-ui-1.12.0-rc.1.custom/jquery-ui.js" %}></script>
-{% endblock %}
 
-{% block extra_assets %}
-{% endblock %}
+    {% block jquery_import %}
+        <script type="text/javascript" src={% static "miroutes/js/jquery-2.2.2.js" %}></script>
+        <script type="text/javascript"
+                src={% static "miroutes/js/jquery-ui-1.12.0-rc.1.custom/jquery-ui.js" %}></script>
+    {% endblock %}
 
+    {% block extra_assets %}
+
+
+    {% endblock %}
+    {% block main-css %}
+        <link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href={% static "miroutes/css/main3.css" %}/>
+    {% endblock %}
 </head>
 
 <body>
 <div id="contentcontainer">
 
-{% block header %}
-
-<div id="header">
-        <img id="headerimg" src="{% static "miroutes/img/header.jpg"     %}" width="1000px"></img>
-</div>
-
-<div id="user_menu">
-    {% if user.is_anonymous %}
-            <a href="{% url 'django.contrib.auth.views.login' %}?next={{request.path}}">Login</a>
-            /
-            <a href="{% url 'users.views.register' %}">Register</a>
-    {% else %}
-            User   : <b>{{ user }}</b>  
-            (<a href="{% url 'django.contrib.auth.views.logout'%}?next={{request.path}}">logout</a>) 
-            &nbsp;&nbsp; Email  : {{user.email}} </br>
-    {% endif %}
-</div>
-<div id="messages">
-  {% if messages %}
-    <ul class="messages">
-      {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-</div>
-
-{% endblock %}
+    {% block header %}
 
 
-	    <div id="content">
-		    {% block content %}Default template content -- there is nothing to see here...{% endblock %}
-	    </div>
+        <div id="user-menu">
+            <a href="/miroutes">
+                <img id="logo" src="{% static "miroutes/img/logo.png" %}"/>
+            </a>
+            <div id="login-menu">
+                {% if user.is_anonymous %}
+                    <a href="{% url 'django.contrib.auth.views.login' %}?next={{ request.path }}">Login</a>
+                    <a href="{% url 'users.views.register' %}">Register</a>
+                {% else %}
+                    User   : <b>{{ user }}</b>
+                    (<a href="{% url 'django.contrib.auth.views.logout' %}?next={{ request.path }}">logout</a>)
+                    &nbsp;&nbsp; Email  : {{ user.email }}
+                {% endif %}
+            </div>
+
+            <div id="search-container">
+                <input id="search-field" type="text" placeholder="Search ..."/>
+            </div>
+        </div>
+        <div id="messages">
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+    {% endblock %}
 
 
+    <div id="content">
+        {% block content %}Default template content -- there is nothing to see here...{% endblock %}
+    </div>
+    <div class="mapobjects-info">
+
+        <div class="inner_container">
+
+            {% block mapobjects_info %}
+            {% endblock %}
+        </div>
     </div>
 
-    </body>
+</div>
+
+{% block footer %}
+    <div id="footer">
+        (c) die Kletteraffen
+    </div>
+{% endblock %}
+</body>
 </html>

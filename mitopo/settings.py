@@ -152,3 +152,8 @@ EMAIL_HOST_USER = 'mitopo.de@gmail.com'
 EMAIL_HOST_PASSWORD = '****'
 DEFAULT_FROM_EMAIL = 'noreply@mitopo.de'
 DEFAULT_TO_EMAIL = 'mitopo.de@gmail.com'
+
+
+LEAFLET_CONFIG = {
+    'RESET_VIEW': False
+}

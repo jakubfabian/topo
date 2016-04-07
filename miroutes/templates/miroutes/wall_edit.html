@@ -1,23 +1,20 @@
 {% extends "base.html" %}
 
-{% block title %} 
-  Mitopo.de - Route Edit Page
+{% block title %}
+    Mitopo.de - Route Edit Page
 {% endblock %}
 
 {% block extra_assets %}
-  {% load leaflet_tags %}
-  {% load geojson_tags %}
-  {% leaflet_js %}
-  {% leaflet_css %}
-  {% leaflet_js plugins="forms" %}
-  {% leaflet_css plugins="forms" %}
-{% endblock %} 
+    {% load leaflet_tags %}
+    {% load geojson_tags %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+    {% leaflet_js plugins="forms" %}
+    {% leaflet_css plugins="forms" %}
+{% endblock %}
 
-{% block content %} 
+{% block content %}
 
-    You're looking at wall {{ wall.wall_name }}
-    <br><br>
-    <!-- css styles for the selectable list. TODO: put tags in css files -->
     <style>
         #wrapper_select {
             width: 800px;
@@ -25,88 +22,134 @@
             overflow: hidden; /* will contain if #first is longer than #second */
         }
 
-        #feedback { font-size: 1.4em; }
-        #selectable .ui-selecting { background: #FECA40; }
-        #selectable .ui-selected { background: #F39814; color: white; }
-        #selectable { display: inline-block; list-style-type: none; width: 300px; border: 1px solid red;}
-        #selectable li { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px; }
+        #feedback {
+            font-size: 1.4em;
+        }
 
-        #selected_routes .ui-selecting { background: #FECA40; }
-        #selected_routes .ui-selected { background: #F39814; color: black; }
-        #selected_routes { display: inline-block; list-style-type: none; width: 300px; overflow: hidden; border: 1px solid green; }
-        #selected_routes li { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px;}
+        #selectable .ui-selecting {
+            background: #FECA40;
+        }
+
+        #selectable .ui-selected {
+            background: #F39814;
+            color: white;
+        }
+
+        #selectable {
+            display: inline-block;
+            list-style-type: none;
+            width: 300px;
+            border: 1px solid red;
+        }
+
+        #selectable li {
+            margin: 3px;
+            padding: 0.4em;
+            font-size: 1.4em;
+            height: 18px;
+        }
+
+        #selected_routes .ui-selecting {
+            background: #FECA40;
+        }
+
+        #selected_routes .ui-selected {
+            background: #F39814;
+            color: black;
+        }
+
+        #selected_routes {
+            display: inline-block;
+            list-style-type: none;
+            width: 300px;
+            overflow: hidden;
+            border: 1px solid green;
+        }
+
+        #selected_routes li {
+            margin: 3px;
+            padding: 0.4em;
+            font-size: 1.4em;
+            height: 18px;
+        }
     </style>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            function update_form() {
 
-<script type="text/javascript">
- $(document).ready(function() {
-     function update_form() {
+                // remove all entries from the list of chosen routes to re-populate
+                $(".route_chooser").children().each(function () {
+                    $(this).remove()
+                });
 
-         // remove all entries from the list of chosen routes to re-populate
-         $(".route_chooser").children().each(function() {
-            $(this).remove()
-         });
+                // populate list with input elements
+                $("#selected_routes").children().each(function () {
+                    var val = $(this).val();
 
-         // populate list with input elements
-        $("#selected_routes").children().each(function() {
-            var val = $(this).val();
+                    // the value in the input elements is given by the route id
+                    var text = '<input type="text" name="routes_onwall" value="'.concat(val).concat('" />');
+                    $(".route_chooser").append(text);
+                })
+            };
 
-            // the value in the input elements is given by the route id
-            var text = '<input type="text" name="routes_onwall" value="'.concat(val).concat('" />');
-            $(".route_chooser").append(text);
-        })
-     };
- 
-     // the list of selected routes on the wall
-     $("#selected_routes").selectable({
-         // on select we pop the element from the list
-        selected: function(event,ui) {
-            var s = $(ui.selected);
-            s.remove();
-            // mark it as non-selected
-            s.removeClass('ui-selected');
-            // and put it back to the list of selectable routes
-            $("#selectable").append(s);
-            // the list of hidden input elements is updated as well
-            update_form();
-        }
-     });
+            // the list of selected routes on the wall
+            $("#selected_routes").selectable({
+                // on select we pop the element from the list
+                selected: function (event, ui) {
+                    var s = $(ui.selected);
+                    s.remove();
+                    // mark it as non-selected
+                    s.removeClass('ui-selected');
+                    // and put it back to the list of selectable routes
+                    $("#selectable").append(s);
+                    // the list of hidden input elements is updated as well
+                    update_form();
+                }
+            });
 
-     // the list of selectable routes on the spot
-     $("#selectable").selectable({
-         // on select we pop the route from the list and add it to the 
-         // list of selected routes
-        selected: function(event,ui) {
-            var s = $(ui.selected);
-            s.remove();
-            s.removeClass('ui-selected');
-            $("#selected_routes").append(s);
-            update_form();
-        }
-     });
- });
-</script>
+            // the list of selectable routes on the spot
+            $("#selectable").selectable({
+                // on select we pop the route from the list and add it to the
+                // list of selected routes
+                selected: function (event, ui) {
+                    var s = $(ui.selected);
+                    s.remove();
+                    s.removeClass('ui-selected');
+                    $("#selected_routes").append(s);
+                    update_form();
+                }
+            });
+        });
+    </script>
 
-<!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
-<div id="wrapper_select">
-  <ol id="selectable">
-      {% for route in spot_routelist %}
-          <li class="ui-widget-content" name="route_onspot" value="{{ route.id }}">{{ route.route_name }}</li>
-      {% endfor %}
-  </ol>
-  <br>
-  
-  <!-- This list contains the routes that are selected -->
-  <ol id="selected_routes">
-      {% for route in wall_routelist %}
-          <li class="ui-widget-content" name="route_selected" value="{{ route.id }}">{{ route.route_name }}</li>
-      {% endfor %}
-  </ol>
-</div>
 
-<!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
-<form method="POST" action="{{request.path|urlencode}}">
-  {% csrf_token %}
-    <div class="route_chooser"></div>
-    <input type="submit" value="speichern"/>
-</form>
+{% endblock %}
+{% block mapobjects_info %}
+    You're looking at wall {{ wall.wall_name }}
+    <br><br>
+    <!-- css styles for the selectable list. TODO: put tags in css files -->
+    <!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
+    <div id="wrapper_select">
+        <ol id="selectable">
+            {% for route in spot_routelist %}
+                <li class="ui-widget-content" name="route_onspot" value="{{ route.id }}">{{ route.route_name }}</li>
+            {% endfor %}
+        </ol>
+        <br>
+
+        <!-- This list contains the routes that are selected -->
+        <ol id="selected_routes">
+            {% for route in wall_routelist %}
+                <li class="ui-widget-content" name="route_selected" value="{{ route.id }}">{{ route.route_name }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+
+    <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
+    <form method="POST" action="{{ request.path|urlencode }}">
+        {% csrf_token %}
+        <div class="route_chooser"></div>
+        <input type="submit" value="speichern"/>
+    </form>
+
 {% endblock %}

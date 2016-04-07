@@ -57,23 +57,29 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Spot add</h1>
-    <a href="/miroutes/"> Home </a> : <a href=../../> {{ spot.spot_area.area_country.country_name }} </a> ::
-    <a href="../">{{ spot.spot_area.area_name }} </a> :: {{ spot.spot_name }}
-    <form method="POST" action="{% url 'spot_add' country_id=area.area_country.id area_id=area.id %}">
-    {% csrf_token %}
-        <input type="text" name="spot_name" value="" />
+
 
     {% leaflet_map "spotmap" callback="window.map_init_basic" %}
 
-        <input type="hidden" id="spot_lat" name="spot_lat" value="" />
-        <input type="hidden" id="spot_lng" name="spot_lng" value="" />
+
+{% endblock %}
+
+{% block mapobjects_info %}
+    <h1>Spot add</h1>
+    <a href="/miroutes/"> Home </a> : <a href=../../> {{ spot.spot_area.area_country.country_name }} </a> ::
+    <a href="../">{{ spot.spot_area.area_name }} </a> :: {{ spot.spot_name }}
+
+    <form method="POST" action="{% url 'spot_add' country_id=area.area_country.id area_id=area.id %}">
+        {% csrf_token %}
+        <input type="text" name="spot_name" value=""/>
+        <input type="hidden" id="spot_lat" name="spot_lat" value=""/>
+        <input type="hidden" id="spot_lng" name="spot_lng" value=""/>
         <input type="submit" value="save">
     </form>
 
     <form method="GET" action="{% url 'spot_add' country_id=area.area_country.id area_id=area.id %}">
+            {% csrf_token %}
         <input type="submit" value="cancel">
     </form>
 
 {% endblock %}
-

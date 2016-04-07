@@ -2,38 +2,40 @@
 {% load geojson_tags %}
 
 <html>
-  <head>
+<head>
     {% leaflet_js plugins="forms" %}
     {% leaflet_css plugins="forms" %}
-      <style>
-    .leaflet-container {  /* all maps */
-        width:  100%;
-        height: 600px;
-    }
-          .leaflet-draw-toolbar .leaflet-draw-draw-rectangle {
-	display: none;
-	background-position: -62px -2px;
-}
-             .leaflet-draw-toolbar .leaflet-draw-draw-polygon {
-	display: none;
+    <style>
 
-}
-          .leaflet-draw-toolbar .leaflet-draw-draw-circle {
-	display: none;
+        .leaflet-draw-toolbar .leaflet-draw-draw-rectangle {
+            display: none;
+            background-position: -62px -2px;
+        }
 
-}
-                       .leaflet-draw-toolbar .leaflet-draw-draw-marker {
-	display: none;
+        .leaflet-draw-toolbar .leaflet-draw-draw-polygon {
+            display: none;
 
-}
-          .leaflet-draw-toolbar .leaflet-draw-edit-remove {
-	display: none;
-}
-                              .leaflet-draw-actions a {
-	display: none;
-}
-</style>
-  </head>
+        }
+
+        .leaflet-draw-toolbar .leaflet-draw-draw-circle {
+            display: none;
+
+        }
+
+        .leaflet-draw-toolbar .leaflet-draw-draw-marker {
+            display: none;
+
+        }
+
+        .leaflet-draw-toolbar .leaflet-draw-edit-remove {
+            display: none;
+        }
+
+        .leaflet-draw-actions a {
+            display: none;
+        }
+    </style>
+</head>
 
 You're looking at wall {{ wall.wall_name }}
 <br><br>
@@ -44,177 +46,192 @@ You're looking at wall {{ wall.wall_name }}
 
 
 
- <script type="text/javascript">
-    var geodjango_geom = {};
-    geodjango_geom.fieldid = 'id_geom';
-    geodjango_geom.modifiable = true;
-    geodjango_geom.geom_type = 'Geometry';
-    geodjango_geom.srid = 4326;
+    <script type="text/javascript">
+        var geodjango_geom = {};
+        geodjango_geom.fieldid = 'id_geom';
+        geodjango_geom.modifiable = true;
+        geodjango_geom.geom_type = 'Geometry';
+        geodjango_geom.srid = 4326;
 
 
-    function id_geom_map_callback(map, options) {
-        geodjango_geom.store_class = L.FieldStore;
-        (new L.GeometryField(geodjango_geom)).addTo(map);
+        function id_geom_map_callback(map, options) {
+            geodjango_geom.store_class = L.FieldStore;
+            (new L.GeometryField(geodjango_geom)).addTo(map);
 
-    };
-
-
-</script>
+        }
+        ;
 
 
+    </script>
 
 
-<div id="id_geom_map" class="leaflet-container-default"></div>
-<script type="text/javascript">
-(function () {
-
-    function loadmap() {
-        var img_dim_string = '{{ wall.get_bg_img_size }}';
-        var img_dim   = img_dim_string.split(',', 4);
-        var img_dim_x = parseFloat(img_dim[0]);
-        var img_dim_y = parseFloat(img_dim[1]);
-        var xzoom     = parseFloat(img_dim[2]);
-        var yzoom     = parseFloat(img_dim[3]);
-
-        var maxzoom   = Math.max(xzoom, yzoom);
-        var minzoom   = Math.min(xzoom, yzoom);
-        var startzoom = maxzoom-minzoom;
-
-        var map = L.map('id_geom_map', {
-            minZoom: minzoom,
-            maxZoom: maxzoom,
-            crs: L.CRS.Simple,
-            center: [-30, 90],
-            zoom: 4,
-
-        });
-
-        var southWest = map.unproject([0, img_dim_y], map.getMaxZoom());
-        var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
-        map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
-
-        var wall_layer = L.tileLayer('{{ wall.get_tiles_url }}/{z}/{x}/{y}.png', {
-            minZoom: 4, maxZoom: 6,
-            noWrap: false,
-            tileSize: 256,
-            continuousWorld: true,
-        });
-
-        wall_layer.addTo(map);
-        var collection = {{ wall_route_list|geojsonfeature|safe }};
-        oldlayer =  L.geoJson(collection);
-        oldlayer.addTo(map);
-
-        var drawnItems = new L.FeatureGroup();
-        map.addLayer(drawnItems);
 
 
-        var drawControl = new L.Control.Draw({
-            edit: {
-                featureGroup: drawnItems
+    <div id="id_geom_map" class="leaflet-container-default"></div>
+    <script type="text/javascript">
+        (function () {
+
+            function loadmap() {
+                var img_dim_string = '{{ wall.get_bg_img_size }}';
+                var img_dim = img_dim_string.split(',', 4);
+                var img_dim_x = parseFloat(img_dim[0]);
+                var img_dim_y = parseFloat(img_dim[1]);
+                var xzoom = parseFloat(img_dim[2]);
+                var yzoom = parseFloat(img_dim[3]);
+
+                var maxzoom = Math.max(xzoom, yzoom);
+                var minzoom = Math.min(xzoom, yzoom);
+                var startzoom = maxzoom - minzoom;
+
+                var map = L.map('id_geom_map', {
+                    minZoom: minzoom,
+                    maxZoom: maxzoom,
+                    crs: L.CRS.Simple,
+                    center: [-30, 90],
+                    zoom: 4,
+
+                });
+
+                var southWest = map.unproject([0, img_dim_y], map.getMaxZoom());
+                var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
+                map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
+
+                var wall_layer = L.tileLayer('{{ wall.get_tiles_url }}/{z}/{x}/{y}.png', {
+                    minZoom: 4, maxZoom: 6,
+                    noWrap: false,
+                    tileSize: 256,
+                    continuousWorld: true,
+                });
+
+                wall_layer.addTo(map);
+                var collection = {{ wall_route_list|geojsonfeature|safe }};
+                oldlayer = L.geoJson(collection);
+                oldlayer.addTo(map);
+
+                var drawnItems = new L.FeatureGroup();
+                map.addLayer(drawnItems);
+
+
+                var drawControl = new L.Control.Draw({
+                    edit: {
+                        featureGroup: drawnItems
+                    }
+                });
+                map.addControl(drawControl);
+
+                // react on newly drawn item
+                map.on('draw:created', function (e) {
+                    map.removeControl(drawControl);
+                    var type = e.layerType,
+                            layer = e.layer;
+                    var fg = new L.featureGroup([layer]);
+                    fg.addTo(map);
+                    var newDrawControl = new L.Control.Draw({
+                        draw: {
+                            polyline: false,
+                        },
+                        edit: {
+                            featureGroup: fg,
+                            polyline: false
+                        }
+                    });
+
+                    map.addControl(newDrawControl);
+
+                    var toolbar;
+                    for (var toolbarId in newDrawControl._toolbars) {
+                        toolbar = newDrawControl._toolbars[toolbarId];
+                        if (toolbar instanceof L.EditToolbar) {
+                            toolbar._modes.edit.handler.enable();
+                        }
+                    }
+
+                    var msg = JSON.stringify(layer.toGeoJSON());
+
+                    var cut1 = msg.match(/{"type":"LineString.+]]}/, 3);
+                    document.getElementById("id_geom").value = cut1[0];
+
+                    map.on('mousemove', function (e) {
+                        var msg = JSON.stringify(layer.toGeoJSON());
+                        var cut1 = msg.match(/{"type":"LineString.+]]}/, 3);
+                        document.getElementById("id_geom").value = cut1[0];
+                    });
+                });
             }
-        });
-        map.addControl(drawControl);
 
-        // react on newly drawn item
-        map.on('draw:created', function (e) {
-            map.removeControl(drawControl);
-            var type = e.layerType,
-            layer = e.layer;
-            var fg = new L.featureGroup([layer]);
-            fg.addTo(map);
-            var newDrawControl = new L.Control.Draw({
-                draw: {
-                    polyline: false,
-                },
-                edit: {
-                    featureGroup: fg,
-                    polyline: false
-                }
-            });
-
-            map.addControl(newDrawControl);
-
-            var toolbar;
-            for (var toolbarId in newDrawControl._toolbars) {
-                toolbar = newDrawControl._toolbars[toolbarId];
-                if (toolbar instanceof L.EditToolbar) {
-                    toolbar._modes.edit.handler.enable();
-                }
+            function switchToModify() {
             }
 
-            var msg = JSON.stringify(layer.toGeoJSON());
+            var loadevents = ["load"];
+            if (loadevents.length === 0) loadmap();
+            else if (window.addEventListener) for (var i = 0; i < loadevents.length; i++) window.addEventListener(loadevents[i], loadmap, false);
+            else if (window.jQuery) jQuery(window).on(loadevents.join(' '), loadmap);
 
-            var cut1 = msg.match(/{"type":"LineString.+]]}/, 3);
-            document.getElementById("id_geom").value = cut1[0];
-
-            map.on('mousemove', function(e) {
-                var msg = JSON.stringify(layer.toGeoJSON());
-                var cut1 = msg.match(/{"type":"LineString.+]]}/, 3);
-                document.getElementById("id_geom").value = cut1[0];
-            });
-        });
-    }
-
-    function switchToModify() {
-    }
-
-    var loadevents = ["load"];
-    if (loadevents.length === 0) loadmap();
-    else if (window.addEventListener) for (var i=0; i<loadevents.length; i++) window.addEventListener(loadevents[i], loadmap, false);
-    else if (window.jQuery) jQuery(window).on(loadevents.join(' '), loadmap);
-
-})();
-</script>
+        })();
+    </script>
 
 
 
-<form method="POST" action="../{{ wall.pk}}-0/">
+    <form method="POST" action="../{{ wall.pk }}-0/">
 
-     {% csrf_token %}
+        {% csrf_token %}
 
-    {{ form.geom }}
+        {{ form.geom }}
 
-    {{ form.non_field_errors }}
-    {{ form.route_name.errors }}
- {{ form.name_of_field.errors }}
+        {{ form.non_field_errors }}
+        {{ form.route_name.errors }}
+        {{ form.name_of_field.errors }}
 
+        {% block mapobjects_info %}
 
-<table width="100%">
-
-
-    <tr><td>Name:</td><td>Schwierigkeit</td><td>Aktionen</td></tr>
+            <table>
 
 
-     <tr><td>
-          {{ form.route_name }}
-        </td><td>
-         {{ form.route_grade }}
-
-          <input type="hidden" id="id_route_wall" name="route_wall" value="{{ wall.id }}">
-
-        </td><td>
-  <input type="submit" value="speichern"/>
-
-         </td></tr>
-
-    {% for route in wall_route_list %}
+                <tr>
+                    <td>Name:</td>
+                    <td>Schwierigkeit</td>
+                    <td>Aktionen</td>
+                </tr>
 
 
-        <tr><td>
-        {{ route.route_name }}
-        </td><td>
-        {{ route.route_grade }}
-        </td><td>
+                <tr>
+                    <td>
+                        {{ form.route_name }}
+                    </td>
+                    <td>
+                        {{ form.route_grade }}
+
+                        <input type="hidden" id="id_route_wall" name="route_wall" value="{{ wall.id }}">
+
+                    </td>
+                    <td>
+                        <input type="submit" value="speichern"/>
+
+                    </td>
+                </tr>
+
+                {% for route in wall_route_list %}
 
 
-        </td></tr>
+                    <tr>
+                        <td>
+                            {{ route.route_name }}
+                        </td>
+                        <td>
+                            {{ route.route_grade }}
+                        </td>
+                        <td>
 
-    {% endfor %}
 
-    </table>
+                        </td>
+                    </tr>
 
-  </form>
+                {% endfor %}
+
+            </table>
+        {% endblock %}
+
+    </form>
 
 
 

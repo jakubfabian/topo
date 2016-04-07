@@ -83,7 +83,7 @@ def spot_add(request, area_id, **kwargs):
         new_spot.spot_name = request.POST.get('spot_name')
         new_spot.spot_area = area
         new_spot.geom = {'coordinates': [
-            request.POST.get('spot_lng'), request.POST.get('spot_lat')]
+            float(request.POST.get('spot_lng')), float(request.POST.get('spot_lat'))]
             , 'type': 'Point'}
         new_spot.save()
 

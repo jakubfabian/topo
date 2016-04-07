@@ -1,131 +1,127 @@
 {% extends "base.html" %}
 
-{% block title %} 
-  Mitopo.de - Wall page
+{% block title %}
+    Mitopo.de - Wall page
 {% endblock %}
 
 {% block extra_assets %}
-  <style>
-    .leaflet-container {  /* all maps */
-    width:  100%;
-    height: 512px;
-    }
-  </style>
 
-  {% load leaflet_tags %}
-  {% load geojson_tags %}
-  {% leaflet_js %}
-  {% leaflet_css %}
-{% endblock %} 
-                                                                                     
-{% block content %} 
-  <script>
-    window.onload = function() { map_init(); }
-  </script>
-
-  You're looking at wall {{ wall.wall_name }}.
-  <!-- if you are the owner or a manager -->
-  <br><br>
-  <a href={% url "wall_edit" wall_id=wall.id%}>Edit {{ wall.wall_name }}</a>
-
-  <br><br>
-  wall.wall_image.get_bg_img_size :: {{ wall.get_bg_img_size }}
-
-  <br><br>
-
-  <div id="wallmap"></div>
-
-  <script type="text/javascript">
-
-    function map_init(){
-
-        var img_dim_string = '{{ wall.get_bg_img_size }}';
-
-        var img_dim   = img_dim_string.split(',', 4);
-        var img_dim_x = parseFloat(img_dim[0]);
-        var img_dim_y = parseFloat(img_dim[1]);
-        var xzoom     = parseFloat(img_dim[2]);
-        var yzoom     = parseFloat(img_dim[3]);
-
-        var maxzoom   = Math.max(xzoom, yzoom);
-
-        // we choose a default zoom level of 2 that matches either the width (approx.) or the
-        // height of the container
-        var minzoom   = 2;
-        var startzoom = minzoom;
-
-        var aspectRatio = img_dim_x/img_dim_y;
-        if (aspectRatio < 1){
-            // we resize the container to fit an image with aspectRatio < 1
-            // the height is then fixed to 1024px              
-            var wall_width = 1024*aspectRatio;              
-            // document.getElementById('wallmap').setAttribute("style","display:block;width:500px");
-            document.getElementById('wallmap').style.width = wall_width + "px";
-            document.getElementById('wallmap').style.height = 1024 + "px";
-        }
-
-        var map = L.map('wallmap', {
-            minZoom: minzoom,
-            maxZoom: maxzoom,
-            crs: L.CRS.Simple,
-            center: [0, 0],
-            zoom: startzoom,
-        });
-
-        var southWest = map.unproject([0, img_dim_y], map.getMaxZoom());
-        var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
-        map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
-
-        var wall_layer = L.tileLayer('{{ wall.get_tiles_url }}/{z}/{x}/{y}.png', {
-            minZoom: 1, maxZoom: maxzoom,
-            noWrap: false,
-            tileSize: 256,
-            continuousWorld: true,
-        });
-
-        wall_layer.addTo(map);
-
-        // If there is a route list we add it to the map
-        {% if wall_route_geom_list %}                
-        var collection = {{ wall_route_geom_list|geojsonfeature|safe }};
-        layer =  L.geoJson(collection);
-        layer.addTo(map);
-        {% endif %}                  
-    }
-  </script>
-  <br>
-  <br>
-  <br>
-
-  {% if wall_route_geom_list %}    
-    In {{ wall.wall_name }} there are following routes:
-    <br>
-    <br>
-  
-    <table width="100%">
-
-      {% for routegeom in wall_route_geom_list %}
-        <tr>
-          <td>
-            <a href="{% url "route_detail" route_id=routegeom.route.pk%}"> {{ routegeom.route.route_name }}</a>
-          </td>
-          <td>
-            {{ routegeom.route.route_grade }}
-          </td>
-          <td>
-              <a href={% url "route_edit" route_id=routegeom.route.pk%}> edit </a>
-          </td>
-        </tr>
-      {% endfor %}
-    </table>
-
-  {% else %}
-    <p>Currently no routes are available in {{ wall.wall_name }}</p>
-  {% endif %}
-    <p><a href="providewallimg">Propose a new wall image.</a></p>
+    {% load leaflet_tags %}
+    {% load geojson_tags %}
+    {% leaflet_js %}
+    {% leaflet_css %}
 {% endblock %}
 
+{% block content %}
+    <script>
+        window.onload = function () {
+            map_init();
+        }
+    </script>
 
+
+    <div id="wallmap"></div>
+
+    <script type="text/javascript">
+
+        function map_init() {
+            var img_dim_string = '{{ wall.get_bg_img_size }}';
+
+            var img_dim = img_dim_string.split(',', 4);
+            var img_dim_x = parseFloat(img_dim[0]);
+            var img_dim_y = parseFloat(img_dim[1]);
+            var xzoom = parseFloat(img_dim[2]);
+            var yzoom = parseFloat(img_dim[3]);
+
+            var maxzoom = Math.max(xzoom, yzoom);
+
+            // we choose a default zoom level of 2 that matches either the width (approx.) or the
+            // height of the container
+            var minzoom = 2;
+            var startzoom = 4;
+
+            var aspectRatio = img_dim_x / img_dim_y;
+{#            if (aspectRatio < 1) {#}
+{#                // we resize the container to fit an image with aspectRatio < 1#}
+{#                // the height is then fixed to 1024px#}
+{#                var wall_width = 1024 * aspectRatio;#}
+{#                // document.getElementById('wallmap').setAttribute("style","display:block;width:500px");#}
+{#                document.getElementById('wallmap').style.width = wall_width + "px";#}
+{#                document.getElementById('wallmap').style.height = 1024 + "px";#}
+{#            }#}
+
+            var map = L.map('wallmap', {
+                minZoom: minzoom,
+                maxZoom: maxzoom,
+                crs: L.CRS.Simple
+            });
+
+            var southWest = map.unproject([0, img_dim_y], map.getMaxZoom());
+            var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
+            map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
+
+            var wall_layer = L.tileLayer('{{ wall.get_tiles_url }}/{z}/{x}/{y}.png', {
+                minZoom: 1, maxZoom: maxzoom,
+                noWrap: false,
+                tileSize: 256,
+                continuousWorld: true,
+            });
+
+            wall_layer.addTo(map);
+
+            // If there is a route list we add it to the map
+            {% if wall_route_geom_list %}
+                var collection = {{ wall_route_geom_list|geojsonfeature|safe }};
+                layer = L.geoJson(collection);
+                layer.addTo(map);
+                map.fitBounds(layer.getBounds().pad(0.5))
+            {% endif %}
+        }
+    </script>
+    <br>
+    <br>
+    <br>
+
+{% endblock %}
+
+{% block mapobjects_info %}
+    You're looking at wall {{ wall.wall_name }}.
+    <!-- if you are the owner or a manager -->
+    <br><br>
+    <a href={% url "wall_edit" wall_id=wall.id %}>Edit {{ wall.wall_name }}</a>
+
+    <br><br>
+    wall.wall_image.get_bg_img_size :: {{ wall.get_bg_img_size }}
+
+    <br><br>
+
+    {% if wall_route_geom_list %}
+        In {{ wall.wall_name }} there are following routes:
+        <br>
+        <br>
+
+        <table width="100%">
+
+            {% for routegeom in wall_route_geom_list %}
+                <tr>
+                    <td>
+                        <a href="{% url "route_detail" route_id=routegeom.route.pk %}"> {{ routegeom.route.route_name }}</a>
+                    </td>
+                    <td>
+                        {{ routegeom.route.route_grade }}
+                    </td>
+                    <td>
+                        <a href={% url "route_edit" route_id=routegeom.route.pk %}> edit </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+
+    {% else %}
+        <p>Currently no routes are available in {{ wall.wall_name }}</p>
+    {% endif %}
+    <p><a href="providewallimg">Propose a new wall image.</a></p>
+{% endblock %}
 
 
 

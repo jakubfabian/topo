@@ -1,0 +1,130 @@
+*
+{
+    font-family: 'PT Sans', sans-serif;
+    margin:0;padding:0;
+}
+
+html,body
+{
+    height:100%;
+    width:100%;
+    background: #476b4c;
+}
+
+#user-menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 97px;
+    width: 100%;
+    background: url('../../img/header2.jpg');
+    border-bottom: 3px solid black;
+}
+.leaflet-control-container .leaflet-top {
+    top: 70px;
+}
+#logo {
+    z-index: 55;
+    position: absolute;
+    top: 5px;
+    left: 8px;
+}
+.leaflet-container, #wallmap {
+    position: absolute;
+    top: 100px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    background: url('../../img/map_bg.jpg');
+    background-repeat: repeat;
+}
+#footer {
+    display: none;
+}
+/*#footer {*/
+    /*position: absolute;*/
+    /*z-index: 50;*/
+    /*bottom: 0;*/
+    /*height: 30px;*/
+    /*background:red;*/
+    /*left: 0;*/
+    /*right: 0;*/
+/*}*/
+
+.mapobjects-info {
+    background: #476b4c;
+    position: absolute;
+    margin: 0 auto;
+    right: 0px;
+    top: 180px;
+    padding-left: 7px;
+    padding-bottom: 7px;
+    padding-top: 7px;
+    padding-right: 0px;
+    bottom: 30px;
+    width: 200px;
+    z-index: 1000;
+    border-radius: 5px;
+}
+.mapobjects-info ul {
+    list-style-type: none;
+}
+
+.leaflet-control-zoom-out {
+    /*display: none !important;*/
+}
+
+.mapobjects-info .inner_container {
+    with: 100%;
+    height:100%;
+    box-sizing:border-box;
+    padding: 10px;
+    background: white;
+    border-radius: 5px;
+    overflow-y: scroll;
+}
+
+#search-container {
+    position: absolute;
+    top: 110px;
+    left: 10px;
+    padding: 5px;
+    width: 400px;
+    z-index: 50;
+    background: #476b4c;
+    border-radius: 10px;
+}
+
+#search-field {
+    width:100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding:4px;
+    border-radius: 5px;
+    font-size: 120%;
+    box-sizing:border-box;
+}
+
+#login-menu {
+    position: absolute;
+    top: 5px;
+    right: 8px;
+}
+
+#login-menu a {
+    display: inline-block;
+    border-radius: 5px;
+    border: solid 2px black;
+    padding: 8px 12px 8px 12px;
+    width: 80px;
+    margin: 0;
+    text-align: center;
+    background: white;
+    text-decoration: none;
+    color: black;
+}
+
+#login-menu a:hover {
+    background: #c8d9cc;
+}
