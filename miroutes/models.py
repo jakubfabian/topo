@@ -1,10 +1,12 @@
-
+from django.contrib.auth.models import User
 from djgeojson.fields import PointField
 from djgeojson.fields import LineStringField
 from django.db import models
 from django.conf import settings
 
 from miroutes.image_tiler import tile_image
+
+from datetime import date
 
 RATING_CHOICES = ((1, 'poor'),
                   (2, 'ok'),
@@ -81,7 +83,8 @@ class WallView(models.Model):
         wall (Wall): The wall object the view is bound to.
         approach (TextField): Details on the approach to the wall
         approach_time (DurationField): How long does the approach take?
-        exposure (IntegerField): The exposure of the wall.
+        morning_sun, midday_sun, afternoon_sun (BooleanField): 
+            Is the sun shining in the morning/midday/afternoon?
         children_friendly (IntegerField): A children-friendly rating (5 choices).
         bolt_quality (IntegerField): A choice field with a bolt quality rating (5 choices).
         wall_height (IntegerField): The approximate height of the wall in meters.
@@ -92,21 +95,16 @@ class WallView(models.Model):
             A manager that filters the wallviews which are associated with
             active walls. The development views are excluded.
     """
-
-    DIRECTIONS = ((0, 'North'),
-                  (1, 'North-East'),
-                  (2, 'East'),
-                  (3, 'South-East'),
-                  (4, 'South'),
-                  (5, 'South-West'),
-                  (6, 'West'),
-                  (7, 'North-West'))
     
     wall = models.ForeignKey('Wall')
     is_dev = models.BooleanField(default=False)
     approach = models.TextField(blank=True, null=True)
     approach_time = models.DurationField(blank=True, null=True)
-    exposure = models.IntegerField(blank=True, null=True, choices=DIRECTIONS)
+    
+    morning_sun = models.NullBooleanField(blank=True, null=True)
+    midday_sun = models.NullBooleanField(blank=True, null=True)
+    afternoon_sun = models.NullBooleanField(blank=True, null=True)
+    
     children_friendly = models.IntegerField(blank=True, null=True, choices=RATING_CHOICES)
     bolt_quality = models.IntegerField(blank=True, null=True, choices=RATING_CHOICES)
     wall_height = models.IntegerField(blank=True, null=True)
@@ -289,7 +287,25 @@ class Wall(models.Model):
     
 
 class Route(models.Model):
+    """
+    Meta data for a route object. Similar to the wall object uniquely refers
+    to an existing route, with multiple route geometries on different wall views.
 
+    Attributes:
+        route_spot: The spot the route can be found on.
+        route_walls: The walls the route can be found on.
+            This list is generated from the RouteGeometry objects.
+        route_name: The name of the route.
+        route_grade: The grade of the route.
+        route_rating: The (average) rating of the route.
+            This should be chosen in agreement with the grading system of the area.
+        route_length: The approximate length of the route in meters.
+        route_number_of_bolts: The number of bolts and thus the number of 
+            quickdraws that are required to climb the route.
+        route_security_rating: How secure is climbing the route? (1-5)
+        route_description: Comments and caveats on the route.
+        
+    """
     GRADE_CHOICES = [(('5a', '5a'),
                       ('5b', '5b'),
                       ('5c', '5c'),
@@ -307,6 +323,7 @@ class Route(models.Model):
     route_spot = models.ForeignKey(Spot, default=None, editable=False)
     # The relation to one or many walls is via the geometry of the route
     route_walls = models.ManyToManyField(WallView, through='RouteGeometry')
+    route_climbers = models.ManyToManyField(User, through='Climb')
 
     route_name = models.CharField(max_length=100)
 
@@ -316,7 +333,7 @@ class Route(models.Model):
                                        choices=RATING_CHOICES)
 
     route_length = models.IntegerField(blank=True, null=True)
-    route_first_ascent = models.CharField(max_length=100, blank=True, null=True)
+
     route_number_of_bolts = models.IntegerField(blank=True, null=True)
     route_security_rating = models.IntegerField(default=3)
     route_description = models.TextField(blank=True, null=True)
@@ -333,3 +350,23 @@ class RouteGeometry(models.Model):
     on_wallview = models.ForeignKey(WallView)
     route = models.ForeignKey(Route)
     geom = LineStringField()
+
+
+class Climb(models.Model):
+    """
+    Relates a user (climber) to a route "through" the details of
+    a climbing attempt.
+    """
+    STYLE_CHOICES = (('flash', 'flash'),
+                     ('on-sight', 'on-sight'),
+                     ('red point', 'red point'),
+                     ('top rope', 'top rope'))
+
+    climber = models.ForeignKey(User)
+    route = models.ForeignKey(Route)
+    date = models.DateField(default=date.today)
+    
+    style = models.CharField(max_length=10, blank=True, null=True, choices=STYLE_CHOICES)
+    rating = models.IntegerField(blank=True, null=True, choices=RATING_CHOICES)
+    comment = models.TextField(blank=True, null=True)
+
