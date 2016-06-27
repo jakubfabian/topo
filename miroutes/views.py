@@ -214,26 +214,40 @@ def wall_edit(request, wall_id, **kwargs):
     wall = get_object_or_404(Wall, pk=wall_id)
     wallview = wall.dev_view
 
-    spot = wall.wall_spot
-
-    if request.POST:
-        print request.POST
-
     # routes on the dev view
     wallroutelist = wallview.route_set.all()
+
+    spot = wall.wall_spot
     # all routes on the spot
     spotroutelist = spot.route_set.all()
+
+    if request.POST:
+        # Get route ids from right hand side list in template
+        route_onwall_ids = request.POST.getlist('routes_onwall', None)
+        if route_onwall_ids is not None:
+            # Routes which are moved from the spot's route pool to this wall are added
+            routes_toadd = spotroutelist.filter(pk__in=route_onwall_ids).exclude(route_walls=wallview)
+            for route in routes_toadd:
+                geom_obj = RouteGeometry(route=route, on_wallview=wallview, geom=None)
+                geom_obj.save()
+
+            # Routes that are not on wall list anymore get detached
+            routes_todel = wallroutelist.exclude(pk__in=route_onwall_ids)
+            for route in routes_todel:
+                rg = route.routegeometry_set.filter(on_wallview=wallview)
+                rg.delete()
+
     
     # take relative complement for spotroutelist:
     # i.e. remove all routes in spotroutelist that are already at wall
-    spotroutelist = spotroutelist.exclude(pk=wallroutelist.values_list('pk', flat=True))
+    spotroutelist = spotroutelist.exclude(route_walls=wallview)
 
     # all active walls on the spot without the currently selected wall
     spotwalllist = Wall.active_objects.all()
     spotwalllist = spotwalllist.exclude(pk=wall.id)
 
     # routes that are not on an active wall
-    spotroutesnotonwall = spotroutelist.exclude(pk=spotwalllist.values_list('routes__pk', flat=True))
+    spotroutesnotonwall = spotroutelist.filter(route_walls=None)
     
     # also get all geoms asociated with wall routes
     wallroutegeomlist = wallview.routegeometry_set.all()

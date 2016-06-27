@@ -16,6 +16,27 @@
 {% block content %}
 
     <style>
+.mapobjects-info {
+    background: #476b4c;
+    position: absolute;
+    margin: 0 auto;
+    right: 0px;
+    top: 180px;
+    padding-left: 7px;
+    padding-bottom: 7px;
+    padding-top: 7px;
+    padding-right: 0px;
+    bottom: 30px;
+    width: 800px;
+    height: 800px;
+    z-index: 1000;
+    border-radius: 5px;
+}
+
+.left_list {
+    float: left;    
+}
+
         #wrapper_select {
             width: 800px;
             border: 1px solid black;
@@ -130,19 +151,21 @@
     <!-- css styles for the selectable list. TODO: put tags in css files -->
     <!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
     <div id="wrapper_select">
+    <div class="left_list">
         <ol id="selectable">
             {% for route in spot_routelist %}
                 <li class="ui-widget-content" name="route_onspot" value="{{ route.id }}">{{ route.route_name }}</li>
             {% endfor %}
         </ol>
-        <br>
-
+    </div>
+    <div class="right_list">
         <!-- This list contains the routes that are selected -->
         <ol id="selected_routes">
             {% for route in wall_routelist %}
                 <li class="ui-widget-content" name="route_selected" value="{{ route.id }}">{{ route.route_name }}</li>
             {% endfor %}
         </ol>
+    </div>
     </div>
 
     <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
