@@ -170,6 +170,7 @@ class Wall(models.Model):
             dev_view.save()
             pub_view = WallView(wall=self, is_dev=False)
             pub_view.save()
+            self.save()
 
     def create_tiles(self):
         """
@@ -250,7 +251,7 @@ class Wall(models.Model):
         # copy the devview
         devview.pk = None
         # and make it the new pub_view
-        old_pubview.is_dev = False
+        self.dev_view.is_dev = False
         devview.save()
 
         # Now we still have to update the RouteGeometries on the
