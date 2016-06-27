@@ -246,13 +246,13 @@ class Wall(models.Model):
         # delete the old pub_view
         self.pub_view.delete()
 
-        devview = self.dev_view
+        newpubview = self.dev_view
         
         # copy the devview
-        devview.pk = None
+        newpubview.pk = None
         # and make it the new pub_view
-        self.dev_view.is_dev = False
-        devview.save()
+        newpubview.is_dev = False
+        newpubview.save()
 
         # Now we still have to update the RouteGeometries on the
         # new pub_view
