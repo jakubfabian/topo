@@ -93,7 +93,30 @@
             font-size: 1.4em;
             height: 18px;
         }
+     
+    
+        #route_list .ui-selecting {
+            background: #FECA40;
+        }
+        #route_list .ui-selected {
+            background: #F39814;
+            color: black;
+         }
+
+        #route_list {
+            display: inline-block;
+            list-style-type: none;
+            width: 300px;
+            overflow: hidden;
+            border: 1px solid green;
+        }
+
+        .leaflet-container {
+            width:  100%;
+            height: 512px;
+        }
     </style>
+
     <script type="text/javascript">
         $(document).ready(function () {
             function update_form() {
@@ -140,7 +163,18 @@
                     update_form();
                 }
             });
+
+
+            // the list of routes whose geometries are to edit
+            $("#route_list").selectable({
+                // on select we do something
+                selected: function (event, ui) {
+                    var s = $(ui.selected);
+                    $("#testtext").text('Route '.concat(s.val()).concat(' chosen'));
+                }
+            });
         });
+
     </script>
 
 
@@ -175,4 +209,21 @@
         <input type="submit" value="speichern"/>
     </form>
 
+    <br>
+    <b>Edit route geometries</b>
+    <br><br>
+
+    <div id="id_geom_map" class="leaflet-container"></div>
+
+    route list (click to edit):
+    <br>
+    
+    <ol id="route_list">
+        {% for route in wall_routelist %}
+            <li class="ui-widget-content" name="route_onspot" value="{{ route.id }}">{{ route.route_name }}</li>
+        {% endfor %}
+    </ol>
+
+    <br>
+    <div id="testtext">Test</div>
 {% endblock %}
