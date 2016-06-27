@@ -31,8 +31,9 @@ r.save()
 
 route_geom = { u'coordinates':[ [90, -i] for i in xrange(9,25) ], u'type': u'LineString'}
 
-geom_obj = RouteGeometry(route=r, on_wallview=w.wallview_set.filter(is_dev=False)[0], geom=route_geom)
+geom_obj = RouteGeometry(route=r, on_wallview=w.dev_view, geom=route_geom)
 geom_obj.save()
+w.publish_dev_view()
 
 fname_image = "/code/misc/lost_arrow.png"
 
