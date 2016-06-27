@@ -7,6 +7,7 @@ from miroutes.models import Area
 from miroutes.models import Spot
 from miroutes.models import Wall
 from miroutes.models import Route
+from miroutes.models import RouteGeometry
 
 
 # Register your models here.
@@ -43,3 +44,4 @@ admin.site.register(Area, AreaAdmin)
 admin.site.register(Spot, LeafletGeoAdmin)
 admin.site.register(Wall, LeafletGeoAdmin)
 admin.site.register(Route, LeafletGeoAdmin)
+admin.site.register(RouteGeometry, LeafletGeoAdmin)
