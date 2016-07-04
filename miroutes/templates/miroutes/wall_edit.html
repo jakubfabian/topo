@@ -287,7 +287,7 @@
 
 	 // we store the layers and the associated routeids in a list of dicts
 	 // one element has geomid and a reference to the layer
-	 var layerlist = {};
+	 var layerdict = {};
 
 	 // the activeGeomId is used to denote the id of the currently edited
 	 // or created geometry
@@ -357,7 +357,7 @@
 	     // to the layer to a dict, add the onClick handler and the layer to the map.
 	     layer.addTo(map);
 	     layer.on('click', onGeomSelect);
-	     layer[geomid] = layer;
+	     layerdict[geomid] = layer;
 	 }
 	 
 
