@@ -224,7 +224,8 @@ def wall_edit(request, wall_id, **kwargs):
     if request.POST:
         # Get route ids from right hand side list in template
         route_onwall_ids = request.POST.getlist('routes_onwall', None)
-        if route_onwall_ids is not None:
+        print request.POST,':: route_onwall_ids',route_onwall_ids
+        if len(route_onwall_ids)!=0:
             # Routes which are moved from the spot's route pool to this wall are added
             routes_toadd = spotroutelist.filter(pk__in=route_onwall_ids).exclude(route_walls=wallview)
             for route in routes_toadd:
@@ -236,6 +237,18 @@ def wall_edit(request, wall_id, **kwargs):
             for route in routes_todel:
                 rg = route.routegeometry_set.filter(on_wallview=wallview)
                 rg.delete()
+
+        for key in request.POST.keys():
+            if key.startswith('routegeomid_'):
+                geomstr = request.POST.get(key)
+                rgid = key.split('_')[1]
+                geom_obj = RouteGeometry.objects.get(pk=rgid)
+                geom_obj.geom = geomstr
+                #import ipdb
+                #ipdb.set_trace()
+                geom_obj.save()
+
+
 
     
     # take relative complement for spotroutelist:
