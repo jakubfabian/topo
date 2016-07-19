@@ -12,13 +12,13 @@
 
     </title>
 
-
-
-
+    <link href="{% static "miroutes/bower_components/select2/dist/css/select2.min.css" %}" rel="stylesheet"/>
     {% block jquery_import %}
         <script type="text/javascript" src={% static "miroutes/js/jquery-2.2.2.js" %}></script>
         <script type="text/javascript"
                 src={% static "miroutes/js/jquery-ui-1.12.0-rc.1.custom/jquery-ui.js" %}></script>
+        <script src="{% static "miroutes/bower_components/select2/dist/js/select2.js" %}"></script>
+
     {% endblock %}
 
     {% block extra_assets %}
@@ -29,6 +29,7 @@
         <link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href={% static "miroutes/css/main3.css" %}/>
     {% endblock %}
+
 </head>
 
 <body>
@@ -53,7 +54,50 @@
             </div>
 
             <div id="search-container">
-                <input id="search-field" type="text" placeholder="Search ..."/>
+
+
+                <select id="search-field">
+                    <option value="NONE" selected="selected">select something ...</option>
+                </select>
+                <script type="text/javascript">
+
+                    function formatRepo(repo) {
+                        return repo.name;
+                    }
+
+                    function formatRepoSelection(repo) {
+                        return repo.name;
+                    }
+
+                    $search_field = $('#search-field')
+                    $search_field.select2({
+                        debug: true,
+                        ajax: {
+                            url: "http://{{ request.get_host }}/miroutes/search/",
+                            dataType: 'json',
+                            quietMillis: 100,
+                            minimumInputLength: 1,
+                            data: function (params) {
+                                return {
+                                    q: params.term, // search term
+                                    page: params.page
+                                };
+                            },
+                            results: function (data) {
+                                console.log(data);
+                                return {
+                                    results: data.items
+                                };
+                            }
+                        }
+                    });
+
+                    $search_field.on("select2:select", function (entry) {
+                        location.href = entry.params.data.url
+                    });
+
+                </script>
+
             </div>
         </div>
         <div id="messages">

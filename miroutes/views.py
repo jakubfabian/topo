@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic.edit import UpdateView
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 from miroutes.models import Country
 from miroutes.models import Area
@@ -15,8 +15,6 @@ from miroutes.models import Route
 from miroutes.models import RouteGeometry
 
 from miroutes.forms import WallImgUploadForm, SpotEditForm
-
-
 
 
 def index(request):
@@ -46,6 +44,7 @@ def country_detail(request, country_id, **kwargs):
     context = {'country': country, 'country_area_list': arealist, 'spotlist': spotlist}
     return render(request, 'miroutes/country_detail.html', context)
 
+
 def area_detail(request, area_id, **kwargs):
     """
     Area detail view.
@@ -54,6 +53,7 @@ def area_detail(request, area_id, **kwargs):
     spotlist = area.spot_set.all()
     context = {'area': area, 'area_spot_list': spotlist}
     return render(request, 'miroutes/area_detail.html', context)
+
 
 def spot_detail(request, spot_id, **kwargs):
     """
@@ -130,7 +130,7 @@ def toggle_show_inactive(request):
     """
     from django.shortcuts import redirect
     request.session['show_inactive'] = not request.session.get('show_inactive', False)
-    return redirect( request.GET.get('from', '/') )
+    return redirect(request.GET.get('from', '/'))
 
 
 def wall_detail(request, wall_id, **kwargs):
@@ -156,6 +156,36 @@ def route_detail(request, route_id, **kwargs):
     route_geometries = route.routegeometry_set.all()
     context = {'route': route, 'route_geometries': route_geometries}
     return render(request, 'miroutes/route_detail.html', context)
+
+
+def search(request, **kwargs):
+    """
+    process search request
+    """
+    search_results = []
+
+    query = request.GET.get('q', "")
+
+    query_results = Area.objects.filter(area_name__icontains=query)
+    search_results += [{"text": "Area - " + area.area_name, "id": area.id,
+                        "url": reverse('area_detail', kwargs={'area_id': area.id})}
+                       for area in query_results]
+
+    query_results = Wall.objects.filter(wall_name__icontains=query)
+    search_results += [
+        {"text": "Wall - " + wall.wall_name, "id": wall.id, "url": reverse('wall_detail', kwargs={'wall_id': wall.id})}
+        for wall in query_results]
+
+    query_results = Spot.objects.filter(spot_name__icontains=query)
+    search_results += [
+        {"text": "Spot - " + spot.spot_name, "id": spot.id, "url": reverse('spot_detail', kwargs={'spot_id': spot.id})}
+        for spot in query_results]
+
+    query_results = Route.objects.filter(route_name__icontains=query)
+    search_results += [{"text": "Route - " + route.route_name, "id": route.id,
+                        "url": reverse('route_detail', kwargs={'route_id': route.id})} for route in query_results]
+
+    return JsonResponse({"results": search_results})
 
 
 def route_edit(request, route_id, **kwargs):
@@ -191,10 +221,9 @@ def route_edit(request, route_id, **kwargs):
     routeform = RouteEditForm(instance=route)
     routeform.fields['route_grade'] = forms.ChoiceField(
         choices=Route.GRADE_CHOICES[route.route_spot.spot_area.area_grade_system])
-    
+
     context = {'route': route, 'route_form': routeform, 'from': request.GET.get('from', None)}
     return render(request, 'miroutes/route_edit.html', context)
-
 
 
 def wall_edit(request, wall_id, **kwargs):
@@ -224,8 +253,8 @@ def wall_edit(request, wall_id, **kwargs):
     if request.POST:
         # Get route ids from right hand side list in template
         route_onwall_ids = request.POST.getlist('routes_onwall', None)
-        print request.POST,':: route_onwall_ids',route_onwall_ids
-        if len(route_onwall_ids)!=0:
+        print request.POST, ':: route_onwall_ids', route_onwall_ids
+        if len(route_onwall_ids) != 0:
             # Routes which are moved from the spot's route pool to this wall are added
             routes_toadd = spotroutelist.filter(pk__in=route_onwall_ids).exclude(route_walls=wallview)
             for route in routes_toadd:
@@ -244,13 +273,10 @@ def wall_edit(request, wall_id, **kwargs):
                 rgid = key.split('_')[1]
                 geom_obj = RouteGeometry.objects.get(pk=rgid)
                 geom_obj.geom = geomstr
-                #import ipdb
-                #ipdb.set_trace()
+                # import ipdb
+                # ipdb.set_trace()
                 geom_obj.save()
 
-
-
-    
     # take relative complement for spotroutelist:
     # i.e. remove all routes in spotroutelist that are already at wall
     spotroutelist = spotroutelist.exclude(route_walls=wallview)
@@ -261,7 +287,7 @@ def wall_edit(request, wall_id, **kwargs):
 
     # routes that are not on an active wall
     spotroutesnotonwall = spotroutelist.filter(route_walls=None)
-    
+
     # also get all geoms asociated with wall routes
     wallroutegeomlist = wallview.routegeometry_set.all()
 
@@ -275,8 +301,9 @@ def wall_edit(request, wall_id, **kwargs):
                'spot_routes_noton_wall': spotroutesnotonwall,
                'wall_routelist': wallroutelist,
                'wall_routegeomlist': wallroutegeomlist}
-    
+
     return render(request, 'miroutes/wall_edit.html', context)
+
 
 def route_add(request, spot_id, **kwargs):
     """
@@ -302,7 +329,7 @@ def route_add(request, spot_id, **kwargs):
 
     return HttpResponseRedirect("{}?from={}".format(
         reverse('route_edit', kwargs=kwargs), request.GET.get('from', None)))
-    
+
 
 def route_del(request, route_id, **kwargs):
     """
@@ -342,4 +369,3 @@ def wall_img_provide(request, wall_id, **kwargs):
     else:
         form = WallImgUploadForm()
         return render(request, 'miroutes/wall_upload.html', {'form': form})
-

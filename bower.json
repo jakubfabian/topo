@@ -1,0 +1,19 @@
+{
+  "name": "mitopo",
+  "homepage": "https://github.com/jakubfabian/topo",
+  "directory": "miroutes/static/miroutes/bower_components",
+  "description": "mitopo",
+  "main": "",
+  "license": "copyright Fabian Jakub",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "select2": "^4.0.3"
+  }
+}
