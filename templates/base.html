@@ -13,18 +13,12 @@
     </title>
 
     <link href="{% static "miroutes/bower_components/select2/dist/css/select2.min.css" %}" rel="stylesheet"/>
-    {% block jquery_import %}
-        <script type="text/javascript" src={% static "miroutes/js/jquery-2.2.2.js" %}></script>
-        <script type="text/javascript"
-                src={% static "miroutes/js/jquery-ui-1.12.0-rc.1.custom/jquery-ui.js" %}></script>
-        <script src="{% static "miroutes/bower_components/select2/dist/js/select2.js" %}"></script>
+    <script type="text/javascript" src={% static "miroutes/bower_components/jquery/dist/jquery.min.js" %}></script>
+    <script type="text/javascript" src={% static "miroutes/bower_components/jquery-ui/jquery-ui.min.js" %}></script>
+    <script type="text/javascript" src="{% static "miroutes/bower_components/select2/dist/js/select2.js" %}"></script>
 
-    {% endblock %}
+    {% block extra_assets %}{% endblock %}
 
-    {% block extra_assets %}
-
-
-    {% endblock %}
     {% block main-css %}
         <link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href={% static "miroutes/css/main3.css" %}/>
