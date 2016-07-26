@@ -24,6 +24,28 @@
         <link rel="stylesheet" href={% static "miroutes/css/main3.css" %}/>
     {% endblock %}
 
+    <script type="text/javascript">
+        <!--
+        $.fn.extend({
+            toggleText: function (a, b) {
+                if (this.text() == a) {
+                    this.text(b);
+                }
+                else {
+                    this.text(a)
+                }
+            }
+        });
+        $(document).ready(function () {
+            $('#toggle_content').click(function (val) {
+                $('.inner_container').toggle("slide", {"direction": "right"});
+                $('#toggle_content').toggleText(">>", "<<");
+            });
+        });
+
+        -->
+    </script>
+
 </head>
 
 <body>
@@ -50,8 +72,7 @@
             <div id="search-container">
 
 
-                <select id="search-field">
-                    <option value="NONE" selected="selected">select something ...</option>
+                <select id="search-field" multiple="multiple">
                 </select>
                 <script type="text/javascript">
 
@@ -89,7 +110,7 @@
                     $search_field.on("select2:select", function (entry) {
                         location.href = entry.params.data.url
                     });
-
+                    $('#search-field').focus();
                 </script>
 
             </div>
@@ -108,9 +129,11 @@
 
 
     <div id="content">
+
         {% block content %}Default template content -- there is nothing to see here...{% endblock %}
     </div>
     <div class="mapobjects-info">
+        <div id="toggle_content">&gt;&gt;</div>
 
         <div class="inner_container">
 
