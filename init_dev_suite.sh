@@ -17,9 +17,9 @@ docker-compose run web python manage.py migrate
 sleep 3
 
 # Create root admin user
-echo "from django.contrib.auth.models import User; User.objects.create_superuser('root', 'myemail@example.com', 'root')" | docker-compose run web python manage.py shell
-docker-compose restart
-sleep 3
+#echo "from django.contrib.auth.models import User; User.objects.create_superuser('root', 'myemail@example.com', 'root')" | docker-compose run web python manage.py shell
+#docker-compose restart
+#sleep 3
 
 sh insertfields.sh
 
