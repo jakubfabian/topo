@@ -21,32 +21,17 @@
   </script>
 
   <style>
-   .mapobjects-info {
-     background: #476b4c;
-     margin: 0 auto;
-     padding-left: 7px;
-     padding-bottom: 7px;
-     padding-top: 7px;
-     padding-right: 0px;
-     bottom: 30px;
-     width: 1054px;
-     height: 1200px;
-     z-index: 1000;
-     border-radius: 5px;
-   }
 
    .left_list {
      float: left;    
    }
 
    #wrapper_select {
-     width: 800px;
      border: 1px solid black;
-     overflow: hidden; /* will contain if #first is longer than #second */
    }
 
    #feedback {
-     font-size: 1.4em;
+     /*font-size: 1.4em;*/
    }
 
    #selectable .ui-selecting {
@@ -68,7 +53,6 @@
    #selectable li {
      margin: 3px;
      padding: 0.4em;
-     font-size: 1.4em;
      height: 18px;
    }
 
@@ -118,16 +102,7 @@
      z-index: 1;
    }
 
-   .custom-leaflet-container {
-     position: relative;
-     top: 0;
-     bottom: 0;
-     left: 0;
-     right: 0;
-     width:  100%;
-     height: 512px;
-     z-index: 1;
-   }
+
   </style>
 
   <script type="text/javascript">
@@ -202,35 +177,11 @@
 
    });
   </script>
-{% endblock %}
 
-{% block mapobjects_info %}
-  You're looking at wall {{ wall.wall_name }}
-  <br><br>
-  <!-- css styles for the selectable list. TODO: put tags in css files -->
-  <!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
-  <div id="wrapper_select">
-    <div class="left_list">
-      <ol id="selectable">
-        {% for route in spot_routelist %}
-          <li class="ui-widget-content" name="route_onspot" value="{{ route.id }}">{{ route.route_name }}</li>
-        {% endfor %}
-      </ol>
-    </div>
-    <div class="right_list">
-      <!-- This list contains the routes that are selected -->
-      <ol id="selected_routes">
-        {% for route in wall_routelist %}
-          <li class="ui-widget-content" name="route_selected" value="{{ route.id }}">{{ route.route_name }}</li>
-        {% endfor %}
-      </ol>
-    </div>
-  </div>
-
-  <br>
+      <br>
   <b>Edit route geometries</b>
 
-  <div id="wallmap_id" class="custom-leaflet-container"></div>
+  <div id="wallmap" class="custom-leaflet-container"></div>
   <script type="text/javascript">
    // The leaflet part
    function map_init () {
@@ -250,7 +201,7 @@
        var minzoom = 2;
        var startzoom = 2;
 
-       var map = L.map('wallmap_id', {
+       var map = L.map('wallmap', {
            minZoom: minzoom,
            maxZoom: maxzoom,
            crs: L.CRS.Simple
@@ -374,18 +325,18 @@
            if(collection.features[i].geometry){
                var geoJsonFC = L.geoJson(collection.features[i]);
 	       var polyline = null;
-	       
+
 	       geoJsonFC.eachLayer(function (layer){
 		   polyline = L.polyline(layer.getLatLngs());
 	       });
-	       
+
                console.log("Creating new feature group with polyline layer with id"+geomids[i])
 
 	       var featureGroup = L.featureGroup([polyline]);
                featureGroup.routegeomid = geomids[i];
 	       featureGroup.addTo(map);
                featureGroup.on('click', onGeomSelect);
-	       
+
            }
        }
        {% endif %}
@@ -444,8 +395,8 @@
                document.getElementById("geom_inputfield_"+activeGeomId).value = gj;
 
 	       // we add this layer to his own featuregroup
-	       
-	       
+
+
                activeGeomId = null;
            }
            // remove the draw controls
@@ -454,7 +405,7 @@
        });
 
 
-       
+
        map.on('draw:edited', function (e) {
 
            //var layer = L.geoJson(e.layers.getLayers()[0].toGeoJSON());
@@ -467,16 +418,16 @@
 	       gj = JSON.stringify(layer.toGeoJSON().geometry);
 	       console.log(gj);
 	   });
-	  
 
-           
+
+
            // TODO: bad hack to find activeGeomId
            document.getElementById("geom_inputfield_"+activeGeomId).value = gj;
 
            // remove the draw controls
            resetDrawControl();
            activeGeomId = null;
-           
+
        });
 
 
@@ -486,6 +437,32 @@
    }
 
   </script>
+
+{% endblock %}
+
+{% block mapobjects_info %}
+  You're looking at wall {{ wall.wall_name }}
+  <br><br>
+  <!-- css styles for the selectable list. TODO: put tags in css files -->
+  <!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
+  <div id="wrapper_select">
+    <div class="left_list">
+      <ol id="selectable">
+        {% for route in spot_routelist %}
+          <li class="ui-widget-content" name="route_onspot" value="{{ route.id }}">{{ route.route_name }}</li>
+        {% endfor %}
+      </ol>
+    </div>
+    <div class="right_list">
+      <!-- This list contains the routes that are selected -->
+      <ol id="selected_routes">
+        {% for route in wall_routelist %}
+          <li class="ui-widget-content" name="route_selected" value="{{ route.id }}">{{ route.route_name }}</li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+
 
   <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
   <form method="POST" action="{{ request.path|urlencode }}">
