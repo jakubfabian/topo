@@ -39,7 +39,7 @@
         $(document).ready(function () {
             $('#toggle_content').click(function (val) {
                 $('.inner_container').toggle("slide", {"direction": "right"});
-                $('#toggle_content').toggleText(">>", "<<");
+                $('#toggle_content').toggleText("▶", "◀");
             });
         });
 
@@ -137,7 +137,7 @@
         {% block content %}Default template content -- there is nothing to see here...{% endblock %}
     </div>
     <div class="mapobjects-info">
-        <div id="toggle_content">&gt;&gt;</div>
+        <div id="toggle_content">▶</div>
 
         <div class="inner_container">
 
