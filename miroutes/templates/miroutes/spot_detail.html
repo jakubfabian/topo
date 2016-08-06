@@ -79,6 +79,10 @@
         <p>Currently no walls are available in {{ spot.spot_name }}</p>
     {% endif %}
 
+    <form action="{% url 'wall_add' spot_id=spot.id %}">
+        <input type="submit" value="Add new wall">
+    </form>
+
 {% endblock %}
 
 

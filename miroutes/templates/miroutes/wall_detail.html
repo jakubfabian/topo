@@ -69,6 +69,12 @@
 
             wall_layer.addTo(map);
 
+            var center_x = img_dim_x/2;
+            var center_y = img_dim_y/2;
+            var center_point = map.unproject([center_x,center_y], minzoom + 1);
+
+            map.setView(center_point, minzoom + 1);
+
             // If there is a route list we add it to the map
             {% if wall_route_geom_list %}
                 var collection = {{ wall_route_geom_list|geojsonfeature|safe }};
@@ -120,7 +126,7 @@
     {% else %}
         <p>Currently no routes are available in {{ wall.wall_name }}</p>
     {% endif %}
-    <p><a href="providewallimg">Propose a new wall image.</a></p>
+    <p><a href="{% url "wall_provide_img" wall_id=wall.pk %}">Propose a new wall image.</a></p>
 {% endblock %}
 
 

@@ -98,7 +98,7 @@ html, body {
 }
 
 .mapobjects-info .inner_container {
-    with: 350px;
+    width: 350px;
     height: 100%;
     box-sizing: border-box;
     padding: 10px;

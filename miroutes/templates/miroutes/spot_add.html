@@ -32,12 +32,12 @@
             var existingSpots = {{ spot_list|geojsonfeature|safe }};
             var newSpot;
 
-            existingSpotsLayer = L.geoJson(existingSpots, {
+            existingWallsLayer = L.geoJson(existingSpots, {
                 pointToLayer: function (feature, latlng) {
                     return L.marker(latlng, {icon: existingSpotIcon});
                 }
             });
-            existingSpotsLayer.addTo(map);
+            existingWallsLayer.addTo(map);
 
             map.on('click', function (e) {
                 if (newSpot === undefined) {
@@ -49,7 +49,7 @@
                 document.getElementById("spot_lng").value = e.latlng.lng;
             });
 
-            map.fitBounds(existingSpotsLayer.getBounds().pad(0.5))
+            map.fitBounds(existingWallsLayer.getBounds().pad(0.5))
 
         }
 

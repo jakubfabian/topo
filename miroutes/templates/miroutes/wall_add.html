@@ -1,72 +1,81 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 
 {% block title %}
-   Mitopo.de - Add new Wall
+    Mitopo.de - Add a new wall
 {% endblock %}
 
 {% block extra_assets %}
 
     {% load leaflet_tags %}
     {% load geojson_tags %}
-    {% leaflet_js %}
-    {% leaflet_css %}
+    {% leaflet_js plugins="forms" %}
+    {% leaflet_css plugins="forms" %}
 
+    <script type="text/javascript">
+        function map_init_basic(map, options) {
+
+            /*var existingSpotIcon = L.icon({
+                iconUrl: '{% static "miroutes/img/spot_existing.svg" %}',
+                iconSize: [120, 120], // size of the icon
+                iconAnchor: [60, 60], // point of the icon which will correspond to marker's location
+                popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
+            });
+
+            var newSpotIcon = L.icon({
+                iconUrl: '{% static "miroutes/img/spot_new.svg" %}',
+                iconSize: [120, 120], // size of the icon
+                iconAnchor: [60, 60], // point of the icon which will correspond to marker's location
+                popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
+            });
+            */
+
+            var existingWalls = {{ wall_list|geojsonfeature|safe }};
+            var newWall;
+
+            existingWallsLayer = L.geoJson(existingWalls, {
+                pointToLayer: function (feature, latlng) {
+                    //return L.marker(latlng, {icon: existingSpotIcon});
+                    return L.marker(latlng);
+                }
+            });
+            existingWallsLayer.addTo(map);
+
+            map.on('click', function (e) {
+                if (newWall === undefined) {
+                    //newSpot = new L.marker(e.latlng, {icon: newSpotIcon}).addTo(map);
+                    newWall = new L.marker(e.latlng).addTo(map);
+                } else {
+                    newWall.setLatLng(e.latlng);
+                }
+                document.getElementById("wall_lat").value = e.latlng.lat;
+                document.getElementById("wall_lng").value = e.latlng.lng;
+            });
+
+            map.fitBounds(existingWallsLayer.getBounds().pad(0.5))
+
+        }
+
+    </script>
 {% endblock %}
 
 {% block content %}
-    Show_inactive ::
-    {% if request.session.show_inactive == True %}
-        <a href="{% url 'toggle_show_inactive' %}?from={{ request.path|urlencode }}">true</a>
-    {% else %}
-        <a href="{% url 'toggle_show_inactive' %}?from={{ request.path|urlencode }}">false</a>
-    {% endif %}
-    <br><br>
-
-    You're looking at spot {{ spot.spot_name }}
-    <br><br>
-
-    {% if spot_wall_list %}
-
-        <script type="text/javascript">
-
-            function map_init(map, options) {
-
-                var markerArray = [];
-
-                {% for wall in spot_wall_list %}
-                    var coord = L.latLng({{ wall.geom.coordinates }});
-                    var newcoord = L.latLng(coord.lng, coord.lat);
-                    var mc = new L.marker(newcoord);
-                    mc.bindPopup("<a href='{{wall.pk}}-0'>{{ wall.wall_name }}</a>");
-                    markerArray.push(mc);
-                {% endfor %}
-
-                var group = L.featureGroup(markerArray).addTo(map);
-
-                if (markerArray.length > 1) {
-                    map.fitBounds(group.getBounds());
-                } else {
-                    map.setView(markerArray[0].getLatLng(), 12);
-                }
-            }
-        </script>
-
-        {% leaflet_map "spots" callback="window.map_init" %}
 
 
-        {% block mapobjects_info %}
+    {% leaflet_map "wallmap" callback="window.map_init_basic" %}
 
-            In {{ spot.spot_name }} there are following walls:<br><br>
 
-            <ul>
-                {% for wall in spot_wall_list %}
-                    <li><a href="{{ wall.pk }}-0"> {{ wall.wall_name }} :: {{ wall.geom.coordinates }}</a></li>
-                {% endfor %}
-            </ul>
+{% endblock %}
 
-        {% endblock %}
-    {% else %}
-        <p>Currently no walls are available in {{ spot.spot_name }}</p>
-    {% endif %}
+{% block mapobjects_info %}
+    <h1>Wall add</h1>
+
+    <form method="POST" action="{% url 'wall_add' spot_id=spot.id %}">
+        {% csrf_token %}
+        <input type="text" name="wall_name" value=""/>
+        <input type="hidden" id="wall_lat" name="wall_lat" value=""/>
+        <input type="hidden" id="wall_lng" name="wall_lng" value=""/>
+        <input type="submit" value="save">
+    </form>
 
 {% endblock %}

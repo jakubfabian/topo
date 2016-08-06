@@ -102,18 +102,28 @@ def wall_add(request, spot_id, **kwargs):
     """
     Add a wall to a spot.
     """
+
     spot = get_object_or_404(Spot, pk=spot_id)
-    wall_list = spot.wall_set
 
-    if not request.session.get('show_inactive', False):
-        wall_list = wall_list.filter(is_active=True)
-
-    wall_list = wall_list.order_by('wall_name')
 
     if request.POST:
-        pass
+        new_wall = Wall()
+        new_wall.wall_name = request.POST.get('wall_name')
+        new_wall.wall_spot = spot
+        new_wall.geom = {'coordinates': [
+            float(request.POST.get('wall_lng')), float(request.POST.get('wall_lat'))]
+            , 'type': 'Point'}
+        new_wall.is_active = True
+        new_wall.save()
 
-    context = {'spot': spot, 'spot_wall_list': wall_list}
+        return redirect(reverse('spot_detail', args=(spot_id)))
+
+    wall_list = spot.wall_set.all()
+
+    context = {
+        'spot': spot,
+        'wall_list': wall_list
+    }
     return render(request, 'miroutes/wall_add.html', context)
 
 
@@ -355,17 +365,18 @@ def route_del(request, route_id, **kwargs):
     return redirect(request.GET.get('from', '/'))
 
 
-def wall_img_provide(request, wall_id, **kwargs):
-    old_wall = get_object_or_404(Wall, pk=wall_id)
+def wall_provide_img(request, wall_id, **kwargs):
+    wall = get_object_or_404(Wall, pk=wall_id)
 
     if request.POST:
         form = WallImgUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            w = Wall(wall_name=old_wall.wall_name, wall_spot=old_wall.wall_spot, geom=old_wall.geom)
-            w.background_img = form.cleaned_data['image']
-            w.save()
-            context = {'wall': w, 'wall_route_list': []}
+            wall.background_img = form.cleaned_data['image']
+            wall.save()
+            wall.create_tiles()
+            wall.save()
+            context = {'wall': wall, 'wall_route_list': []}
             return render(request, 'miroutes/wall_detail.html', context)
     else:
         form = WallImgUploadForm()
-        return render(request, 'miroutes/wall_upload.html', {'form': form})
+        return render(request, 'miroutes/wall_provide_img.html', {'form': form})
