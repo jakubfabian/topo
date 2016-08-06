@@ -98,7 +98,7 @@ def spot_add(request, area_id, **kwargs):
     return render(request, 'miroutes/spot_add.html', context)
 
 
-def add_wall(request, spot_id, **kwargs):
+def wall_add(request, spot_id, **kwargs):
     """
     Add a wall to a spot.
     """
@@ -114,7 +114,7 @@ def add_wall(request, spot_id, **kwargs):
         pass
 
     context = {'spot': spot, 'spot_wall_list': wall_list}
-    return render(request, 'miroutes/add_wall.html', context)
+    return render(request, 'miroutes/wall_add.html', context)
 
 
 def toggle_show_inactive(request):
