@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.conf.urls import patterns, url
+from django.conf.urls import *
 
 hello = lambda request: HttpResponse("Hello .. mehr Power!")
 
