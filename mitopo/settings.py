@@ -59,23 +59,24 @@ MIDDLEWARE_CLASSES = [
 
 ROOT_URLCONF = 'mitopo.urls'
 
+
+
 TEMPLATES = [
     {
-        'DIRS' : (os.path.join(BASE_DIR, 'templates'), ),
-        'BACKEND' : 'django.template.backends.django.DjangoTemplates',
-        'APP_DIRS' : True,
-        'OPTIONS' : {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR,'templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.core.context_processors.request',
+                'django.template.context_processors.request',
             ],
         },
     },
 ]
-
 WSGI_APPLICATION = 'mitopo.wsgi.application'
 
 
