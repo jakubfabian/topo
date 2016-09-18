@@ -18,12 +18,18 @@
             var existingSpots = {{ spot_list|geojsonfeature|safe }};
             var newSpot;
 
+
             existingWallsLayer = L.geoJson(existingSpots, {
                 pointToLayer: function (feature, latlng) {
                     return L.marker(latlng);
                 }
             });
-            existingWallsLayer.addTo(map);
+
+            map.options.maxZoom = 15;
+
+            markers = new L.MarkerClusterGroup();
+            markers.addLayer(existingWallsLayer);
+            map.addLayer(markers);
 
             map.on('click', function (e) {
                 if (newSpot === undefined) {
@@ -32,15 +38,15 @@
                     newSpot.setLatLng(e.latlng);
                 }
                 var geojson = {
-                        "type": "Point",
-                        "coordinates": L.GeoJSON.latLngToCoords(e.latlng)
+                    "type": "Point",
+                    "coordinates": L.GeoJSON.latLngToCoords(e.latlng)
 
                 };
 
                 document.getElementById("id_geom").value = JSON.stringify(geojson);
             });
 
-            map.fitBounds(existingWallsLayer.getBounds().pad(0.5))
+            map.fitBounds(markers.getBounds().pad(0.5))
 
         }
 
