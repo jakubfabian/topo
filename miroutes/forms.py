@@ -16,13 +16,12 @@ class RouteEditForm(forms.ModelForm):
         model = Route
         exclude = ('route_walls',)
 
-        
 
-class SpotEditForm(forms.ModelForm):
+class SpotAddForm(forms.ModelForm):
     class Meta:
         model = Spot
-        fields = ('spot_name', 'geom')
-        widgets = {'geom': LeafletWidget()}
+        fields = ('spot_name', 'spot_area', 'geom')
+        widgets = {'geom': forms.HiddenInput(), 'spot_area': forms.HiddenInput()}
 
 
 class WallImgUploadForm(forms.Form):
@@ -30,4 +29,3 @@ class WallImgUploadForm(forms.Form):
     Form to upload an image file for a specific wall.
     """
     image = forms.ImageField()
-    

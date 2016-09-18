@@ -14,7 +14,7 @@ from miroutes.models import WallView
 from miroutes.models import Route
 from miroutes.models import RouteGeometry
 
-from miroutes.forms import WallImgUploadForm, SpotEditForm
+from miroutes.forms import WallImgUploadForm, SpotAddForm
 
 
 def index(request):
@@ -78,22 +78,34 @@ def spot_add(request, area_id, **kwargs):
     """
     area = get_object_or_404(Area, pk=area_id)
 
-    if request.POST:
-        new_spot = Spot()
-        new_spot.spot_name = request.POST.get('spot_name')
-        new_spot.spot_area = area
-        new_spot.geom = {'coordinates': [
-            float(request.POST.get('spot_lng')), float(request.POST.get('spot_lat'))]
-            , 'type': 'Point'}
-        new_spot.save()
+    if request.method == 'POST':
 
-        return redirect(reverse('area_detail', args=(area_id)))
+        form = SpotAddForm(request.POST)
+
+        if form.is_valid():
+
+            form.save()
+            return redirect(reverse('area_detail', args=(area_id)))
+    else:
+        form = SpotAddForm(initial={'spot_area': area})
+
+    # if request.POST:
+    #     new_spot = Spot()
+    #     new_spot.spot_name = request.POST.get('spot_name')
+    #     new_spot.spot_area = area
+    #     new_spot.geom = {'coordinates': [
+    #         float(request.POST.get('spot_lng')), float(request.POST.get('spot_lat'))]
+    #         , 'type': 'Point'}
+    #     new_spot.save()
+    #
+    #     return redirect(reverse('area_detail', args=(area_id)))
 
     spot_list = area.spot_set.all()
 
     context = {
         'area': area,
-        'spot_list': spot_list
+        'spot_list': spot_list,
+        'form' : form
     }
     return render(request, 'miroutes/spot_add.html', context)
 

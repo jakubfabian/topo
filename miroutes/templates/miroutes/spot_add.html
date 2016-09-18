@@ -15,38 +15,29 @@
     <script type="text/javascript">
         function map_init_basic(map, options) {
 
-            var existingSpotIcon = L.icon({
-                iconUrl: '{% static "miroutes/img/spot_existing.svg" %}',
-                iconSize: [120, 120], // size of the icon
-                iconAnchor: [60, 60], // point of the icon which will correspond to marker's location
-                popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
-            });
-
-            var newSpotIcon = L.icon({
-                iconUrl: '{% static "miroutes/img/spot_new.svg" %}',
-                iconSize: [120, 120], // size of the icon
-                iconAnchor: [60, 60], // point of the icon which will correspond to marker's location
-                popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
-            });
-
             var existingSpots = {{ spot_list|geojsonfeature|safe }};
             var newSpot;
 
             existingWallsLayer = L.geoJson(existingSpots, {
                 pointToLayer: function (feature, latlng) {
-                    return L.marker(latlng, {icon: existingSpotIcon});
+                    return L.marker(latlng);
                 }
             });
             existingWallsLayer.addTo(map);
 
             map.on('click', function (e) {
                 if (newSpot === undefined) {
-                    newSpot = new L.marker(e.latlng, {icon: newSpotIcon}).addTo(map);
+                    newSpot = new L.marker(e.latlng).addTo(map);
                 } else {
                     newSpot.setLatLng(e.latlng);
                 }
-                document.getElementById("spot_lat").value = e.latlng.lat;
-                document.getElementById("spot_lng").value = e.latlng.lng;
+                var geojson = {
+                        "type": "Point",
+                        "coordinates": L.GeoJSON.latLngToCoords(e.latlng)
+
+                };
+
+                document.getElementById("id_geom").value = JSON.stringify(geojson);
             });
 
             map.fitBounds(existingWallsLayer.getBounds().pad(0.5))
@@ -71,14 +62,12 @@
 
     <form method="POST" action="{% url 'spot_add' country_id=area.area_country.id area_id=area.id %}">
         {% csrf_token %}
-        <input type="text" name="spot_name" value=""/>
-        <input type="hidden" id="spot_lat" name="spot_lat" value=""/>
-        <input type="hidden" id="spot_lng" name="spot_lng" value=""/>
+        {{ form }}
         <input type="submit" value="save">
     </form>
 
     <form method="GET" action="{% url 'spot_add' country_id=area.area_country.id area_id=area.id %}">
-            {% csrf_token %}
+        {% csrf_token %}
         <input type="submit" value="cancel">
     </form>
 
