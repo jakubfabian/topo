@@ -63,9 +63,9 @@
                     <a href="{% url 'django.contrib.auth.views.login' %}?next={{ request.path }}">Login</a>
                     <a href="{% url 'users.views.register' %}">Register</a>
                 {% else %}
-                    User   : <b>{{ user }}</b>
-                    (<a href="{% url 'django.contrib.auth.views.logout' %}?next={{ request.path }}">logout</a>)
-                    &nbsp;&nbsp; Email  : {{ user.email }}
+                    <span class="loginname">User: {{ user }} &lt;{{ user.email }}&gt;</span>
+                    &nbsp;<a href="{% url 'django.contrib.auth.views.logout' %}?next={{ request.path }}">logout</a>
+                    &nbsp;&nbsp;
                 {% endif %}
             </div>
 

@@ -164,3 +164,8 @@ html, body {
 #login-menu a:hover {
     background: #c8d9cc;
 }
+.loginname {
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 2px 2px 6px #000000;
+}
