@@ -105,7 +105,6 @@ def wall_add(request, spot_id, **kwargs):
 
     spot = get_object_or_404(Spot, pk=spot_id)
 
-
     if request.POST:
         new_wall = Wall()
         new_wall.wall_name = request.POST.get('wall_name')
@@ -142,19 +141,33 @@ def toggle_show_inactive(request):
     return redirect(request.GET.get('from', '/'))
 
 
-def wall_detail(request, wall_id, **kwargs):
+def wall_detail(request, wall_id, wallview=None, **kwargs):
     """
     Details of a wall and the public view on the wall.
     """
     from miroutes.forms import RouteEditForm
     wall = get_object_or_404(Wall, pk=wall_id)
-    wallview = wall.pub_view
+
+    if wallview is None:
+        wallview = wall.pub_view
 
     routegeomlist = wallview.routegeometry_set.all()
     context = {'wall': wall,
                'wallview': wallview,
                'wall_route_geom_list': routegeomlist}
     return render(request, 'miroutes/wall_detail.html', context)
+
+
+def wall_detail_dev(request, wall_id, **kwargs):
+    """
+    Details of a wall and the public view on the wall.
+    """
+    from miroutes.forms import RouteEditForm
+
+    wall = get_object_or_404(Wall, pk=wall_id)
+    wallview = wall.dev_view
+
+    return wall_detail(request, wall_id, wallview=wallview)
 
 
 def route_detail(request, route_id, **kwargs):

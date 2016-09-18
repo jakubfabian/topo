@@ -12,6 +12,7 @@ url(r'^spot(?P<spot_id>\d+)/$', views.spot_detail, name='spot_detail'),
 url(r'^search/', views.search, name='search'),
 url(r'^(?P<country_id>\d+)/(?P<area_id>\d+)/add_spot$', views.spot_add, name='spot_add'),
 
+url(r'^wall(?P<wall_id>\d+)/dev$', views.wall_detail_dev, name='wall_detail_dev'),
 url(r'^wall(?P<wall_id>\d+)/$', views.wall_detail, name='wall_detail'),
 url(r'^spot(?P<spot_id>\d+)/wall_add$', views.wall_add, name='wall_add'),
 url(r'^wall(?P<wall_id>\d+)/edit$', views.wall_edit, name='wall_edit'),

@@ -41,14 +41,14 @@
             var startzoom = 4;
 
             var aspectRatio = img_dim_x / img_dim_y;
-{#            if (aspectRatio < 1) {#}
-{#                // we resize the container to fit an image with aspectRatio < 1#}
-{#                // the height is then fixed to 1024px#}
-{#                var wall_width = 1024 * aspectRatio;#}
-{#                // document.getElementById('wallmap').setAttribute("style","display:block;width:500px");#}
-{#                document.getElementById('wallmap').style.width = wall_width + "px";#}
-{#                document.getElementById('wallmap').style.height = 1024 + "px";#}
-{#            }#}
+            {#            if (aspectRatio < 1) {#}
+            {#                // we resize the container to fit an image with aspectRatio < 1#}
+            {#                // the height is then fixed to 1024px#}
+            {#                var wall_width = 1024 * aspectRatio;#}
+            {#                // document.getElementById('wallmap').setAttribute("style","display:block;width:500px");#}
+            {#                document.getElementById('wallmap').style.width = wall_width + "px";#}
+            {#                document.getElementById('wallmap').style.height = 1024 + "px";#}
+            {#            }#}
 
             var map = L.map('wallmap', {
                 minZoom: minzoom,
@@ -69,9 +69,9 @@
 
             wall_layer.addTo(map);
 
-            var center_x = img_dim_x/2;
-            var center_y = img_dim_y/2;
-            var center_point = map.unproject([center_x,center_y], minzoom + 1);
+            var center_x = img_dim_x / 2;
+            var center_y = img_dim_y / 2;
+            var center_point = map.unproject([center_x, center_y], minzoom + 1);
 
             map.setView(center_point, minzoom + 1);
 
@@ -92,9 +92,17 @@
 
 {% block mapobjects_info %}
     You're looking at wall {{ wall.wall_name }}.
-    <!-- if you are the owner or a manager -->
-    <br><br>
-    <a href={% url "wall_edit" wall_id=wall.id %}>Edit {{ wall.wall_name }}</a>
+    <br/>
+    {% if wallview.is_dev %}
+        <a href="{% url "wall_detail" wall_id=wall.id %}">Show live wall view</a>
+        <br />
+        <!-- if you are the owner or a manager -->
+        <a href={% url "wall_edit" wall_id=wall.id %}>Edit {{ wall.wall_name }}</a>
+    {% else %}
+        <a href="{% url "wall_detail_dev" wall_id=wall.id %}">Show dev wall view</a>
+    {% endif %}
+
+
 
     <br><br>
     wall.wall_image.get_bg_img_size :: {{ wall.get_bg_img_size }}
@@ -126,7 +134,11 @@
     {% else %}
         <p>Currently no routes are available in {{ wall.wall_name }}</p>
     {% endif %}
-    <p><a href="{% url "wall_provide_img" wall_id=wall.pk %}">Propose a new wall image.</a></p>
+
+    {% if wallview.is_dev %}
+        <p><a href="{% url "wall_provide_img" wall_id=wall.pk %}">Propose a new wall image.</a></p>
+    {% endif %}
+
 {% endblock %}
 
 
