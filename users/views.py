@@ -44,7 +44,6 @@ def register(request):
       new_user.userprofile.activation_key,
       )
 
-#      import ipdb; ipdb.set_trace()
       send_mail(email_subject,
           email_body,
           'registration@mitopo.de',

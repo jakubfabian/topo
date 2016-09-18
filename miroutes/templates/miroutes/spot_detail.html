@@ -82,6 +82,8 @@
     <form action="{% url 'wall_add' spot_id=spot.id %}">
         <input type="submit" value="Add new wall">
     </form>
+    {% if perms.miroutes.add_wall %}
+    {% endif %}
 
 {% endblock %}
 

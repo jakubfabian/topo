@@ -158,3 +158,5 @@ DEFAULT_TO_EMAIL = 'mitopo.de@gmail.com'
 LEAFLET_CONFIG = {
     'RESET_VIEW': False
 }
+
+LOGIN_URL="/users/login"

@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic.edit import UpdateView
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
+from django.contrib.auth.decorators import permission_required, login_required
 
 from miroutes.models import Country
 from miroutes.models import Area
@@ -72,6 +73,7 @@ def spot_detail(request, spot_id, **kwargs):
     return render(request, 'miroutes/spot_detail.html', context)
 
 
+@permission_required('miroutes.spot.can_add')
 def spot_add(request, area_id, **kwargs):
     """
     Adding a new spot.
@@ -110,6 +112,8 @@ def spot_add(request, area_id, **kwargs):
     return render(request, 'miroutes/spot_add.html', context)
 
 
+@login_required
+@permission_required('miroutes.add_wall', raise_exception=True)
 def wall_add(request, spot_id, **kwargs):
     """
     Add a wall to a spot.
@@ -170,6 +174,7 @@ def wall_detail(request, wall_id, wallview=None, **kwargs):
     return render(request, 'miroutes/wall_detail.html', context)
 
 
+@login_required
 def wall_detail_dev(request, wall_id, **kwargs):
     """
     Details of a wall and the public view on the wall.
@@ -221,7 +226,7 @@ def search(request, **kwargs):
 
     return JsonResponse({"results": search_results})
 
-
+@login_required
 def route_edit(request, route_id, **kwargs):
     """
     Edit route object. Accessible via spot details and wall details.
@@ -260,6 +265,7 @@ def route_edit(request, route_id, **kwargs):
     return render(request, 'miroutes/route_edit.html', context)
 
 
+@login_required
 def wall_edit(request, wall_id, **kwargs):
     """
     Edit the development WallView of a wall.
@@ -339,6 +345,7 @@ def wall_edit(request, wall_id, **kwargs):
     return render(request, 'miroutes/wall_edit.html', context)
 
 
+@login_required
 def route_add(request, spot_id, **kwargs):
     """
     Add a route to a spot.
@@ -365,6 +372,7 @@ def route_add(request, spot_id, **kwargs):
         reverse('route_edit', kwargs=kwargs), request.GET.get('from', None)))
 
 
+@login_required
 def route_del(request, route_id, **kwargs):
     """
     Delete route from route list and redirect to the page
@@ -389,6 +397,7 @@ def route_del(request, route_id, **kwargs):
     return redirect(request.GET.get('from', '/'))
 
 
+@login_required
 def wall_provide_img(request, wall_id, **kwargs):
     wall = get_object_or_404(Wall, pk=wall_id)
 
