@@ -34,7 +34,12 @@
                     markerArray.push(mc);
                 {% endfor %}
 
-                var group = L.featureGroup(markerArray).addTo(map);
+                var group = L.featureGroup(markerArray);
+
+                map.options.maxZoom = 15;
+                markers = new L.MarkerClusterGroup();
+                markers.addLayer(group);
+                map.addLayer(markers);
 
                 if (markerArray.length > 1) {
                     map.fitBounds(group.getBounds());

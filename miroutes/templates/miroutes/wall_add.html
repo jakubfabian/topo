@@ -16,19 +16,21 @@
         function map_init_basic(map, options) {
 
             /*var existingSpotIcon = L.icon({
-                iconUrl: '{% static "miroutes/img/spot_existing.svg" %}',
-                iconSize: [120, 120], // size of the icon
-                iconAnchor: [60, 60], // point of the icon which will correspond to marker's location
-                popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
-            });
+             iconUrl: '
+            {% static "miroutes/img/spot_existing.svg" %}',
+             iconSize: [120, 120], // size of the icon
+             iconAnchor: [60, 60], // point of the icon which will correspond to marker's location
+             popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
+             });
 
-            var newSpotIcon = L.icon({
-                iconUrl: '{% static "miroutes/img/spot_new.svg" %}',
-                iconSize: [120, 120], // size of the icon
-                iconAnchor: [60, 60], // point of the icon which will correspond to marker's location
-                popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
-            });
-            */
+             var newSpotIcon = L.icon({
+             iconUrl: '
+            {% static "miroutes/img/spot_new.svg" %}',
+             iconSize: [120, 120], // size of the icon
+             iconAnchor: [60, 60], // point of the icon which will correspond to marker's location
+             popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
+             });
+             */
 
             var existingWalls = {{ wall_list|geojsonfeature|safe }};
             var newWall;
@@ -39,7 +41,11 @@
                     return L.marker(latlng);
                 }
             });
-            existingWallsLayer.addTo(map);
+
+            map.options.maxZoom = 15;
+            markers = new L.MarkerClusterGroup();
+            markers.addLayer(existingWallsLayer);
+            map.addLayer(markers);
 
             map.on('click', function (e) {
                 if (newWall === undefined) {
