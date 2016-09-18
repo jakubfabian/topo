@@ -113,7 +113,6 @@ def wall_add(request, spot_id, **kwargs):
         new_wall.geom = {'coordinates': [
             float(request.POST.get('wall_lng')), float(request.POST.get('wall_lat'))]
             , 'type': 'Point'}
-        new_wall.is_active = True
         new_wall.save()
 
         return redirect(reverse('spot_detail', args=(spot_id)))
