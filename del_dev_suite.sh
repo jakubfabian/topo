@@ -8,6 +8,8 @@ docker-compose rm db
 
 docker ps -a | awk '{print $1}' | xargs --no-run-if-empty docker rm -f
 
+docker rmi $(docker images | grep topo_web | awk '{ print $3 }')
+
 if [ "$1" == "force" ]; then
    echo "== deleting also images =="
    docker rmi $(docker images -q)
