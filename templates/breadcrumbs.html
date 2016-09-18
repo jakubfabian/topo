@@ -1,16 +1,13 @@
-
-{% comment "Does not work yet as relationships are broken with sample route" %}
 {% if route %}
     <a href=" {% url "route_detail" route_id=route.pk %} "> {{ route.route_name }}</a>
-    &lt;&lt;
-    <a href=" {% url "wall_detail" wall_id=route.route_walls.0.pk %} "> {{ route.route_walls.0.wall_name }}</a>
-    &lt;&lt;
-    <a href=" {% url "spot_detail" spot_id=route.route_walls.0.wall_spot.pk %} "> {{ route.route_walls.0.wall_spot.spot_name }}</a>
-    &lt;&lt;
-    <a href=" {% url "area_detail" area_id=route.route_walls.0.wall_spot.spot_area.pk %} "> {{ route.route_walls.0.wall_spot.spot_area.area_name }}</a>
-{% endcomment %}
+    ::
+    <a href=" {% url "spot_detail" spot_id=route.route_spot.pk %} "> {{ route.route_spot.spot_name }}</a>
+    ::
+    <a href=" {% url "area_detail" area_id=route.route_spot.spot_area.pk %} "> {{ route.route_spot.spot_area.area_name }}</a>
+    ::
+    <a href="/miroutes">Home</a>
 
-{% if wall %}
+{% elif wall %}
 
     <a href=" {% url "wall_detail" wall_id=wall.pk %} "> {{ wall.wall_name }}</a>
     ::
