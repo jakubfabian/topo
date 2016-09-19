@@ -13,33 +13,16 @@ RATING_CHOICES = ((1, 'poor'),
                   (4, 'good'),
                   (5, 'excellent'))
 
+GRADE_SYSTEMS = (
+    (0, 'France'),
+    (1, 'UIAA'),
+    (2, 'UK'),
+    (3, 'Sierra'))
 
-# Create your models here.
-class Country(models.Model):
-    name = models.CharField(max_length=100)
-    country_code = models.CharField(max_length=4)
-    def __str__(self):
-        return self.name
-
-class Area(models.Model):
-    GRADE_SYSTEMS = (
-        (0, 'France'),
-        (1, 'UIAA'),
-        (2, 'UK'),
-        (3, 'Sierra'))
-
-    grade_system = models.IntegerField(choices=GRADE_SYSTEMS,
-                                            default=1)
-
-    name = models.CharField(max_length=100)
-    country = models.ForeignKey(Country)
-    def __str__(self):
-        return self.name
 
 class Spot(models.Model):
     name = models.CharField(max_length=100)
     geom = PointField()
-    area = models.ForeignKey(Area)
 
     def __str__(self):
         return self.name
@@ -326,8 +309,7 @@ class Route(models.Model):
 
     grade = models.CharField(max_length=4, blank=True, null=True)
 
-    rating = models.IntegerField(default='1',
-                                       choices=RATING_CHOICES)
+    rating = models.IntegerField(default='1', choices=RATING_CHOICES)
 
     length = models.IntegerField(blank=True, null=True)
 

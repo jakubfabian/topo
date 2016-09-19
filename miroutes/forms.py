@@ -20,8 +20,8 @@ class RouteEditForm(forms.ModelForm):
 class SpotAddForm(forms.ModelForm):
     class Meta:
         model = Spot
-        fields = ('name', 'area', 'geom')
-        widgets = {'geom': forms.HiddenInput(), 'area': forms.HiddenInput()}
+        fields = ('name', 'geom')
+        widgets = {'geom': forms.HiddenInput()}
 
 
 class WallImgUploadForm(forms.Form):

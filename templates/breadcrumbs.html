@@ -3,8 +3,6 @@
     ::
     <a href=" {% url "spot_detail" spot_id=route.spot.pk %} "> {{ route.spot.name }}</a>
     ::
-    <a href=" {% url "area_detail" area_id=route.spot.area.pk %} "> {{ route.spot.area.name }}</a>
-    ::
     <a href="/miroutes">Home</a>
 
 {% elif wall %}
@@ -13,22 +11,11 @@
     ::
     <a href=" {% url "spot_detail" spot_id=wall.spot.pk %} "> {{ wall.spot.name }}</a>
     ::
-    <a href=" {% url "area_detail" area_id=wall.spot.area.pk %} "> {{ wall.spot.area.name }}</a>
-    ::
     <a href="/miroutes">Home</a>
 
 
 {% elif spot %}
     <a href=" {% url "spot_detail" spot.pk %} "> {{ spot.name }}</a>
-    ::
-    <a href=" {% url "area_detail" area_id=spot.area.pk %} "> {{ spot.area.name }}</a>
-    ::
-    <a href="/miroutes">Home</a>
-
-
-{% elif area %}
-
-    <a href=" {% url "area_detail" area_id=area.pk %} "> {{ area.name }}</a>
     ::
     <a href="/miroutes">Home</a>
 

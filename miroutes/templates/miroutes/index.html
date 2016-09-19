@@ -15,66 +15,66 @@
 
 {% block content %}
 
-    {% if country_listing %}
-        <script type="text/javascript">
+    <script type="text/javascript">
 
-            function map_init(map, options) {
+        function map_init(map, options) {
 
-                var markerArray = [];
+            var markerArray = [];
 
-                {% for spot in spot_listing %}
-                    var coord = L.latLng({{ spot.geom.coordinates }});
-                    var newcoord = L.latLng(coord.lng, coord.lat);
-                    var mc = new L.marker(newcoord);
-                    mc.bindPopup("<a href={% url "spot_detail" spot_id=spot.id %}>{{spot.name}}</a>");
-                    markerArray.push(mc);
-                {% endfor %}
+            {% for spot in spot_listing %}
+                var coord = L.latLng({{ spot.geom.coordinates }});
+                var newcoord = L.latLng(coord.lng, coord.lat);
+                var mc = new L.marker(newcoord);
+                mc.bindPopup("<a href={% url "spot_detail" spot_id=spot.id %}>{{spot.name}}</a>");
+                markerArray.push(mc);
+            {% endfor %}
 
-                var group = L.featureGroup(markerArray);
+            var group = L.featureGroup(markerArray);
 
-                map.options.maxZoom = 15;
-                markers = new L.MarkerClusterGroup();
-                markers.addLayer(group);
-                map.addLayer(markers);
+            map.options.maxZoom = 15;
+            markers = new L.MarkerClusterGroup();
+            markers.addLayer(group);
+            map.addLayer(markers);
 
-                if (markerArray.length > 1) {
-                    map.fitBounds(group.getBounds());
-                } else {
-                    map.setView(markerArray[0].getLatLng(), 10);
-                }
-
+            if (markerArray.length > 1) {
+                map.fitBounds(group.getBounds());
+            } else {
+                map.setView(markerArray[0].getLatLng(), 10);
             }
 
-        </script>
+        }
 
-        {% leaflet_map "spots" callback="window.map_init" %}
-    {% endif %}
+    </script>
+
+    {% leaflet_map "spots" callback="window.map_init" %}
 
 {% endblock %}
 
 {% block mapobjects_info %}
 
+    Spots: {{ spot_listing|length }} <br>
+    Walls: {{ wall_listing|length }} <br>
+    Routes: {{ route_listing|length }} <br>
 
-    {% if country_listing %}
+    <form action="{% url 'spot_add' %}">
+        <input type="submit" value="Add new spot">
+    </form>
 
-        <ul>
-            {% for country in country_listing %}
-                <li><a href="{% url "country_detail" country_id=country.id %}">{{ country.name }}</a>
-                </li>
-            {% endfor %}
-        </ul>
-        <b>Statistics:</b>
-        <br><br>
-        Countries: {{ country_listing|length }} <br>
-        Areas: {{ area_listing|length }} <br>
-        Spots: {{ spot_listing|length }} <br>
-        Walls: {{ wall_listing|length }} <br>
-        Routes: {{ route_listing|length }} <br>
+    <h2>Spots</h2>
+    <ul>
+        {% for spot in spot_listing %}
+            <li>
+                <a href=" {% url "spot_detail" spot_id=spot.pk %} "> {{ spot.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
 
+    <h2>Walls</h2>
 
-    {% else %}
+    <ul>
+        {% for wall in wall_listing %}
+            <li><a href="{% url "wall_detail" wall_id=wall.pk %}"> {{ wall.name }}</a></li>
+        {% endfor %}
+    </ul>
 
-        <p>No countries are available.</p>
-
-    {% endif %}
 {% endblock %}

@@ -1,60 +1,27 @@
-import ipdb
-from django.core.urlresolvers import reverse
-
-from django.shortcuts import get_object_or_404, render, redirect
-from django.views.generic.edit import UpdateView
 from django.contrib import messages
-from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import permission_required, login_required
-
-from miroutes.models import Country
-from miroutes.models import Area
-from miroutes.models import Spot
-from miroutes.models import Wall
-from miroutes.models import WallView
-from miroutes.models import Route
-from miroutes.models import RouteGeometry
+from django.core.urlresolvers import reverse
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render, redirect
 
 from miroutes.forms import WallImgUploadForm, SpotAddForm
+from miroutes.models import Route
+from miroutes.models import RouteGeometry
+from miroutes.models import Spot
+from miroutes.models import Wall
 
 
 def index(request):
     """
     Main view for landing page
     """
-    country_listing = Country.objects.order_by('name')[:5]
-    area_listing = Area.objects.order_by('name')
     spot_listing = Spot.objects.order_by('name')
     wall_listing = Wall.active_objects.order_by('name')
     route_listing = Route.objects.order_by('name')
-    context = {'country_listing': country_listing,
-               'area_listing': area_listing,
-               'spot_listing': spot_listing,
+    context = {'spot_listing': spot_listing,
                'wall_listing': wall_listing,
                'route_listing': route_listing}
     return render(request, 'miroutes/index.html', context)
-
-
-def country_detail(request, country_id, **kwargs):
-    """
-    Country detail view.
-    """
-    country = get_object_or_404(Country, pk=country_id)
-    arealist = country.area_set.all()
-    spotlist = Spot.objects.filter(area__country=country_id)
-    context = {'country': country, 'country_area_list': arealist, 'spotlist': spotlist}
-    return render(request, 'miroutes/country_detail.html', context)
-
-
-def area_detail(request, area_id, **kwargs):
-    """
-    Area detail view.
-    """
-    area = get_object_or_404(Area, pk=area_id)
-    spotlist = area.spot_set.all()
-    context = {'area': area, 'area_spot_list': spotlist}
-    return render(request, 'miroutes/area_detail.html', context)
-
 
 def spot_detail(request, spot_id, **kwargs):
     """
@@ -74,12 +41,10 @@ def spot_detail(request, spot_id, **kwargs):
 
 
 @permission_required('miroutes.spot.can_add')
-def spot_add(request, area_id, **kwargs):
+def spot_add(request, **kwargs):
     """
     Adding a new spot.
     """
-    area = get_object_or_404(Area, pk=area_id)
-
     if request.method == 'POST':
 
         form = SpotAddForm(request.POST)
@@ -87,25 +52,13 @@ def spot_add(request, area_id, **kwargs):
         if form.is_valid():
 
             form.save()
-            return redirect(reverse('area_detail', args=(area_id)))
+            return redirect(reverse('index'))
     else:
-        form = SpotAddForm(initial={'area': area})
+        form = SpotAddForm()
 
-    # if request.POST:
-    #     new_spot = Spot()
-    #     new_spot.name = request.POST.get('name')
-    #     new_spot.area = area
-    #     new_spot.geom = {'coordinates': [
-    #         float(request.POST.get('spot_lng')), float(request.POST.get('spot_lat'))]
-    #         , 'type': 'Point'}
-    #     new_spot.save()
-    #
-    #     return redirect(reverse('area_detail', args=(area_id)))
-
-    spot_list = area.spot_set.all()
+    spot_list = Spot.objects.order_by('name')
 
     context = {
-        'area': area,
         'spot_list': spot_list,
         'form' : form
     }
@@ -161,7 +114,6 @@ def wall_detail(request, wall_id, wallview=None, **kwargs):
     """
     Details of a wall and the public view on the wall.
     """
-    from miroutes.forms import RouteEditForm
     wall = get_object_or_404(Wall, pk=wall_id)
 
     if wallview is None:
@@ -179,7 +131,6 @@ def wall_detail_dev(request, wall_id, **kwargs):
     """
     Details of a wall and the public view on the wall.
     """
-    from miroutes.forms import RouteEditForm
 
     wall = get_object_or_404(Wall, pk=wall_id)
     wallview = wall.dev_view
@@ -204,11 +155,6 @@ def search(request, **kwargs):
     search_results = []
 
     query = request.GET.get('q', "")
-
-    query_results = Area.objects.filter(name__icontains=query)
-    search_results += [{"text": "Area - " + area.name, "id": area.id,
-                        "url": reverse('area_detail', kwargs={'area_id': area.id})}
-                       for area in query_results]
 
     query_results = Wall.objects.filter(name__icontains=query)
     search_results += [
@@ -259,7 +205,7 @@ def route_edit(request, route_id, **kwargs):
 
     routeform = RouteEditForm(instance=route)
     routeform.fields['grade'] = forms.ChoiceField(
-        choices=Route.GRADE_CHOICES[route.spot.area.grade_system])
+        choices=Route.GRADE_CHOICES[1])
 
     context = {'route': route, 'route_form': routeform, 'from': request.GET.get('from', None)}
     return render(request, 'miroutes/route_edit.html', context)

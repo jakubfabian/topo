@@ -3,14 +3,10 @@ from django.conf.urls import *
 from miroutes import views
 
 urlpatterns = [ url(r'^$', views.index, name='miroutes_index'),
-url(r'^country(?P<country_id>\d+)/$', views.country_detail, name='country_detail'),
-
-url(r'^area(?P<area_id>\d+)/$', views.area_detail, name='area_detail'),
-
 
 url(r'^spot(?P<spot_id>\d+)/$', views.spot_detail, name='spot_detail'),
 url(r'^search/', views.search, name='search'),
-url(r'^(?P<country_id>\d+)/(?P<area_id>\d+)/add_spot$', views.spot_add, name='spot_add'),
+url(r'^add_spot$', views.spot_add, name='spot_add'),
 
 url(r'^wall(?P<wall_id>\d+)/dev$', views.wall_detail_dev, name='wall_detail_dev'),
 url(r'^wall(?P<wall_id>\d+)/$', views.wall_detail, name='wall_detail'),

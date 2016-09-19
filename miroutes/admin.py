@@ -1,46 +1,26 @@
-from leaflet.admin import LeafletGeoAdmin
-from djgeojson.fields import PointField
 from django.contrib import admin
+from leaflet.admin import LeafletGeoAdmin
 
-from miroutes.models import Country
-from miroutes.models import Area
-from miroutes.models import Spot
-from miroutes.models import Wall
 from miroutes.models import Route
 from miroutes.models import RouteGeometry
+from miroutes.models import Spot
+from miroutes.models import Wall
 
 
 # Register your models here.
 
-
-class AreaAdmin(admin.ModelAdmin):
-    fieldsets = [
-        (None, {'fields': ['name']}),
-        ('Country:', {'fields': ['country']})
-        ]
-    list_filter = ['country']
-
 class SpotAdmin(admin.ModelAdmin):
-    list_filter = ['area']
-
-class CountryAdmin(admin.ModelAdmin):
-    fieldsets = [
-        (None, {'fields': ['name']}),
-        ('Additional Info:', {'fields': ['country_code']})
-        ]
+    pass
 
 class WallAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields': ['name']}),
-        ('Area:', {'fields': ['spot']})
+        (None, {'fields': ['name','spot']}),
         ]
     list_filter = ['spot']
 
 class RouteAdmin(admin.ModelAdmin):
     list_filter = ['route_wall']
 
-admin.site.register(Country, CountryAdmin)
-admin.site.register(Area, AreaAdmin)
 admin.site.register(Spot, LeafletGeoAdmin)
 admin.site.register(Wall, LeafletGeoAdmin)
 admin.site.register(Route, LeafletGeoAdmin)

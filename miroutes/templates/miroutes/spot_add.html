@@ -63,16 +63,14 @@
 
 {% block mapobjects_info %}
     <h1>Spot add</h1>
-    <a href="/miroutes/"> Home </a> : <a href=../../> {{ spot.area.country.name }} </a> ::
-    <a href="../">{{ spot.area.name }} </a> :: {{ spot.name }}
 
-    <form method="POST" action="{% url 'spot_add' country_id=area.country.id area_id=area.id %}">
+    <form method="POST" action="{% url 'spot_add' %}">
         {% csrf_token %}
         {{ form }}
         <input type="submit" value="save">
     </form>
 
-    <form method="GET" action="{% url 'spot_add' country_id=area.country.id area_id=area.id %}">
+    <form method="GET" action="{% url 'spot_add' %}">
         {% csrf_token %}
         <input type="submit" value="cancel">
     </form>

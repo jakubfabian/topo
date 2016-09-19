@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'djgeojson',
     'leaflet',
-    'testapp',
     'miroutes',
     'users',
     'reversion',
