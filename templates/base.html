@@ -63,11 +63,11 @@
             </a>
             <div id="login-menu">
                 {% if user.is_anonymous %}
-                    <a href="{% url 'django.contrib.auth.views.login' %}?next={{ request.path }}">Login</a>
-                    <a href="{% url 'users.views.register' %}">Register</a>
+                    <a id="login_button" href="{% url 'django.contrib.auth.views.login' %}?next={{ request.path }}">Login</a>
+                    <a id="register_button" href="{% url 'users.views.register' %}">Register</a>
                 {% else %}
                     <span class="loginname">User: {{ user }} &lt;{{ user.email }}&gt;</span>
-                    &nbsp;<a href="{% url 'django.contrib.auth.views.logout' %}?next={{ request.path }}">logout</a>
+                    &nbsp;<a id="logout_button" href="{% url 'django.contrib.auth.views.logout' %}?next={{ request.path }}">logout</a>
                     &nbsp;&nbsp;
                 {% endif %}
             </div>
