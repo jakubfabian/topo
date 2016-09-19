@@ -78,7 +78,7 @@
 
     <form method="POST" action="{% url 'wall_add' spot_id=spot.id %}">
         {% csrf_token %}
-        <input type="text" name="wall_name" value=""/>
+        <input type="text" name="name" value=""/>
         <input type="hidden" id="wall_lat" name="wall_lat" value=""/>
         <input type="hidden" id="wall_lng" name="wall_lng" value=""/>
         <input type="submit" value="save">

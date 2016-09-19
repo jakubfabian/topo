@@ -15,28 +15,28 @@ from testapp.models import Route
 
 class AreaAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields': ['area_name']}),
-        ('Country:', {'fields': ['area_country']})
+        (None, {'fields': ['name']}),
+        ('Country:', {'fields': ['country']})
         ]
-    list_filter = ['area_country']
+    list_filter = ['country']
 
 class SpotAdmin(admin.ModelAdmin):
 
-    list_filter = ['spot_area']
+    list_filter = ['area']
 
 class CountryAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields': ['country_name']}),
+        (None, {'fields': ['name']}),
         ('Additional Info:', {'fields': ['country_code']})
         ]
 
 
 class WallAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields': ['wall_name']}),
-        ('Area:', {'fields': ['wall_spot']})
+        (None, {'fields': ['name']}),
+        ('Area:', {'fields': ['spot']})
         ]
-    list_filter = ['wall_spot']
+    list_filter = ['spot']
 
 class RouteAdmin(admin.ModelAdmin):
     list_filter = ['route_wall']

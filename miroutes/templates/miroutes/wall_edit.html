@@ -318,7 +318,7 @@
        var routenames = [];
        var geomids = [];
        {% for geom in wall_routegeomlist %}
-       routenames.push("{{ geom.route.route_name }}");
+       routenames.push("{{ geom.route.name }}");
        geomids.push("{{ geom.id }}");
        {% endfor %}
        for (var i = 0; i < collection.features.length; i++) {
@@ -441,7 +441,7 @@
 {% endblock %}
 
 {% block mapobjects_info %}
-  You're looking at wall {{ wall.wall_name }}
+  You're looking at wall {{ wall.name }}
   <br><br>
   <!-- css styles for the selectable list. TODO: put tags in css files -->
   <!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
@@ -449,7 +449,7 @@
     <div class="left_list">
       <ol id="selectable">
         {% for route in spot_routelist %}
-          <li class="ui-widget-content" name="route_onspot" value="{{ route.id }}">{{ route.route_name }}</li>
+          <li class="ui-widget-content" name="route_onspot" value="{{ route.id }}">{{ route.name }}</li>
         {% endfor %}
       </ol>
     </div>
@@ -457,7 +457,7 @@
       <!-- This list contains the routes that are selected -->
       <ol id="selected_routes">
         {% for route in wall_routelist %}
-          <li class="ui-widget-content" name="route_selected" value="{{ route.id }}">{{ route.route_name }}</li>
+          <li class="ui-widget-content" name="route_selected" value="{{ route.id }}">{{ route.name }}</li>
         {% endfor %}
       </ol>
     </div>
@@ -476,8 +476,8 @@
       <ol id="route_list">
         {% for routegeom in wall_routegeomlist %}
           <!-- We save geometry and route name in the list -->
-          <li class="ui-widget-content" value="{{ routegeom.id }}" data-geom="{{ routegeom.geom }}" data-name="{{ routegeom.route.route_name }}">
-            {{ routegeom.route.route_name }}
+          <li class="ui-widget-content" value="{{ routegeom.id }}" data-geom="{{ routegeom.geom }}" data-name="{{ routegeom.route.name }}">
+            {{ routegeom.route.name }}
             <input id="geom_inputfield_{{ routegeom.id }}" type="text" name="routegeomid_{{ routegeom.id }}" value="{{ routegeom.geom }}">
           </li>
           

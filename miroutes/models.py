@@ -1,12 +1,11 @@
+from datetime import date
+
 from django.contrib.auth.models import User
-from djgeojson.fields import PointField
-from djgeojson.fields import LineStringField
 from django.db import models
-from django.conf import settings
+from djgeojson.fields import LineStringField
+from djgeojson.fields import PointField
 
 from miroutes.image_tiler import tile_image
-
-from datetime import date
 
 RATING_CHOICES = ((1, 'poor'),
                   (2, 'ok'),
@@ -17,10 +16,10 @@ RATING_CHOICES = ((1, 'poor'),
 
 # Create your models here.
 class Country(models.Model):
-    country_name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
     country_code = models.CharField(max_length=4)
     def __str__(self):
-        return self.country_name
+        return self.name
 
 class Area(models.Model):
     GRADE_SYSTEMS = (
@@ -29,20 +28,21 @@ class Area(models.Model):
         (2, 'UK'),
         (3, 'Sierra'))
 
-    area_grade_system = models.IntegerField(choices=GRADE_SYSTEMS,
+    grade_system = models.IntegerField(choices=GRADE_SYSTEMS,
                                             default=1)
-    
-    area_name = models.CharField(max_length=100)
-    area_country = models.ForeignKey(Country)
+
+    name = models.CharField(max_length=100)
+    country = models.ForeignKey(Country)
     def __str__(self):
-        return self.area_name
+        return self.name
 
 class Spot(models.Model):
-    spot_name = models.CharField(max_length=100)
-    spot_area = models.ForeignKey(Area)
+    name = models.CharField(max_length=100)
     geom = PointField()
+    area = models.ForeignKey(Area)
+
     def __str__(self):
-        return self.spot_name
+        return self.name
 
 
 def get_bg_img_upload_path(wallimage, filename):
@@ -53,17 +53,18 @@ def get_bg_img_upload_path(wallimage, filename):
     """
     import os
     from time import gmtime, strftime
-    time = strftime("%Y-%m-%d-%H-%M-%S", gmtime())+'_'+filename
-    return os.path.join("wall_pictures", "background",str(time))
+    time = strftime("%Y-%m-%d-%H-%M-%S", gmtime()) + '_' + filename
+    return os.path.join("wall_pictures", "background", str(time))
 
 
 class ActiveWallViewManager(models.Manager):
     """
     This manager filters all currently active views excluding the dev views.
     """
+
     def get_queryset(self):
         return super(ActiveWallViewManager, self).get_queryset().filter(wall__is_active=True).filter(is_dev=False)
-    
+
 
 class WallView(models.Model):
     """
@@ -95,33 +96,33 @@ class WallView(models.Model):
             A manager that filters the wallviews which are associated with
             active walls. The development views are excluded.
     """
-    
+
     wall = models.ForeignKey('Wall')
     is_dev = models.BooleanField(default=False)
     approach = models.TextField(blank=True, null=True)
     approach_time = models.DurationField(blank=True, null=True)
-    
+
     morning_sun = models.NullBooleanField(blank=True, null=True)
     midday_sun = models.NullBooleanField(blank=True, null=True)
     afternoon_sun = models.NullBooleanField(blank=True, null=True)
-    
+
     children_friendly = models.IntegerField(blank=True, null=True, choices=RATING_CHOICES)
     bolt_quality = models.IntegerField(blank=True, null=True, choices=RATING_CHOICES)
     wall_height = models.IntegerField(blank=True, null=True)
-    
 
     objects = models.Manager()
     active_objects = ActiveWallViewManager()
 
-    
+
 class ActiveWallManager(models.Manager):
     """
     The active wall manager is used to access the active walls.
     """
+
     def get_queryset(self):
         return super(ActiveWallManager, self).get_queryset().filter(is_active=True)
 
-    
+
 class Wall(models.Model):
     """
     Hosts basic informations on a wall. The informations that are put
@@ -130,8 +131,8 @@ class Wall(models.Model):
     
     Attributes:
         is_active (Boolean): Flags active (visible) walls.
-        wall_spot (Spot): The spot the wall is associated to.
-        wall_name (str): Human readable string describing the wall.
+        spot (Spot): The spot the wall is associated to.
+        name (str): Human readable string describing the wall.
         background_img (ImageField): Hosts the image associated with the wall.
         geom (djgeojson.fields.PointField): JSON of the location of the wall on the map.
         objects (Manager): The generic model manager.
@@ -141,15 +142,15 @@ class Wall(models.Model):
         dev_view (WallView): Accesses the WallView with is_dev=True.
         pub_view (WallView): Accesses the WallView with is_dev=False.
     """
-    wall_name = models.CharField(max_length=100)
-    wall_spot = models.ForeignKey(Spot)
+    name = models.CharField(max_length=100)
+    spot = models.ForeignKey(Spot)
     geom = PointField()
     is_active = models.BooleanField(default=False)
-    
+
     objects = models.Manager()
     active_objects = ActiveWallManager()
 
-    background_img = models.ImageField(blank = True, upload_to=get_bg_img_upload_path)
+    background_img = models.ImageField(blank=True, upload_to=get_bg_img_upload_path)
 
     @property
     def dev_view(self):
@@ -160,8 +161,8 @@ class Wall(models.Model):
         return self.wallview_set.filter(is_dev=False)[0]
 
     def __str__(self):
-        return self.wall_name
-    
+        return self.name
+
     def save(self, *args, **kwargs):
         super(Wall, self).save(*args, **kwargs)
         self.create_tiles()
@@ -178,7 +179,6 @@ class Wall(models.Model):
         We take the Wall background image, create the tiles and save them in the local path to the media dir
         """
         import os
-        from PIL import Image
         from django.core.files.storage import default_storage as storage
         if not self.background_img:
             print ("No background image to create tiles for")
@@ -207,23 +207,22 @@ class Wall(models.Model):
         file_path = self.background_img.name
         filename_base, filename_ext = os.path.splitext(file_path)
         tiles_file_path = u"%s_tiles" % filename_base
-	print "background_img url: {}".format(self.background_img.url)
+        print "background_img url: {}".format(self.background_img.url)
         if storage.exists(tiles_file_path):
             return storage.url(tiles_file_path)
-	else:
-	    print "No tiles found for {}".format(filename_base)
-            return ""	
+        else:
+            print "No tiles found for {}".format(filename_base)
+            return ""
 
     def get_bg_img_size(self):
         """
         Return the size of the original background image and the number of zoom levels in x and direction
         @TODO: is this what we really want -- shouldnt it be the image size of the zoom lvl 0 tile?
         """
-        import os
         from django.core.files.storage import default_storage as storage
         from PIL import Image
         import numpy as np
-            #import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         if not self.background_img:
             return ""
         file_path = self.background_img.name
@@ -232,13 +231,13 @@ class Wall(models.Model):
             tile_width = 256
             dim = image.size
 
-            newdim = [ int(np.ceil(1.*d/tile_width)*tile_width) for d in dim ]
-            zoom_levels = [ np.int(np.ceil(zl)) for zl in np.log( np.array(newdim)/tile_width)/np.log(2) ]
+            newdim = [int(np.ceil(1. * d / tile_width) * tile_width) for d in dim]
+            zoom_levels = [np.int(np.ceil(zl)) for zl in np.log(np.array(newdim) / tile_width) / np.log(2)]
 
-            res = list(dim)+zoom_levels
-            return ' ,'.join( [ str(d) for d in res ] )
+            res = list(dim) + zoom_levels
+            return ' ,'.join([str(d) for d in res])
         return ''
-    
+
     def publish_dev_view(self):
         """
         Deletes the current pub_view and copies the dev_view over the pub_view
@@ -247,7 +246,7 @@ class Wall(models.Model):
         self.pub_view.delete()
 
         newpubview = self.dev_view
-        
+
         # copy the devview
         newpubview.pk = None
         # and make it the new pub_view
@@ -262,7 +261,6 @@ class Wall(models.Model):
                                           geom=routegeom.geom)
             new_routegeom.save()
 
-            
     def reset_dev_view(self):
         """
         Deletes the current dev_view and copies the pub_view over the dev_view.
@@ -271,7 +269,7 @@ class Wall(models.Model):
         self.dev_view.delete()
 
         pubview = self.pub_view
-        
+
         # copy the pub_view
         pubview.pk = None
         # and make it the new dev_view
@@ -285,7 +283,7 @@ class Wall(models.Model):
                                           on_wallview=self.dev_view,
                                           geom=routegeom.geom)
             new_routegeom.save()
-    
+
 
 class Route(models.Model):
     """
@@ -293,18 +291,18 @@ class Route(models.Model):
     to an existing route, with multiple route geometries on different wall views.
 
     Attributes:
-        route_spot: The spot the route can be found on.
-        route_walls: The walls the route can be found on.
+        spot: The spot the route can be found on.
+        walls: The walls the route can be found on.
             This list is generated from the RouteGeometry objects.
-        route_name: The name of the route.
-        route_grade: The grade of the route.
-        route_rating: The (average) rating of the route.
+        name: The name of the route.
+        grade: The grade of the route.
+        rating: The (average) rating of the route.
             This should be chosen in agreement with the grading system of the area.
-        route_length: The approximate length of the route in meters.
-        route_number_of_bolts: The number of bolts and thus the number of 
+        length: The approximate length of the route in meters.
+        number_of_bolts: The number of bolts and thus the number of
             quickdraws that are required to climb the route.
-        route_security_rating: How secure is climbing the route? (1-5)
-        route_description: Comments and caveats on the route.
+        security_rating: How secure is climbing the route? (1-5)
+        description: Comments and caveats on the route.
         
     """
     GRADE_CHOICES = [(('5a', '5a'),
@@ -318,30 +316,27 @@ class Route(models.Model):
                       ('5', '5'),
                       ('5+', '5+'))]
 
-                      
-    
     # Every route is located at a climbing spot
-    route_spot = models.ForeignKey(Spot, default=None, editable=False)
+    spot = models.ForeignKey(Spot, default=None, editable=False)
     # The relation to one or many walls is via the geometry of the route
-    route_walls = models.ManyToManyField(WallView, through='RouteGeometry')
-    route_climbers = models.ManyToManyField(User, through='Climb')
+    walls = models.ManyToManyField(WallView, through='RouteGeometry')
+    climbers = models.ManyToManyField(User, through='Climb')
 
-    route_name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
 
-    route_grade = models.CharField(max_length=4, blank=True, null=True)
+    grade = models.CharField(max_length=4, blank=True, null=True)
 
-    route_rating = models.IntegerField(default='1',
+    rating = models.IntegerField(default='1',
                                        choices=RATING_CHOICES)
 
-    route_length = models.IntegerField(blank=True, null=True)
+    length = models.IntegerField(blank=True, null=True)
 
-    route_number_of_bolts = models.IntegerField(blank=True, null=True)
-    route_security_rating = models.IntegerField(default=3)
-    route_description = models.TextField(blank=True, null=True)
-    
+    number_of_bolts = models.IntegerField(blank=True, null=True)
+    security_rating = models.IntegerField(default=3)
+    description = models.TextField(blank=True, null=True)
+
     def __str__(self):
-        return self.route_name
-
+        return self.name
 
 
 class RouteGeometry(models.Model):
@@ -366,8 +361,7 @@ class Climb(models.Model):
     climber = models.ForeignKey(User)
     route = models.ForeignKey(Route)
     date = models.DateField(default=date.today)
-    
+
     style = models.CharField(max_length=10, blank=True, null=True, choices=STYLE_CHOICES)
     rating = models.IntegerField(blank=True, null=True, choices=RATING_CHOICES)
     comment = models.TextField(blank=True, null=True)
-

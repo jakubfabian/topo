@@ -7,41 +7,41 @@ from django.db import models
 # Create your models here.
 
 class Country(models.Model):
-    country_name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
     country_code = models.CharField(max_length=4)
     def __str__(self):
-        return self.country_name
+        return self.name
 
 class Area(models.Model):
-    area_name = models.CharField(max_length=100)
-    area_country = models.ForeignKey(Country)
+    name = models.CharField(max_length=100)
+    country = models.ForeignKey(Country)
     def __str__(self):
-        return self.area_name
+        return self.name
 
 class Spot(models.Model):
-    spot_name = models.CharField(max_length=100)
-    spot_area = models.ForeignKey(Area)
+    name = models.CharField(max_length=100)
+    area = models.ForeignKey(Area)
     geom = PointField()
     def __str__(self):
-        return self.spot_name
+        return self.name
 
 
 def get_bg_img_upload_path(instance, filename):
     import os
     from time import gmtime, strftime
     time = strftime("%Y-%m-%d-%H-%M-%S", gmtime())+'_'+filename
-    return os.path.join("wall_pictures",'{}'.format(instance.wall_name),"background",str(time))
+    return os.path.join("wall_pictures",'{}'.format(instance.name),"background",str(time))
 
 
 
 class Wall(models.Model):
-    wall_name = models.CharField(max_length=100)
-    wall_spot = models.ForeignKey(Spot)
+    name = models.CharField(max_length=100)
+    spot = models.ForeignKey(Spot)
     geom = PointField()
     background_img = models.ImageField(blank = True,upload_to=get_bg_img_upload_path)
 
     def __str__(self):
-        return self.wall_name
+        return self.name
 
     @property
     def popupContent(self):
@@ -171,10 +171,10 @@ class Route(models.Model):
 
 
 
-    route_name = models.CharField(max_length=100)
-    route_grade = models.CharField(max_length=2, choices=GRADE_CHOICES, default="5b")
+    name = models.CharField(max_length=100)
+    grade = models.CharField(max_length=2, choices=GRADE_CHOICES, default="5b")
     route_wall = models.ForeignKey(Wall)
     geom = LineStringField()
     def __str__(self):
-        return self.route_name
+        return self.name
 

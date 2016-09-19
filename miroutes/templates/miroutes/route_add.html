@@ -37,7 +37,7 @@
     </style>
 </head>
 
-You're looking at wall {{ wall.wall_name }}
+You're looking at wall {{ wall.name }}
 <br><br>
 {% if wall_route_list %}
 
@@ -179,7 +179,7 @@ You're looking at wall {{ wall.wall_name }}
         {{ form.geom }}
 
         {{ form.non_field_errors }}
-        {{ form.route_name.errors }}
+        {{ form.name.errors }}
         {{ form.name_of_field.errors }}
 
         {% block mapobjects_info %}
@@ -196,10 +196,10 @@ You're looking at wall {{ wall.wall_name }}
 
                 <tr>
                     <td>
-                        {{ form.route_name }}
+                        {{ form.name }}
                     </td>
                     <td>
-                        {{ form.route_grade }}
+                        {{ form.grade }}
 
                         <input type="hidden" id="id_route_wall" name="route_wall" value="{{ wall.id }}">
 
@@ -215,10 +215,10 @@ You're looking at wall {{ wall.wall_name }}
 
                     <tr>
                         <td>
-                            {{ route.route_name }}
+                            {{ route.name }}
                         </td>
                         <td>
-                            {{ route.route_grade }}
+                            {{ route.grade }}
                         </td>
                         <td>
 
@@ -258,5 +258,5 @@ You're looking at wall {{ wall.wall_name }}
 
 
 {% else %}
-    <p>Currently no routes are available in {{ wall.wall_name }}</p>
+    <p>Currently no routes are available in {{ wall.name }}</p>
 {% endif %}

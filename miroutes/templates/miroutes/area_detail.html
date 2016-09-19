@@ -16,7 +16,7 @@
 {% block content %}
 
     <br><br>
-    You're looking at area selection {{ area.area_name }}
+    You're looking at area selection {{ area.name }}
 
     {% if area_spot_list %}
 
@@ -30,7 +30,7 @@
                     var coord = L.latLng({{ spot.geom.coordinates }});
                     var newcoord = L.latLng(coord.lng, coord.lat);
                     var mc = new L.marker(newcoord);
-                    mc.bindPopup("<a href={% url "spot_detail" spot_id=spot.id %}>{{ spot.spot_name }}</a>");
+                    mc.bindPopup("<a href={% url "spot_detail" spot_id=spot.id %}>{{ spot.name }}</a>");
                     markerArray.push(mc);
                 {% endfor %}
 
@@ -54,21 +54,21 @@
         {% block mapobjects_info %}
 
 
-            In {{ area.area_name }} there are following spots:<br><br>
+            In {{ area.name }} there are following spots:<br><br>
 
             {% for spot in area_spot_list %}
                 <li>
-                    <a href=" {% url "spot_detail" spot_id=spot.pk %} "> {{ spot.spot_name }} {{ spot.geom.coordinates }}</a>
+                    <a href=" {% url "spot_detail" spot_id=spot.pk %} "> {{ spot.name }} {{ spot.geom.coordinates }}</a>
                 </li>
             {% endfor %}
             </ul>
 
-            <form action="{% url 'spot_add' country_id=area.area_country.id area_id=area.id %}">
+            <form action="{% url 'spot_add' country_id=area.country.id area_id=area.id %}">
                 <input type="submit" value="Add new spot">
             </form>
         {% endblock %}
     {% else %}
-        <p>Currently no spots are available in {{ area.area_name }}</p>
+        <p>Currently no spots are available in {{ area.name }}</p>
     {% endif %}
 
 {% endblock %}

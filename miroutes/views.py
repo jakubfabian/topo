@@ -22,11 +22,11 @@ def index(request):
     """
     Main view for landing page
     """
-    country_listing = Country.objects.order_by('country_name')[:5]
-    area_listing = Area.objects.order_by('area_name')
-    spot_listing = Spot.objects.order_by('spot_name')
-    wall_listing = Wall.active_objects.order_by('wall_name')
-    route_listing = Route.objects.order_by('route_name')
+    country_listing = Country.objects.order_by('name')[:5]
+    area_listing = Area.objects.order_by('name')
+    spot_listing = Spot.objects.order_by('name')
+    wall_listing = Wall.active_objects.order_by('name')
+    route_listing = Route.objects.order_by('name')
     context = {'country_listing': country_listing,
                'area_listing': area_listing,
                'spot_listing': spot_listing,
@@ -41,7 +41,7 @@ def country_detail(request, country_id, **kwargs):
     """
     country = get_object_or_404(Country, pk=country_id)
     arealist = country.area_set.all()
-    spotlist = Spot.objects.filter(spot_area__area_country=country_id)
+    spotlist = Spot.objects.filter(area__country=country_id)
     context = {'country': country, 'country_area_list': arealist, 'spotlist': spotlist}
     return render(request, 'miroutes/country_detail.html', context)
 
@@ -67,7 +67,7 @@ def spot_detail(request, spot_id, **kwargs):
     if not request.session.get('show_inactive', False):
         walllist = walllist.filter(is_active=True)
 
-    walllist = walllist.order_by('wall_name')
+    walllist = walllist.order_by('name')
 
     context = {'spot': spot, 'spot_wall_list': walllist}
     return render(request, 'miroutes/spot_detail.html', context)
@@ -89,12 +89,12 @@ def spot_add(request, area_id, **kwargs):
             form.save()
             return redirect(reverse('area_detail', args=(area_id)))
     else:
-        form = SpotAddForm(initial={'spot_area': area})
+        form = SpotAddForm(initial={'area': area})
 
     # if request.POST:
     #     new_spot = Spot()
-    #     new_spot.spot_name = request.POST.get('spot_name')
-    #     new_spot.spot_area = area
+    #     new_spot.name = request.POST.get('name')
+    #     new_spot.area = area
     #     new_spot.geom = {'coordinates': [
     #         float(request.POST.get('spot_lng')), float(request.POST.get('spot_lat'))]
     #         , 'type': 'Point'}
@@ -123,8 +123,8 @@ def wall_add(request, spot_id, **kwargs):
 
     if request.POST:
         new_wall = Wall()
-        new_wall.wall_name = request.POST.get('wall_name')
-        new_wall.wall_spot = spot
+        new_wall.name = request.POST.get('name')
+        new_wall.spot = spot
         new_wall.geom = {'coordinates': [
             float(request.POST.get('wall_lng')), float(request.POST.get('wall_lat'))]
             , 'type': 'Point'}
@@ -205,23 +205,23 @@ def search(request, **kwargs):
 
     query = request.GET.get('q', "")
 
-    query_results = Area.objects.filter(area_name__icontains=query)
-    search_results += [{"text": "Area - " + area.area_name, "id": area.id,
+    query_results = Area.objects.filter(name__icontains=query)
+    search_results += [{"text": "Area - " + area.name, "id": area.id,
                         "url": reverse('area_detail', kwargs={'area_id': area.id})}
                        for area in query_results]
 
-    query_results = Wall.objects.filter(wall_name__icontains=query)
+    query_results = Wall.objects.filter(name__icontains=query)
     search_results += [
-        {"text": "Wall - " + wall.wall_name, "id": wall.id, "url": reverse('wall_detail', kwargs={'wall_id': wall.id})}
+        {"text": "Wall - " + wall.name, "id": wall.id, "url": reverse('wall_detail', kwargs={'wall_id': wall.id})}
         for wall in query_results]
 
-    query_results = Spot.objects.filter(spot_name__icontains=query)
+    query_results = Spot.objects.filter(name__icontains=query)
     search_results += [
-        {"text": "Spot - " + spot.spot_name, "id": spot.id, "url": reverse('spot_detail', kwargs={'spot_id': spot.id})}
+        {"text": "Spot - " + spot.name, "id": spot.id, "url": reverse('spot_detail', kwargs={'spot_id': spot.id})}
         for spot in query_results]
 
-    query_results = Route.objects.filter(route_name__icontains=query)
-    search_results += [{"text": "Route - " + route.route_name, "id": route.id,
+    query_results = Route.objects.filter(name__icontains=query)
+    search_results += [{"text": "Route - " + route.name, "id": route.id,
                         "url": reverse('route_detail', kwargs={'route_id': route.id})} for route in query_results]
 
     return JsonResponse({"results": search_results})
@@ -258,8 +258,8 @@ def route_edit(request, route_id, **kwargs):
                 return redirect(next)
 
     routeform = RouteEditForm(instance=route)
-    routeform.fields['route_grade'] = forms.ChoiceField(
-        choices=Route.GRADE_CHOICES[route.route_spot.spot_area.area_grade_system])
+    routeform.fields['grade'] = forms.ChoiceField(
+        choices=Route.GRADE_CHOICES[route.spot.area.grade_system])
 
     context = {'route': route, 'route_form': routeform, 'from': request.GET.get('from', None)}
     return render(request, 'miroutes/route_edit.html', context)
@@ -286,7 +286,7 @@ def wall_edit(request, wall_id, **kwargs):
     # routes on the dev view
     wallroutelist = wallview.route_set.all()
 
-    spot = wall.wall_spot
+    spot = wall.spot
     # all routes on the spot
     spotroutelist = spot.route_set.all()
 
@@ -296,7 +296,7 @@ def wall_edit(request, wall_id, **kwargs):
         print request.POST, ':: route_onwall_ids', route_onwall_ids
         if len(route_onwall_ids) != 0:
             # Routes which are moved from the spot's route pool to this wall are added
-            routes_toadd = spotroutelist.filter(pk__in=route_onwall_ids).exclude(route_walls=wallview)
+            routes_toadd = spotroutelist.filter(pk__in=route_onwall_ids).exclude(walls=wallview)
             for route in routes_toadd:
                 geom_obj = RouteGeometry(route=route, on_wallview=wallview, geom=None)
                 geom_obj.save()
@@ -319,21 +319,21 @@ def wall_edit(request, wall_id, **kwargs):
 
     # take relative complement for spotroutelist:
     # i.e. remove all routes in spotroutelist that are already at wall
-    spotroutelist = spotroutelist.exclude(route_walls=wallview)
+    spotroutelist = spotroutelist.exclude(walls=wallview)
 
     # all active walls on the spot without the currently selected wall
     spotwalllist = Wall.active_objects.all()
     spotwalllist = spotwalllist.exclude(pk=wall.id)
 
     # routes that are not on an active wall
-    spotroutesnotonwall = spotroutelist.filter(route_walls=None)
+    spotroutesnotonwall = spotroutelist.filter(walls=None)
 
     # also get all geoms asociated with wall routes
     wallroutegeomlist = wallview.routegeometry_set.all()
 
     # TODO: in order to use them consecutively in template, shouldnt we order them by something?
 
-    context = {'spot': wall.wall_spot,
+    context = {'spot': wall.spot,
                'spot_walllist': spotwalllist,
                'wall': wall,
                'wallview': wallview,
@@ -361,8 +361,8 @@ def route_add(request, spot_id, **kwargs):
     from django.http import HttpResponseRedirect
 
     spot = get_object_or_404(Spot, id=spot_id)
-    newroute = Route(route_spot=spot,
-                     route_name='Insert Route Name Here!')
+    newroute = Route(spot=spot,
+                     name='Insert Route Name Here!')
     newroute.save()
 
     kwargs['route_id'] = newroute.id
@@ -389,7 +389,7 @@ def route_del(request, route_id, **kwargs):
     route = get_object_or_404(Route, pk=route_id)
     for routegeom in route.routegeometry_set.all():
         routegeom.delete()
-    routename = route.route_name
+    routename = route.name
     route.delete()
 
     messages.add_message(request, messages.SUCCESS, 'Successfully deleted route {}.'.format(routename))

@@ -16,7 +16,7 @@
 {% block content %}
 
     <br><br>
-    You're looking at Country selection {{ country.country_name }}
+    You're looking at Country selection {{ country.name }}
 
     {% if spotlist %}
 
@@ -30,7 +30,7 @@
                     var coord = L.latLng({{ spot.geom.coordinates }});
                     var newcoord = L.latLng(coord.lng, coord.lat);
                     var mc = new L.marker(newcoord);
-                    mc.bindPopup("<a href={% url "spot_detail" spot_id=spot.pk %}>{{ spot.spot_name }}</a>");
+                    mc.bindPopup("<a href={% url "spot_detail" spot_id=spot.pk %}>{{ spot.name }}</a>");
                     markerArray.push(mc);
                 {% endfor %}
 
@@ -53,10 +53,10 @@
 
         {% block mapobjects_info %}
 
-            In {{ country.country_name }} there are following areas:<br><br>
+            In {{ country.name }} there are following areas:<br><br>
 
             {% for area in country_area_list %}
-                <li><a href={% url "area_detail" area_id=area.pk %}> {{ area.area_name }}</a></li>
+                <li><a href={% url "area_detail" area_id=area.pk %}> {{ area.name }}</a></li>
             {% endfor %}
 
             <br>
@@ -66,14 +66,14 @@
             Spots:
             {% for spot in spotlist %}
                 <li>
-                    <a href={% url "spot_detail" spot_id=spot.pk %}> {{ spot.spot_name }} {{ spot.geom.coordinates }}</a>
+                    <a href={% url "spot_detail" spot_id=spot.pk %}> {{ spot.name }} {{ spot.geom.coordinates }}</a>
                 </li>
             {% endfor %}
             </ul>
         {% endblock %}
 
     {% else %}
-        <p>Currently no areas are available in {{ country.country_name }}</p>
+        <p>Currently no areas are available in {{ country.name }}</p>
     {% endif %}
 
 {% endblock %}

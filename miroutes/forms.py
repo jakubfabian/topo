@@ -14,14 +14,14 @@ class RouteGeometryEditForm(forms.ModelForm):
 class RouteEditForm(forms.ModelForm):
     class Meta:
         model = Route
-        exclude = ('route_walls',)
+        exclude = ('walls',)
 
 
 class SpotAddForm(forms.ModelForm):
     class Meta:
         model = Spot
-        fields = ('spot_name', 'spot_area', 'geom')
-        widgets = {'geom': forms.HiddenInput(), 'spot_area': forms.HiddenInput()}
+        fields = ('name', 'area', 'geom')
+        widgets = {'geom': forms.HiddenInput(), 'area': forms.HiddenInput()}
 
 
 class WallImgUploadForm(forms.Form):

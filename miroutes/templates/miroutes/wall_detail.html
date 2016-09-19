@@ -91,13 +91,13 @@
 {% endblock %}
 
 {% block mapobjects_info %}
-    You're looking at wall {{ wall.wall_name }}.
+    You're looking at wall {{ wall.name }}.
     <br/>
     {% if wallview.is_dev %}
         <a href="{% url "wall_detail" wall_id=wall.id %}">Show live wall view</a>
         <br />
         <!-- if you are the owner or a manager -->
-        <a href={% url "wall_edit" wall_id=wall.id %}>Edit {{ wall.wall_name }}</a>
+        <a href={% url "wall_edit" wall_id=wall.id %}>Edit {{ wall.name }}</a>
     {% else %}
         <a href="{% url "wall_detail_dev" wall_id=wall.id %}">Show dev wall view</a>
     {% endif %}
@@ -110,7 +110,7 @@
     <br><br>
 
     {% if wall_route_geom_list %}
-        In {{ wall.wall_name }} there are following routes:
+        In {{ wall.name }} there are following routes:
         <br>
         <br>
 
@@ -119,10 +119,10 @@
             {% for routegeom in wall_route_geom_list %}
                 <tr>
                     <td>
-                        <a href="{% url "route_detail" route_id=routegeom.route.pk %}"> {{ routegeom.route.route_name }}</a>
+                        <a href="{% url "route_detail" route_id=routegeom.route.pk %}"> {{ routegeom.route.name }}</a>
                     </td>
                     <td>
-                        {{ routegeom.route.route_grade }}
+                        {{ routegeom.route.grade }}
                     </td>
                     <td>
                         <a href={% url "route_edit" route_id=routegeom.route.pk %}> edit </a>
@@ -132,7 +132,7 @@
         </table>
 
     {% else %}
-        <p>Currently no routes are available in {{ wall.wall_name }}</p>
+        <p>Currently no routes are available in {{ wall.name }}</p>
     {% endif %}
 
     {% if wallview.is_dev %}

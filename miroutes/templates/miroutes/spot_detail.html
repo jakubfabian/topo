@@ -27,7 +27,7 @@
                     var coord = L.latLng({{ wall.geom.coordinates }});
                     var newcoord = L.latLng(coord.lng, coord.lat);
                     var mc = new L.marker(newcoord);
-                    mc.bindPopup("<a href={% url "wall_detail" wall_id=wall.pk%}>{{ wall.wall_name }}</a>");
+                    mc.bindPopup("<a href={% url "wall_detail" wall_id=wall.pk%}>{{ wall.name }}</a>");
                     markerArray.push(mc);
                 {% endfor %}
 
@@ -62,26 +62,26 @@
         <br><br>
 
 
-        <a href="/miroutes/"> Home </a> : <a href=../../> {{ spot.spot_area.area_country.country_name }} </a> ::
-        <a href="../">{{ spot.spot_area.area_name }} </a> :: {{ spot.spot_name }}
+        <a href="/miroutes/"> Home </a> : <a href=../../> {{ spot.area.country.name }} </a> ::
+        <a href="../">{{ spot.area.name }} </a> :: {{ spot.name }}
         <br><br>
 
-        You're looking at spot {{ spot.spot_name }}.
+        You're looking at spot {{ spot.name }}.
         <!-- if you are a spot manager -->
 
         <br><br>
 
 
-        In {{ spot.spot_name }} there are following walls:<br><br>
+        In {{ spot.name }} there are following walls:<br><br>
 
         <ul>
             {% for wall in spot_wall_list %}
-                <li><a href="{% url "wall_detail" wall_id=wall.pk %}"> {{ wall.wall_name }}
+                <li><a href="{% url "wall_detail" wall_id=wall.pk %}"> {{ wall.name }}
                     :: {{ wall.geom.coordinates }}</a></li>
             {% endfor %}
         </ul>
     {% else %}
-        <p>Currently no walls are available in {{ spot.spot_name }}</p>
+        <p>Currently no walls are available in {{ spot.name }}</p>
     {% endif %}
 
     <form action="{% url 'wall_add' spot_id=spot.id %}">
