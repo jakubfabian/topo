@@ -57,14 +57,14 @@
     Routes: {{ route_listing|length }} <br>
 
     <form action="{% url 'spot_add' %}">
-        <input type="submit" value="Add new spot">
+        <input id="add_spot_button" type="submit" value="Add new spot">
     </form>
 
     <h2>Spots</h2>
     <ul>
         {% for spot in spot_listing %}
             <li>
-                <a href=" {% url "spot_detail" spot_id=spot.pk %} "> {{ spot.name }}</a>
+                <a class="spot_entry" href="{% url "spot_detail" spot_id=spot.pk %} ">{{ spot.name }}</a>
             </li>
         {% endfor %}
     </ul>
@@ -73,7 +73,7 @@
 
     <ul>
         {% for wall in wall_listing %}
-            <li><a href="{% url "wall_detail" wall_id=wall.pk %}"> {{ wall.name }}</a></li>
+            <li><a href="{% url "wall_detail" wall_id=wall.pk %}">{{ wall.name }}</a></li>
         {% endfor %}
     </ul>
 

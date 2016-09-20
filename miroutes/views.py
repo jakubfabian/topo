@@ -52,7 +52,7 @@ def spot_add(request, **kwargs):
         if form.is_valid():
 
             form.save()
-            return redirect(reverse('index'))
+            return redirect(reverse('miroutes_index'))
     else:
         form = SpotAddForm()
 
