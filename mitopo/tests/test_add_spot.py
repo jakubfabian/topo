@@ -1,4 +1,4 @@
-from mitopo.tests.utils import MitopoTestCase
+from utils import MitopoTestCase
 
 
 class AddSpotTest(MitopoTestCase):

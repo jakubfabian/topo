@@ -1,4 +1,4 @@
-from mitopo.tests.utils import MitopoTestCase
+from utils import MitopoTestCase
 
 
 class LoginLogoutTest(MitopoTestCase):
@@ -55,3 +55,7 @@ class LoginLogoutTest(MitopoTestCase):
         self.ensure_present("#register_button")
         self.ensure_absent("span.loginname")
         self.ensure_absent("#logout_button")
+
+if __name__ == "__main__":
+    import unittest
+    unittest.main()
