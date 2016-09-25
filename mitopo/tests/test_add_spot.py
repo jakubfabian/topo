@@ -49,7 +49,7 @@ class AddSpotTest(MitopoTestCase):
         # AND after logout should be back to the start page
 
         header = self.ensure_present(".inner_container h1")
-        self.assertEqual(header.text, "Spot add")
+        self.assertEqual(header.text, "Add new Spot")
 
         markers_before = self.browser.find_elements_by_css_selector("img.leaflet-marker-icon")
 
