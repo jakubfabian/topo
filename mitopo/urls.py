@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^$', RedirectView.as_view(url='/miroutes/', permanent=True)),
     url(r'^admin/', admin.site.urls),
     url(r'^miroutes/', include('miroutes.urls')),
+    url(r'^edit_spot/', include('edit_spot.urls')),
     url(r'^users/', include('users.urls')),
 ]
 

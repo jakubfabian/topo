@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'djgeojson',
     'leaflet',
     'miroutes',
+    'edit_spot',
     'users',
     'reversion',
 ]

@@ -2,7 +2,7 @@
 {% load staticfiles %}
 
 {% block title %}
-    Mitopo.de - Spot Edit
+    Mitopo.de - Add new Spot
 {% endblock %}
 
 {% block extra_assets %}
@@ -16,12 +16,10 @@
 
 function map_init_basic(map, options) {
 
-    map.options.maxZoom = 15;
+    map.options.maxZoom = 17;
 
     var existingSpots = {{ spot_list|geojsonfeature|safe }};
-    var newSpot;
-
-    existingSpotssLayer = L.geoJson(existingSpots, {
+    existingSpotsLayer = L.geoJson(existingSpots, {
         pointToLayer: function (feature, latlng) {
             return L.marker(latlng);
         }
@@ -31,6 +29,14 @@ function map_init_basic(map, options) {
     markers.addLayer(existingSpotsLayer);
     map.addLayer(markers);
 
+    editSpotIcon = L.icon({
+        iconUrl: '{% static "edit_spot/img/edit_marker_icon.png" %}',
+        iconSize: [25,41], // size of the icon
+        iconAnchor: [12, 41], // point of the icon which will correspond to marker's location
+        popupAnchor: [1, -34] // point from which the popup should open relative to the iconAnchor
+    });
+
+    var newSpot;
 
     if(existingSpots.features.length === 0) {
         munich = new L.marker([48.137154, 11.576124]);
@@ -41,7 +47,7 @@ function map_init_basic(map, options) {
 
     map.on('click', function (e) {
         if (newSpot === undefined) {
-            newSpot = new L.marker(e.latlng).addTo(map);
+            newSpot = new L.marker(e.latlng, {icon: editSpotIcon}).addTo(map);
         } else {
             newSpot.setLatLng(e.latlng);
         }
@@ -61,15 +67,15 @@ function map_init_basic(map, options) {
 {% endblock %}
 
 {% block mapobjects_info %}
-    <h1>Spot add</h1>
+    <h1>Add new Spot</h1>
 
-    <form method="POST" action="{% url 'spot_add' %}">
+    <form method="POST" action="{% url 'add_spot' %}">
         {% csrf_token %}
-        {{ form }}
+        {{ form.as_p }}
         <input type="submit" value="save">
     </form>
 
-    <form method="GET" action="{% url 'spot_add' %}">
+    <form method="GET" action="{% url 'edit_spot_index' %}">
         {% csrf_token %}
         <input type="submit" value="cancel">
     </form>

@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 
-from miroutes.forms import WallImgUploadForm, SpotAddForm
+from miroutes.forms import WallImgUploadForm
 from miroutes.models import Route
 from miroutes.models import RouteGeometry
 from miroutes.models import Spot
@@ -38,31 +38,6 @@ def spot_detail(request, spot_id, **kwargs):
 
     context = {'spot': spot, 'spot_wall_list': walllist}
     return render(request, 'miroutes/spot_detail.html', context)
-
-
-@permission_required('miroutes.spot.can_add')
-def spot_add(request, **kwargs):
-    """
-    Adding a new spot.
-    """
-    if request.method == 'POST':
-
-        form = SpotAddForm(request.POST)
-
-        if form.is_valid():
-
-            form.save()
-            return redirect(reverse('miroutes_index'))
-    else:
-        form = SpotAddForm()
-
-    spot_list = Spot.objects.order_by('name')
-
-    context = {
-        'spot_list': spot_list,
-        'form' : form
-    }
-    return render(request, 'miroutes/spot_add.html', context)
 
 
 @login_required
