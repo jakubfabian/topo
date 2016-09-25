@@ -13,52 +13,51 @@
     {% leaflet_css plugins="forms" %}
 
     <script type="text/javascript">
-        function map_init_basic(map, options) {
 
-            var existingSpots = {{ spot_list|geojsonfeature|safe }};
-            var newSpot;
+function map_init_basic(map, options) {
 
+    map.options.maxZoom = 15;
 
-            existingWallsLayer = L.geoJson(existingSpots, {
-                pointToLayer: function (feature, latlng) {
-                    return L.marker(latlng);
-                }
-            });
+    var existingSpots = {{ spot_list|geojsonfeature|safe }};
+    var newSpot;
 
-            map.options.maxZoom = 15;
-
-            markers = new L.MarkerClusterGroup();
-            markers.addLayer(existingWallsLayer);
-            map.addLayer(markers);
-
-            map.on('click', function (e) {
-                if (newSpot === undefined) {
-                    newSpot = new L.marker(e.latlng).addTo(map);
-                } else {
-                    newSpot.setLatLng(e.latlng);
-                }
-                var geojson = {
-                    "type": "Point",
-                    "coordinates": L.GeoJSON.latLngToCoords(e.latlng)
-
-                };
-
-                document.getElementById("id_geom").value = JSON.stringify(geojson);
-            });
-
-            map.fitBounds(markers.getBounds().pad(0.5))
-
+    existingWallsLayer = L.geoJson(existingSpots, {
+        pointToLayer: function (feature, latlng) {
+            return L.marker(latlng);
         }
+    });
+
+    markers = new L.MarkerClusterGroup();
+    markers.addLayer(existingWallsLayer);
+    map.addLayer(markers);
+
+
+    if(existingSpots.features.length === 0) {
+        munich = new L.marker([48.137154, 11.576124]);
+        map.setView(munich.getLatLng(), 10);
+    } else {
+        map.fitBounds(markers.getBounds().pad(0.5))
+    };
+
+    map.on('click', function (e) {
+        if (newSpot === undefined) {
+            newSpot = new L.marker(e.latlng).addTo(map);
+        } else {
+            newSpot.setLatLng(e.latlng);
+        }
+        var geojson = {
+            "type": "Point",
+            "coordinates": L.GeoJSON.latLngToCoords(e.latlng)
+        };
+
+        document.getElementById("id_geom").value = JSON.stringify(geojson);
+    });
+
+}
 
     </script>
-{% endblock %}
-
-{% block content %}
-
 
     {% leaflet_map "spotmap" callback="window.map_init_basic" %}
-
-
 {% endblock %}
 
 {% block mapobjects_info %}

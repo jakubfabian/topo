@@ -41,11 +41,6 @@ You're looking at wall {{ wall.name }}
 <br><br>
 {% if wall_route_list %}
 
-
-
-
-
-
     <script type="text/javascript">
         var geodjango_geom = {};
         geodjango_geom.fieldid = 'id_geom';
@@ -61,11 +56,7 @@ You're looking at wall {{ wall.name }}
         }
         ;
 
-
     </script>
-
-
-
 
     <div id="id_geom_map" class="leaflet-container-default"></div>
     <script type="text/javascript">
@@ -232,30 +223,6 @@ You're looking at wall {{ wall.name }}
         {% endblock %}
 
     </form>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 {% else %}
     <p>Currently no routes are available in {{ wall.name }}</p>

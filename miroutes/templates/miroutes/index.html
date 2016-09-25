@@ -17,36 +17,39 @@
 
     <script type="text/javascript">
 
-        function map_init(map, options) {
+function map_init(map, options) {
 
-            var markerArray = [];
+    var markerArray = [];
 
-            {% for spot in spot_listing %}
-                var coord = L.latLng({{ spot.geom.coordinates }});
-                var newcoord = L.latLng(coord.lng, coord.lat);
-                var mc = new L.marker(newcoord);
-                mc.bindPopup("<a href={% url "spot_detail" spot_id=spot.id %}>{{spot.name}}</a>");
-                markerArray.push(mc);
-            {% endfor %}
+    {% for spot in spot_listing %}
+    var coord = L.latLng({{ spot.geom.coordinates }});
+    var newcoord = L.latLng(coord.lng, coord.lat);
+    var mc = new L.marker(newcoord);
+    mc.bindPopup("<a href={% url "spot_detail" spot_id=spot.id %}>{{spot.name}}</a>");
+    markerArray.push(mc);
+    {% endfor %}
 
-            var group = L.featureGroup(markerArray);
 
-            map.options.maxZoom = 15;
-            markers = new L.MarkerClusterGroup();
-            markers.addLayer(group);
-            map.addLayer(markers);
+    map.options.maxZoom = 15;
 
-            if (markerArray.length > 1) {
-                map.fitBounds(group.getBounds());
-            } else {
-                map.setView(markerArray[0].getLatLng(), 10);
-            }
+    var group = L.featureGroup(markerArray);
+    markers = new L.MarkerClusterGroup();
+    markers.addLayer(group);
+    map.addLayer(markers);
 
-        }
+    if (markerArray.length === 0) {
+        munich = new L.marker([48.137154, 11.576124]);
+        map.setView(munich.getLatLng(), 10);
+    } else if (markerArray.length === 1) {
+        map.setView(markerArray[0].getLatLng(), 10);
+    } else {
+        map.fitBounds(group.getBounds());
+    }
+}
 
     </script>
 
-    {% leaflet_map "spots" callback="window.map_init" %}
+    {% leaflet_map "spots_map" callback="window.map_init" %}
 
 {% endblock %}
 
