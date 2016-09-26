@@ -32,7 +32,18 @@ def wall_index(request, spot_id):
             'show_edit_pane': True}
     return render(request, 'edit_spot/wall_index.html', context)
 
-@login_required
+@permission_required('miroutes.wall.can_change')
+def publish_wall(request, wall_id):
+    """
+        Publish Wall
+    """
+    wall = get_object_or_404(Wall, pk=wall_id)
+    wall.publish_dev_view()
+    wall.is_active = True
+    wall.save()
+    return redirect(reverse('spot_detail', kwargs={'spot_id':wall.spot.id}))
+
+@permission_required('miroutes.wall.can.change')
 def link_routes_to_wall(request, wall_id, **kwargs):
     """
     Edit the development WallView of a wall.
@@ -211,7 +222,7 @@ def add_route(request, spot_id, **kwargs):
     }
     return render(request, 'edit_spot/add_route.html', context)
 
-@login_required
+@permission_required('miroutes.wall.can.change')
 def draw_routes(request, wall_id, **kwargs):
     """Draw route geometries on a wall.
 

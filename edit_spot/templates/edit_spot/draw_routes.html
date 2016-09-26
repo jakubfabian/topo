@@ -372,4 +372,9 @@ $(document).ready(function () {
     </div>
     <input type="submit" value="speichern"/> 
   </form>
+
+    <form method="GET" action="{% url 'publish_wall' wall_id=wall.pk%}">
+        {% csrf_token %}
+        <input type="submit" value="publish wall">
+    </form>
 {% endblock %}
