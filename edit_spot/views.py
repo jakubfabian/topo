@@ -123,27 +123,20 @@ def add_wall(request, spot_id, **kwargs):
     if request.method == 'POST':
 
         form = WallForm(request.POST, request.FILES)
-        print 'is valid',form.is_valid()
         if form.is_valid():
-            #wall = form.save(commit=False)
-            #print wall
-            #wall.background_img = form.cleaned_data['background_img']
-            #wall.save()
-            #wall.create_tiles()
-            #wall.save()
             form.save()
             return wall_index(request, spot.pk)
     else:
         form = WallForm(initial={'spot':spot})
 
-    wall_list = Wall.objects.order_by('name')
+    wall_list = spot.wall_set.all().order_by('name')
 
     context = {
             'spot':spot,
-        'wall_list': wall_list,
-        'show_edit_pane' : True,
-        'form' : form
-    }
+            'wall_list': wall_list,
+            'show_edit_pane' : True,
+            'form' : form
+            }
     return render(request, 'edit_spot/add_wall.html', context)
 
 
