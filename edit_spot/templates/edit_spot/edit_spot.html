@@ -7,6 +7,8 @@
 
 {% block extra_assets %}
 
+<link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
+
     {% load leaflet_tags %}
     {% load geojson_tags %}
     {% leaflet_js %}
@@ -63,11 +65,13 @@
 {% endblock %}
 
 {% block content %}
-
-
     {% leaflet_map "spotmap" callback="window.map_init_basic" %}
+{% endblock %}
 
-
+{% block edit_pane %}
+<a href="{% url "edit_spot" spot_id=spot.pk %}">Edit Spot</a> &nbsp;
+<a href="{% url "add_route" spot_id=spot.pk %}">Routepool</a>&nbsp;
+<a href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">ChooseWall</a>&nbsp;
 {% endblock %}
 
 {% block mapobjects_info %}
@@ -83,4 +87,10 @@
         {% csrf_token %}
         <input type="submit" value="cancel">
     </form>
+<p>
+    <form method="GET" action="{% url "add_route" spot_id=spot.pk %}">
+        {% csrf_token %}
+        <input type="submit" value="Add routes">
+    </form>
+</p>
 {% endblock %}

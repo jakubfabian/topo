@@ -11,9 +11,7 @@
     {% leaflet_js %}
     {% leaflet_css %}
 
-{% endblock %}
 
-{% block content %}
 
     <script type="text/javascript">
 
@@ -48,9 +46,10 @@ function map_init(map, options) {
 }
 
     </script>
+{% endblock %}
 
+{% block content %}
     {% leaflet_map "spots_map" callback="window.map_init" %}
-
 {% endblock %}
 
 {% block mapobjects_info %}

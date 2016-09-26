@@ -22,7 +22,7 @@ GRADE_SYSTEMS = (
 
 class Spot(models.Model):
     name = models.CharField(max_length=100)
-    description = models.CharField(max_length=10000)
+    description = models.CharField(max_length=10000, blank=True, null=True)
     geom = PointField()
 
     def __str__(self):
@@ -301,7 +301,7 @@ class Route(models.Model):
                       ('5+', '5+'))]
 
     # Every route is located at a climbing spot
-    spot = models.ForeignKey(Spot, default=None, editable=False)
+    spot = models.ForeignKey(Spot, default=None)
     # The relation to one or many walls is via the geometry of the route
     walls = models.ManyToManyField(WallView, through='RouteGeometry')
     climbers = models.ManyToManyField(User, through='Climb')

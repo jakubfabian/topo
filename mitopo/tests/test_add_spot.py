@@ -14,7 +14,7 @@ class AddSpotTest(MitopoTestCase):
         # during test development. When you finished developing the test comment it out
         # so the test runs with maximum speed.
         #
-        # self.slow_down = 500
+        self.slow_down = 1000
 
         # GIVEN is the start page of the application with login and register buttons
         #       present

@@ -7,8 +7,9 @@ from django.core.urlresolvers import reverse
 from miroutes.models import Spot
 from miroutes.models import Wall
 from miroutes.models import Route
+from miroutes.models import RouteGeometry
+from .forms import SpotForm, RouteForm, WallForm
 
-from .forms import SpotForm
 
 @permission_required('miroutes.spot.can_change')
 def index(request):
@@ -18,6 +19,121 @@ def index(request):
     spot_listing = Spot.objects.order_by('name')
     context = {'spot_listing': spot_listing}
     return render(request, 'edit_spot/index.html', context)
+
+@permission_required('miroutes.wall.can_change')
+def wall_index(request, spot_id):
+    """
+    Display all walls on spot and give user possibility to create new ones
+    """
+    spot = get_object_or_404(Spot, pk=spot_id)
+    wall_listing = Wall.objects.filter(spot__id=spot_id).order_by('name')
+    context = {'wall_listing': wall_listing,
+            'spot':spot,
+            'show_edit_pane': True}
+    return render(request, 'edit_spot/wall_index.html', context)
+
+@login_required
+def link_routes_to_wall(request, wall_id, **kwargs):
+    """
+    Edit the development WallView of a wall.
+    We select one existing route or
+    create a new one and draw the geometry.
+
+    Args:
+      request: the http request object
+      spot_id: the id of the spot as given in the url, see urls.py
+      wall_id: the id of the wall as given in the url, see urls.py
+
+    Returns:
+      A HTML web page generated from the wall_edit.html template
+    """
+    wall = get_object_or_404(Wall, pk=wall_id)
+    wallview = wall.dev_view
+
+    # routes on the dev view
+    wallroutelist = wallview.route_set.all()
+
+    spot = wall.spot
+    # all routes on the spot
+    spotroutelist = spot.route_set.all()
+
+    if request.POST:
+        # Get route ids from right hand side list in template
+        route_onwall_ids = request.POST.getlist('routes_onwall', None)
+        print request.POST, ':: route_onwall_ids', route_onwall_ids
+        if len(route_onwall_ids) != 0:
+            # Routes which are moved from the spot's route pool to this wall are added
+            routes_toadd = spotroutelist.filter(pk__in=route_onwall_ids).exclude(walls=wallview)
+            for route in routes_toadd:
+                geom_obj = RouteGeometry(route=route, on_wallview=wallview, geom=None)
+                geom_obj.save()
+
+            # Routes that are not on wall list anymore get detached
+            routes_todel = wallroutelist.exclude(pk__in=route_onwall_ids)
+            for route in routes_todel:
+                rg = route.routegeometry_set.filter(on_wallview=wallview)
+                rg.delete()
+
+    # take relative complement for spotroutelist:
+    # i.e. remove all routes in spotroutelist that are already at wall
+    spotroutelist = spotroutelist.exclude(walls=wallview)
+
+    # all active walls on the spot without the currently selected wall
+    spotwalllist = Wall.active_objects.all()
+    spotwalllist = spotwalllist.exclude(pk=wall.id)
+
+    # routes that are not on an active wall
+    spotroutesnotonwall = spotroutelist.filter(walls=None)
+
+    # also get all geoms asociated with wall routes
+    wallroutegeomlist = wallview.routegeometry_set.all()
+
+    # TODO: in order to use them consecutively in template, shouldnt we order them by something?
+
+    context = {'spot': wall.spot,
+               'spot_walllist': spotwalllist,
+               'wall': wall,
+               'wallview': wallview,
+               'spot_routelist': spotroutelist,
+               'spot_routes_noton_wall': spotroutesnotonwall,
+               'wall_routelist': wallroutelist,
+               'show_edit_pane': True}
+
+    return render(request, 'edit_spot/link_routes_to_wall.html', context)
+
+@permission_required('miroutes.wall.can_add')
+def add_wall(request, spot_id, **kwargs):
+    """
+    Adding a new wall.
+    """
+
+    spot = get_object_or_404(Spot, pk=spot_id)
+
+    if request.method == 'POST':
+
+        form = WallForm(request.POST, request.FILES)
+        print 'is valid',form.is_valid()
+        if form.is_valid():
+            #wall = form.save(commit=False)
+            #print wall
+            #wall.background_img = form.cleaned_data['background_img']
+            #wall.save()
+            #wall.create_tiles()
+            #wall.save()
+            form.save()
+            return wall_index(request, spot.pk)
+    else:
+        form = WallForm(initial={'spot':spot})
+
+    wall_list = Wall.objects.order_by('name')
+
+    context = {
+            'spot':spot,
+        'wall_list': wall_list,
+        'show_edit_pane' : True,
+        'form' : form
+    }
+    return render(request, 'edit_spot/add_wall.html', context)
 
 
 @permission_required('miroutes.spot.can_add')
@@ -38,6 +154,7 @@ def add_spot(request, **kwargs):
 
     context = {
         'spot_list': spot_list,
+        'show_edit_pane' : True,
         'form' : form
     }
     return render(request, 'edit_spot/add_spot.html', context)
@@ -63,5 +180,67 @@ def edit_spot(request, spot_id):
 
     context = {'spot': spot,
             'spot_list': spot_list,
+            'show_edit_pane' : True,
             'form': form}
     return render(request, 'edit_spot/edit_spot.html', context)
+
+
+@permission_required('miroutes.spot.can_add')
+def add_route(request, spot_id, **kwargs):
+    """
+    Adding a new Route.
+    """
+    spot = get_object_or_404(Spot, pk=spot_id)
+
+    if request.method == 'POST':
+
+        form = RouteForm(request.POST)
+        if form.is_valid():
+            form.save()
+    else:
+        form = RouteForm(initial={'spot': spot})
+        #form = RouteForm()
+
+    route_list = Route.objects.order_by('name')
+
+    context = {
+        'spot': spot,
+        'route_list': route_list,
+        'form' : form,
+        'show_edit_pane' : True
+    }
+    return render(request, 'edit_spot/add_route.html', context)
+
+@login_required
+def draw_routes(request, wall_id, **kwargs):
+    """Draw route geometries on a wall.
+
+    Select all routegeometries on a wall. Draw existing geometry strings.
+
+    """
+    wall = get_object_or_404(Wall, pk=wall_id)
+    wallview = wall.dev_view
+
+    # also get all geoms asociated with wall routes
+    wallroutegeomlist = wallview.routegeometry_set.all()
+
+    if request.POST:
+        for key in request.POST.keys():
+            if key.startswith('routegeomid_'):
+                geomstr = request.POST.get(key)
+                rgid = key.split('_')[1]
+                geom_obj = RouteGeometry.objects.get(pk=rgid)
+                geom_obj.geom = geomstr
+                # import ipdb
+                # ipdb.set_trace()
+                geom_obj.save()
+
+
+
+    context = {'wall': wall,
+            'wallview': wallview,
+            'wall_routegeomlist': wallroutegeomlist,
+            'show_edit_pane': True}
+
+    return render(request, 'edit_spot/draw_routes.html', context)
+

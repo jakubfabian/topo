@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% load staticfiles %} 
+
+{% block title %}
+  Mitopo.de - Relate routes to the wall
+{% endblock %}
+
+{% block extra_assets %}
+
+<link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
+{% endblock %}
+
+{% block edit_pane %}
+<a href="{% url "edit_spot" spot_id=spot.pk %}">Edit Spot</a> &nbsp;
+<a href="{% url "add_route" spot_id=spot.pk %}">Routepool</a>&nbsp;
+<a href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">ChooseWall</a>&nbsp;
+<a href="{% url "link_routes_to_wall" wall_id=wall.pk %}">LinkRoutesToWall</a>&nbsp;
+<a href="{% url "draw_routes" wall_id=wall.pk %}">DrawRoutesOnWall</a>&nbsp;
+{% endblock %}
+
+{% block content %}
+
+  <style>
+
+   .left_list {
+     float: left;    
+   }
+
+   #wrapper_select {
+     border: 1px solid black;
+   }
+
+   #feedback {
+     /*font-size: 1.4em;*/
+   }
+
+   #selectable .ui-selecting {
+     background: #FECA40;
+   }
+
+   #selectable .ui-selected {
+     background: #F39814;
+     color: white;
+   }
+
+   #selectable {
+     display: inline-block;
+     list-style-type: none;
+     width: 300px;
+     border: 1px solid red;
+   }
+
+   #selectable li {
+     margin: 3px;
+     padding: 0.4em;
+     height: 18px;
+   }
+
+   #selected_routes .ui-selecting {
+     background: #FECA40;
+   }
+
+   #selected_routes .ui-selected {
+     background: #F39814;
+     color: black;
+   }
+
+   #selected_routes {
+     display: inline-block;
+     list-style-type: none;
+     width: 300px;
+     overflow: hidden;
+     border: 1px solid green;
+   }
+
+   #selected_routes li {
+     margin: 3px;
+     padding: 0.4em;
+     font-size: 1.4em;
+     height: 18px;
+   }
+
+
+   #route_list .ui-selecting {
+     background: #FECA40;
+   }
+   #route_list .ui-selected {
+     background: #F39814;
+     color: black;
+   }
+
+   #route_list {
+     display: inline-block;
+     list-style-type: none;
+     width: 300px;
+     overflow: hidden;
+     border: 1px solid green;
+   }
+
+   #routelist_div{
+     position: relative;
+     z-index: 1;
+   }
+
+
+  </style>
+
+  <script type="text/javascript">
+   // This is the widget part
+   $(document).ready(function () {
+       function update_form() {
+
+           // remove all entries from the list of chosen routes to re-populate
+           $(".route_chooser").children().each(function () {
+               $(this).remove()
+           });
+
+           // populate list with input elements
+           $("#selected_routes").children().each(function () {
+               var val = $(this).val();
+               // the value in the input elements is given by the route id
+               var text = '<input type="text" name="routes_onwall" value="'.concat(val).concat('" />');
+               $(".route_chooser").append(text);
+           });
+       };
+
+       // the list of selected routes on the wall
+       $("#selected_routes").selectable({
+           // on select we pop the element from the list
+           selected: function (event, ui) {
+               var s = $(ui.selected);
+               s.remove();
+               // mark it as non-selected
+               s.removeClass('ui-selected');
+               // and put it back to the list of selectable routes
+               $("#selectable").append(s);
+               // the list of hidden input elements is updated as well
+               update_form();
+           }
+       });
+
+       // the list of selectable routes on the spot
+       $("#selectable").selectable({
+           // on select we pop the route from the list and add it to the
+           // list of selected routes
+           selected: function (event, ui) {
+               var s = $(ui.selected);
+               s.remove();
+               s.removeClass('ui-selected');
+               $("#selected_routes").append(s);
+               update_form();
+           }
+       });
+
+
+       // the list of routes whose geometries are to edit
+       $("#route_list").selectable({
+           // on select we do something
+           selected: function (event, ui) {
+               var s = $(ui.selected);
+               var geomid = s.val();
+               var geomstring = s.data('geom');
+               $("#testtext").text('Geometry '.concat(geomid).concat(' chosen. String ').concat(geomstring));
+
+               if(geomstring == "None"){
+                   var newRouteEvent = new CustomEvent('newRouteEvent', { 'detail': {'geomid': geomid}});
+                   document.dispatchEvent(newRouteEvent);
+
+               }else{
+                   var editRouteEvent = new CustomEvent('editRouteEvent', {
+                       'detail': {'geomid': geomid, 'geomstring': geomstring }});
+                   document.dispatchEvent(editRouteEvent);
+               }
+           }	 
+       });
+
+
+   });
+  </script>
+
+  <br>
+
+  <b> Routepool on the spot:</b>
+  <div class="left_list">
+      <ol id="selectable">
+          {% for route in spot_routelist %}
+          <li class="ui-widget-content" name="route_onspot" value="{{ route.id }}">{{ route.name }}</li>
+          {% endfor %}
+      </ol>
+  </div>
+{% endblock %}
+
+{% block mapobjects_info %}
+  Selected routes for wall {{ wall.name }}
+  <br><br>
+  <!-- css styles for the selectable list. TODO: put tags in css files -->
+  <!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
+  <div id="wrapper_select">
+    <div class="right_list">
+      <!-- This list contains the routes that are selected -->
+      <ol id="selected_routes">
+        {% for route in wall_routelist %}
+          <li class="ui-widget-content" name="route_selected" value="{{ route.id }}">{{ route.name }}</li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+
+
+  <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
+  <form method="POST" action="{{ request.path|urlencode }}">
+    {% csrf_token %}
+    <div class="route_chooser"></div>
+
+    <div id="routelist_div">
+      route list (click to edit):
+      <br>
+
+
+      <br>
+    </div>
+    <input type="submit" value="speichern"/> 
+  </form>
+  <div id="testtext">Test</div>
+{% endblock %}

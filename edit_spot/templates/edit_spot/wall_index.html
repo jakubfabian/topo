@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}
+    Wall list on spot, available for editing
+{% endblock %}
+
+{% block extra_assets %}
+<link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
+
+    {% load leaflet_tags %}
+    {% load geojson_tags %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+
+{% endblock %}
+
+{% block content %}
+
+    <script type="text/javascript">
+
+        function map_init(map, options) {
+
+            var markerArray = [];
+
+            {% for wall in wall_listing %}
+                var coord = L.latLng({{ wall.geom.coordinates }});
+                var newcoord = L.latLng(coord.lng, coord.lat);
+                var mc = new L.marker(newcoord);
+                mc.bindPopup("<a href={% url "wall_detail" wall_id=wall.id %}>{{wall.name}}</a>");
+                markerArray.push(mc);
+            {% endfor %}
+
+            var group = L.featureGroup(markerArray);
+
+            map.options.maxZoom = 17;
+            markers = new L.MarkerClusterGroup();
+            markers.addLayer(group);
+            map.addLayer(markers);
+
+            if (markerArray.length > 1) {
+                map.fitBounds(group.getBounds());
+            } else {
+                map.setView(markerArray[0].getLatLng(), 10);
+            }
+
+        }
+
+    </script>
+
+    {% leaflet_map "walls" callback="window.map_init" %}
+
+{% endblock %}
+
+{% block edit_pane %}
+<a href="{% url "edit_spot" spot_id=spot.pk %}">Edit Spot</a> &nbsp;
+<a href="{% url "add_route" spot_id=spot.pk %}">Routepool</a>&nbsp;
+<a href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">ChooseWall</a>&nbsp;
+{% endblock %}
+
+{% block mapobjects_info %}
+
+    Number of Walls: {{ wall_listing|length }} <br>
+
+    <form action="{% url 'add_wall' spot_id=spot.pk%}">
+        <input id="add_wall_button" type="submit" value="Add new wall">
+    </form>
+
+    <h2>Edit Walls:</h2>
+    <ul>
+        {% for wall in wall_listing %}
+            <li>
+                <a class="wall_entry" href="{% url 'link_routes_to_wall' wall_id=wall.pk %}">{{ wall.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

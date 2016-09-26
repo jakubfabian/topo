@@ -121,7 +121,10 @@
             <div id="breadcrumbs">
                 {% include "breadcrumbs.html" %}
             </div>
-        </div>
+
+
+        </div> <!-- user menu -->
+
         <div id="messages">
             {% if messages %}
                 <ul class="messages">
@@ -134,9 +137,17 @@
 
     {% endblock %}
 
+    {% if show_edit_pane %}
+
+    <div id="edit_pane">
+        {% block edit_pane %} 
+        {% endblock %}
+    </div>
+    {% endif %}
+
+
 
     <div id="content">
-
         {% block content %}Default template content -- there is nothing to see here...{% endblock %}
     </div>
     <div class="mapobjects-info">

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}
+    Mitopo.de - Add new Route
+{% endblock %}
+
+{% block extra_assets %}
+
+<link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
+{% endblock %}
+
+{% block content %}
+
+<h2>Existing Routes:</h2>
+
+     <table style="width:100%">
+  <tr>
+    <th>name</th>
+    <th>grade</th>
+    <th>length</th>
+    <th>rating</th>
+  </tr>
+    {% for route in route_list %}
+  <tr>
+    <td><a href="{% url "route_detail" route_id=route.pk %}">{{ route.name }} </a></td>
+    <td>{{route.grade}}</td>
+    <td>{{route.length}}</td>
+    <td>{{route.rating}}</td>
+  </tr>
+    {% endfor %}
+</table> 
+
+
+
+{% endblock %}
+
+{% block edit_pane %}
+<a href="{% url "edit_spot" spot_id=spot.pk %}">Edit Spot</a> &nbsp;
+<a href="{% url "add_route" spot_id=spot.pk %}">Routepool</a>&nbsp;
+<a href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">ChooseWall</a>&nbsp;
+LinkRoutesToWall &nbsp;
+{% endblock %}
+
+{% block mapobjects_info %}
+    <h1>Add new Route</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="save">
+    </form>
+
+    <form method="GET" action="{% url 'edit_spot' spot_id=spot.pk %}">
+        {% csrf_token %}
+        <input type="submit" value="cancel">
+    </form>
+
+{% endblock %}

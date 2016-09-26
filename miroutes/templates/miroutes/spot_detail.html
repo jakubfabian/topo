@@ -11,43 +11,40 @@
     {% leaflet_js %}
     {% leaflet_css %}
 
+    <script type="text/javascript">
+
+function map_init(map, options) {
+
+    var markerArray = [];
+
+    {% for wall in spot_wall_list %}
+    var coord = L.latLng({{ wall.geom.coordinates }});
+    var newcoord = L.latLng(coord.lng, coord.lat);
+    var mc = new L.marker(newcoord);
+    mc.bindPopup("<a href={% url "wall_detail" wall_id=wall.pk%}>{{ wall.name }}</a>");
+    markerArray.push(mc);
+    {% endfor %}
+
+    var group = L.featureGroup(markerArray);
+
+    map.options.maxZoom = 15;
+    markers = new L.MarkerClusterGroup();
+    markers.addLayer(group);
+    map.addLayer(markers);
+
+    if (markerArray.length > 1) {
+        map.fitBounds(group.getBounds());
+    } else {
+        map.setView(markerArray[0].getLatLng(), 12);
+    }
+}
+    </script>
+
+    {% leaflet_map "spots" callback="window.map_init" %}
+
 {% endblock %}
 
 {% block content %}
-    {% if spot_wall_list %}
-
-
-        <script type="text/javascript">
-
-            function map_init(map, options) {
-
-                var markerArray = [];
-
-                {% for wall in spot_wall_list %}
-                    var coord = L.latLng({{ wall.geom.coordinates }});
-                    var newcoord = L.latLng(coord.lng, coord.lat);
-                    var mc = new L.marker(newcoord);
-                    mc.bindPopup("<a href={% url "wall_detail" wall_id=wall.pk%}>{{ wall.name }}</a>");
-                    markerArray.push(mc);
-                {% endfor %}
-
-                var group = L.featureGroup(markerArray);
-
-                map.options.maxZoom = 15;
-                markers = new L.MarkerClusterGroup();
-                markers.addLayer(group);
-                map.addLayer(markers);
-
-                if (markerArray.length > 1) {
-                    map.fitBounds(group.getBounds());
-                } else {
-                    map.setView(markerArray[0].getLatLng(), 12);
-                }
-            }
-        </script>
-
-        {% leaflet_map "spots" callback="window.map_init" %}
-    {% endif %}
 {% endblock %}
 
 {% block mapobjects_info %}
@@ -79,8 +76,8 @@
         <p>Currently no walls are available in {{ spot.name }}</p>
     {% endif %}
 
-    <form action="{% url 'wall_add' spot_id=spot.id %}">
-        <input type="submit" value="Add new wall">
+    <form action="{% url 'edit_spot' spot_id=spot.id %}">
+        <input type="submit" value="Edit Spot">
     </form>
     {% if perms.miroutes.add_wall %}
     {% endif %}
