@@ -205,7 +205,7 @@ def add_route(request, spot_id, **kwargs):
         form = RouteForm(initial={'spot': spot})
         #form = RouteForm()
 
-    route_list = Route.objects.order_by('name')
+    route_list = spot.route_set.all().order_by('name')
 
     context = {
         'spot': spot,
