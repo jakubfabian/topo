@@ -116,15 +116,6 @@ $(document).ready(function () {
        var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
        map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
 
-       var aspectRatio = img_dim_x / img_dim_y;
-       if (aspectRatio < 1){
-           // we resize the container to fit an image with aspectRatio < 1
-           // the height is then fixed to 1024px
-           var wall_width = 1024 * aspectRatio;
-           document.getElementById('wallmap').style.width = wall_width + "px";
-           document.getElementById('wallmap').style.height = 1024 + "px";
-       }
-
        var wall_layer = L.tileLayer('{{ wall.get_tiles_url }}/{z}/{x}/{y}.png', {
            minZoom: minzoom, maxZoom: maxzoom,
            noWrap: false,
@@ -247,6 +238,10 @@ $(document).ready(function () {
                addToLayerdict(geomids[i], featureGroup)
            }
        }
+
+            if (Object.keys(layerdict).length > 1) {
+                map.fitBounds(layerdict[Object.keys(layerdict)[0]].getBounds());
+            } 
        {% endif %}
 
 
@@ -337,10 +332,6 @@ $(document).ready(function () {
            activeGeomId = null;
 
        });
-
-
-       map.fitBounds(new L.LatLngBounds(southWest, northEast));
-
 
    }
 
