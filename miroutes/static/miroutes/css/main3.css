@@ -5,7 +5,6 @@
 }
 
 html, body {
-    height: 100%;
     width: 100%;
     background: #476b4c;
 }
@@ -14,15 +13,16 @@ html, body {
     position: absolute;
     top: 0;
     left: 0;
-    height: 97px;
+    height: 57px;
     width: 100%;
     background: url('../../img/header2.jpg');
     background-position: right;
     border-bottom: 3px solid black;
 }
 
-.leaflet-control-container .leaflet-top {
-    top: 70px;
+.leaflet-top {
+    top: 20px;
+    right: 20px;
 }
 
 #logo {
@@ -30,11 +30,12 @@ html, body {
     position: absolute;
     top: 5px;
     left: 8px;
+    height: 50px;
 }
 
 .leaflet-container, #wallmap {
     position: absolute;
-    top: 100px;
+    top: 58px;
     bottom: 0;
     left: 0;
     right: 0;
@@ -61,14 +62,14 @@ html, body {
     background: #ffffff;
     position: absolute;
     margin: 0 auto;
-    right: 0px;
-    top: 180px;
+    left: 0px;
+    top: 110px;
+    bottom: 30px;
     padding-left: 2px;
     padding-bottom: 2px;
     padding-top: 2px;
     padding-right: 0px;
     min-width: 5px;
-    bottom: 30px;
     z-index: 1000;
     border-radius: 5px;
     border: solid 1px #dddddd;
@@ -78,13 +79,12 @@ html, body {
     color: #666666;
     position: relative;
     top: -3px;
-    margin-left: -24px;
     height: 26px;
     padding-left: 5px;
     padding-right: 5px;
     background: #ffffff;
     z-index: 99000;
-    float: left;
+    float: right;
     border-radius: 5px;
     border: solid 1px #dddddd;
 }
@@ -112,7 +112,6 @@ html, body {
 
 .mapobjects-info .inner_container {
     width: 350px;
-    height: 100%;
     box-sizing: border-box;
     padding: 10px;
     background: white;
@@ -123,8 +122,8 @@ html, body {
 
 #search-container {
     position: absolute;
-    top: 110px;
-    left: 10px;
+    top: 87px;
+    right: 80px;
     width: 250px;
     z-index: 50;
     border-radius: 10px;
@@ -143,8 +142,8 @@ html, body {
 
 #breadcrumbs {
     position: absolute;
-    top: 110px;
-    right: 10px;
+    top: 65px;
+    left: 10px;
     padding: 5px;
     padding-left: 10px;
     padding-right: 10px;
@@ -155,13 +154,19 @@ html, body {
 }
 
 
+#top_buttons {
+    position: absolute;
+    top: 9px;
+    left: 300px;
+}
+
 #login-menu {
     position: absolute;
-    top: 5px;
+    top: 9px;
     right: 8px;
 }
 
-#login-menu a {
+#top_buttons a, #login-menu a {
     display: inline-block;
     border-radius: 5px;
     border: solid 2px black;
@@ -174,7 +179,7 @@ html, body {
     color: black;
 }
 
-#login-menu a:hover {
+#top_buttons a:hover, #login-menu a:hover {
     background: #c8d9cc;
 }
 .loginname {

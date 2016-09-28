@@ -25,6 +25,8 @@
     <script type="text/javascript">
 
         function map_init() {
+            map.zoomControl.setPosition("topright");
+
             var img_dim_string = '{{ wall.get_bg_img_size }}';
 
             var img_dim = img_dim_string.split(',', 4);

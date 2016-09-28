@@ -87,6 +87,8 @@ $(document).ready(function () {
   <script type="text/javascript">
    // The leaflet part
    function map_init () {
+       map.zoomControl.setPosition("topright");
+
        // Map init paperworks...
        var img_dim_string = '{{ wall.get_bg_img_size }}';
 

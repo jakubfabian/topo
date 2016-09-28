@@ -1,26 +1,23 @@
 {% if route %}
-    <a href=" {% url "route_detail" route_id=route.pk %} "> {{ route.name }}</a>
+    <a href="/miroutes">Home</a>
     ::
     <a href=" {% url "spot_detail" spot_id=route.spot.pk %} "> {{ route.spot.name }}</a>
     ::
-    <a href="/miroutes">Home</a>
+    <a href=" {% url "route_detail" route_id=route.pk %} "> {{ route.name }}</a>
 
 {% elif wall %}
-
-    <a href=" {% url "wall_detail" wall_id=wall.pk %} "> {{ wall.name }}</a>
+    <a href="/miroutes">Home</a>
     ::
     <a href=" {% url "spot_detail" spot_id=wall.spot.pk %} "> {{ wall.spot.name }}</a>
     ::
-    <a href="/miroutes">Home</a>
-
+    <a href=" {% url "wall_detail" wall_id=wall.pk %} "> {{ wall.name }}</a>
 
 {% elif spot %}
-    <a href=" {% url "spot_detail" spot.pk %} "> {{ spot.name }}</a>
-    ::
     <a href="/miroutes">Home</a>
+    ::
+    <a href=" {% url "spot_detail" spot.pk %} "> {{ spot.name }}</a>
 
 {% else %}
-
     <a href="/miroutes">Home</a>
 
 {% endif %}

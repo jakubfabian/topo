@@ -15,35 +15,36 @@
 
     <script type="text/javascript">
 
-function map_init(map, options) {
+        function map_init(map, options) {
 
-    var markerArray = [];
+            map.zoomControl.setPosition("topright");
+            var markerArray = [];
 
-    {% for spot in spot_listing %}
-    var coord = L.latLng({{ spot.geom.coordinates }});
-    var newcoord = L.latLng(coord.lng, coord.lat);
-    var mc = new L.marker(newcoord);
-    mc.bindPopup("<a href={% url "spot_detail" spot_id=spot.id %}>{{spot.name}}</a>");
-    markerArray.push(mc);
-    {% endfor %}
+            {% for spot in spot_listing %}
+                var coord = L.latLng({{ spot.geom.coordinates }});
+                var newcoord = L.latLng(coord.lng, coord.lat);
+                var mc = new L.marker(newcoord);
+                mc.bindPopup("<a href={% url "spot_detail" spot_id=spot.id %}>{{spot.name}}</a>");
+                markerArray.push(mc);
+            {% endfor %}
 
 
-    map.options.maxZoom = 15;
+            map.options.maxZoom = 15;
 
-    var group = L.featureGroup(markerArray);
-    markers = new L.MarkerClusterGroup();
-    markers.addLayer(group);
-    map.addLayer(markers);
+            var group = L.featureGroup(markerArray);
+            markers = new L.MarkerClusterGroup();
+            markers.addLayer(group);
+            map.addLayer(markers);
 
-    if (markerArray.length === 0) {
-        munich = new L.marker([48.137154, 11.576124]);
-        map.setView(munich.getLatLng(), 10);
-    } else if (markerArray.length === 1) {
-        map.setView(markerArray[0].getLatLng(), 10);
-    } else {
-        map.fitBounds(group.getBounds());
-    }
-}
+            if (markerArray.length === 0) {
+                munich = new L.marker([48.137154, 11.576124]);
+                map.setView(munich.getLatLng(), 10);
+            } else if (markerArray.length === 1) {
+                map.setView(markerArray[0].getLatLng(), 10);
+            } else {
+                map.fitBounds(group.getBounds());
+            }
+        }
 
     </script>
 {% endblock %}
@@ -57,10 +58,6 @@ function map_init(map, options) {
     Spots: {{ spot_listing|length }} <br>
     Walls: {{ wall_listing|length }} <br>
     Routes: {{ route_listing|length }} <br>
-
-    <form action="{% url 'add_spot' %}">
-        <input id="add_spot_button" type="submit" value="Add new spot">
-    </form>
 
     <h2>Spots</h2>
     <ul>

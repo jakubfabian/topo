@@ -15,12 +15,15 @@
     {% block extra_assets %}{% endblock %}
 
     <link href="{% static "miroutes/bower_components/select2/dist/css/select2.min.css" %}" rel="stylesheet"/>
-    <link href="{% static "miroutes/bower_components/leaflet.markercluster/dist/MarkerCluster.css" %}" rel="stylesheet"/>
-    <link href="{% static "miroutes/bower_components/leaflet.markercluster/dist/MarkerCluster.Default.css" %}" rel="stylesheet"/>
+    <link href="{% static "miroutes/bower_components/leaflet.markercluster/dist/MarkerCluster.css" %}"
+          rel="stylesheet"/>
+    <link href="{% static "miroutes/bower_components/leaflet.markercluster/dist/MarkerCluster.Default.css" %}"
+          rel="stylesheet"/>
     <script type="text/javascript" src={% static "miroutes/bower_components/jquery/dist/jquery.min.js" %}></script>
     <script type="text/javascript" src={% static "miroutes/bower_components/jquery-ui/jquery-ui.min.js" %}></script>
     <script type="text/javascript" src="{% static "miroutes/bower_components/select2/dist/js/select2.js" %}"></script>
-    <script type="text/javascript" src="{% static "miroutes/bower_components/leaflet.markercluster/dist/leaflet.markercluster.js" %}"></script>
+    <script type="text/javascript"
+            src="{% static "miroutes/bower_components/leaflet.markercluster/dist/leaflet.markercluster.js" %}"></script>
 
     {% block main-css %}
         <link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
@@ -41,8 +44,8 @@
         });
         $(document).ready(function () {
             $('#toggle_content').click(function (val) {
-                $('.inner_container').toggle("slide", {"direction": "right"});
-                $('#toggle_content').toggleText("▶", "◀");
+                $('.inner_container').toggle("slide", {"direction": "left"});
+                $('#toggle_content').toggleText("◀", "▶");
             });
         });
 
@@ -61,13 +64,19 @@
             <a href="/miroutes">
                 <img id="logo" src="{% static "miroutes/img/logo.png" %}"/>
             </a>
+            <div id="top_buttons">
+                {% block top_buttons %}
+                    <a href="{% url 'add_spot' %}">&#10133; Spot</a>
+                {% endblock %}
+            </div>
             <div id="login-menu">
                 {% if user.is_anonymous %}
                     <a id="login_button" href="{% url 'django.contrib.auth.views.login' %}?next={{ request.path }}">Login</a>
                     <a id="register_button" href="{% url 'users.views.register' %}">Register</a>
                 {% else %}
                     <span class="loginname">User: {{ user }} &lt;{{ user.email }}&gt;</span>
-                    &nbsp;<a id="logout_button" href="{% url 'django.contrib.auth.views.logout' %}?next={{ request.path }}">logout</a>
+                    &nbsp;
+                    <a id="logout_button" href="{% url 'django.contrib.auth.views.logout' %}?next={{ request.path }}">logout</a>
                     &nbsp;&nbsp;
                 {% endif %}
             </div>
@@ -139,10 +148,10 @@
 
     {% if show_edit_pane %}
 
-    <div id="edit_pane">
-        {% block edit_pane %} 
-        {% endblock %}
-    </div>
+        <div id="edit_pane">
+            {% block edit_pane %}
+            {% endblock %}
+        </div>
     {% endif %}
 
 
@@ -151,7 +160,7 @@
         {% block content %}Default template content -- there is nothing to see here...{% endblock %}
     </div>
     <div class="mapobjects-info">
-        <div id="toggle_content">▶</div>
+        <div id="toggle_content">◀</div>
 
         <div class="inner_container">
 
