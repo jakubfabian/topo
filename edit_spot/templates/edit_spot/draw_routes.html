@@ -87,7 +87,6 @@ $(document).ready(function () {
   <script type="text/javascript">
    // The leaflet part
    function map_init () {
-       map.zoomControl.setPosition("topright");
 
        // Map init paperworks...
        var img_dim_string = '{{ wall.get_bg_img_size }}';
@@ -110,6 +109,7 @@ $(document).ready(function () {
            maxZoom: maxzoom,
            crs: L.CRS.Simple
        });
+       map.zoomControl.setPosition("topright");
 
        var southWest = map.unproject([0, img_dim_y], map.getMaxZoom());
        var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
