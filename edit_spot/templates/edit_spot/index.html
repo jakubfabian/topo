@@ -55,10 +55,6 @@
 
     Number of Spots: {{ spot_listing|length }} <br>
 
-    <form action="{% url 'add_spot' %}">
-        <input id="add_spot_button" type="submit" value="Add new spot">
-    </form>
-
     <h2>Edit Spots:</h2>
     <ul>
         {% for spot in spot_listing %}

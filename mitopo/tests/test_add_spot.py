@@ -57,7 +57,7 @@ class AddSpotTest(MitopoTestCase):
 
         from selenium import webdriver
         action = webdriver.common.action_chains.ActionChains(self.browser)
-        action.move_by_offset(zoom_out.location['x'] + 100, zoom_out.location['y'])
+        action.move_by_offset(zoom_out.location['x'] - 200, zoom_out.location['y'] + 100)
         action.click()
         action.perform()
 
