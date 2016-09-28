@@ -2,375 +2,386 @@
 {% load staticfiles %}
 
 {% block title %}
-  Mitopo.de - Draw Routes on the Wall
+    Mitopo.de - Draw Routes on the Wall
 {% endblock %}
 
 {% block extra_assets %}
-  {% load leaflet_tags %}
-  {% load geojson_tags %}
-  {% leaflet_js %}
-  {% leaflet_css %}
-  {% leaflet_js plugins="forms" %}
-  {% leaflet_css plugins="forms" %}
+    {% load leaflet_tags %}
+    {% load geojson_tags %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+    {% leaflet_js plugins="forms" %}
+    {% leaflet_css plugins="forms" %}
 
-<link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
-<style>
+    <link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
+    <style>
 
-   #route_list .ui-selecting {
-     background: #FECA40;
-   }
-   #route_list .ui-selected {
-     background: #F39814;
-     color: black;
-   }
+        #route_list .ui-selecting {
+            background: #FECA40;
+        }
 
-   #route_list {
-     display: inline-block;
-     list-style-type: none;
-     width: 300px;
-     overflow: hidden;
-     border: 1px solid green;
-   }
+        #route_list .ui-selected {
+            background: #F39814;
+            color: black;
+        }
 
-   #routelist_div{
-     position: relative;
-     z-index: 1;
-   }
+        #route_list {
+            display: inline-block;
+            list-style-type: none;
+            width: 300px;
+            overflow: hidden;
+            border: 1px solid green;
+        }
 
-</style>
+        #routelist_div {
+            position: relative;
+            z-index: 1;
+        }
+
+    </style>
 {% endblock %}
 
 {% block edit_pane %}
-<a href="{% url "edit_spot" spot_id=wall.spot.pk %}">Edit Spot</a> &nbsp;
-<a href="{% url "add_route" spot_id=wall.spot.pk %}">Routepool</a>&nbsp;
-<a href="{% url "edit_spot_wall_index" spot_id=wall.spot.pk %}">ChooseWall</a>&nbsp;
-<a href="{% url "link_routes_to_wall" wall_id=wall.pk %}">LinkRoutesToWall</a>&nbsp;
-<a href="{% url "draw_routes" wall_id=wall.pk %}">DrawRoutesOnWall</a>&nbsp;
+    <a href="{% url "edit_spot" spot_id=wall.spot.pk %}">Edit Spot</a> &nbsp;
+    <a href="{% url "add_route" spot_id=wall.spot.pk %}">Routepool</a>&nbsp;
+    <a href="{% url "edit_spot_wall_index" spot_id=wall.spot.pk %}">ChooseWall</a>&nbsp;
+    <a href="{% url "link_routes_to_wall" wall_id=wall.pk %}">LinkRoutesToWall</a>&nbsp;
+    <a href="{% url "draw_routes" wall_id=wall.pk %}">DrawRoutesOnWall</a>&nbsp;
 
 {% endblock %}
 
 {% block content %}
-  <script>
-   window.onload = function () {
-       map_init();
-   }
-  </script>
+    <script>
+        window.onload = function () {
+            map_init();
+        }
+    </script>
 
-  <script>
-// the list of routes whose geometries are to edit
-$(document).ready(function () {
-    $("#route_list").selectable({
-        // on select we do something
-        selected: function (event, ui) {
-            console.log('test')
-                var s = $(ui.selected);
-            var geomid = s.val();
-            var geomstring = s.data('geom');
+    <script>
+        // the list of routes whose geometries are to edit
+        $(document).ready(function () {
+            $("#route_list").selectable({
+                // on select we do something
+                selected: function (event, ui) {
+                    console.log('test')
+                    var s = $(ui.selected);
+                    var geomid = s.val();
+                    var geomstring = s.data('geom');
 
-            if(geomstring == "None"){
-                var newRouteEvent = new CustomEvent('newRouteEvent', { 'detail': {'geomid': geomid}});
-                document.dispatchEvent(newRouteEvent);
+                    if (geomstring == "None") {
+                        var newRouteEvent = new CustomEvent('newRouteEvent', {'detail': {'geomid': geomid}});
+                        document.dispatchEvent(newRouteEvent);
 
-            }else{
-                var editRouteEvent = new CustomEvent('editRouteEvent', {
-                    'detail': {'geomid': geomid, 'geomstring': geomstring }});
-                document.dispatchEvent(editRouteEvent);
+                    } else {
+                        var editRouteEvent = new CustomEvent('editRouteEvent', {
+                            'detail': {'geomid': geomid, 'geomstring': geomstring}
+                        });
+                        document.dispatchEvent(editRouteEvent);
+                    }
+                }
+            });
+        });
+    </script>
+
+
+
+    <div id="wallmap" class="custom-leaflet-container"></div>
+    <script type="text/javascript">
+
+        // The leaflet part
+        function map_init() {
+
+            // Map init paperworks...
+            var img_dim_string = '{{ wall.get_bg_img_size }}';
+
+            var img_dim = img_dim_string.split(',', 4);
+            var img_dim_x = parseFloat(img_dim[0]);
+            var img_dim_y = parseFloat(img_dim[1]);
+            var xzoom = parseFloat(img_dim[2]);
+            var yzoom = parseFloat(img_dim[3]);
+
+            var maxzoom = Math.max(xzoom, yzoom);
+
+            // we choose a default zoom level of 2 that matches either the width (approx.) or the
+            // height of the container
+            var minzoom = 2;
+            var startzoom = 2;
+
+            var map = L.map('wallmap', {
+                minZoom: minzoom,
+                maxZoom: maxzoom,
+                crs: L.CRS.Simple
+            });
+            map.zoomControl.setPosition("topright");
+
+            var southWest = map.unproject([0, img_dim_y], map.getMaxZoom());
+            var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
+            map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
+
+            var wall_layer = L.tileLayer('{{ wall.get_tiles_url }}/{z}/{x}/{y}.png', {
+                minZoom: minzoom, maxZoom: maxzoom,
+                noWrap: false,
+                tileSize: 256,
+                continuousWorld: true,
+            });
+
+            wall_layer.addTo(map);
+
+            // the activeGeomId is used to denote the id of the currently edited
+            // or created geometry
+            var activeGeomId = null;
+            var activeFeatureGroup = null;
+            var layerdict = {};
+
+            // We define a empty draw control and add it to the map
+            var drawControl = new L.Control.Draw({
+                draw: false,
+                edit: false
+            });
+            drawControl.setPosition("topright");
+            map.addControl(drawControl);
+
+            function annotateGeom(layer, geomRouteName) {
+                // here we want to add popups below the route geometries with
+                // the route names as labels
+
+                /* var firstPoint = layer._layers._latlngs[0];
+                 var lastPoint = layer._layers._latlngs[-1];
+
+                 which one is below the other?
+                 if(firstPoint[lat] < lastPoint[lat]){
+                 var annotPoint = firstPoint;
+                 }
+                 else{
+                 var annotPoint = lastPoint;
+                 }
+
+                 var popup = L.popup()
+                 .setLatLng(annotPoint)
+                 .setContent(geomRouteName)
+                 .openOn(map);*/
             }
-        }	 
-    });
-});
-  </script>
 
+            function resetDrawControl(newDrawControl) {
+                // utility function to reset the draw controls and (in case) provide
+                // new draw controls
+                map.removeControl(drawControl);
+                if (!(newDrawControl)) {
+                    var newDrawControl = new L.Control.Draw({
+                        draw: false,
+                        edit: false
+                    });
+                }
+                // we need to overwrite the global variable
+                // otherwise we successively add draw controls
+                drawControl = newDrawControl;
+                drawControl.setPosition("topright");
 
-
-  <div id="wallmap" class="custom-leaflet-container"></div>
-  <script type="text/javascript">
-
-   // The leaflet part
-   function map_init () {
-
-       // Map init paperworks...
-       var img_dim_string = '{{ wall.get_bg_img_size }}';
-
-       var img_dim = img_dim_string.split(',', 4);
-       var img_dim_x = parseFloat(img_dim[0]);
-       var img_dim_y = parseFloat(img_dim[1]);
-       var xzoom = parseFloat(img_dim[2]);
-       var yzoom = parseFloat(img_dim[3]);
-
-       var maxzoom = Math.max(xzoom, yzoom);
-
-       // we choose a default zoom level of 2 that matches either the width (approx.) or the
-       // height of the container
-       var minzoom = 2;
-       var startzoom = 2;
-
-       var map = L.map('wallmap', {
-           minZoom: minzoom,
-           maxZoom: maxzoom,
-           crs: L.CRS.Simple
-       });
-       map.zoomControl.setPosition("topright");
-
-       var southWest = map.unproject([0, img_dim_y], map.getMaxZoom());
-       var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
-       map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
-
-       var wall_layer = L.tileLayer('{{ wall.get_tiles_url }}/{z}/{x}/{y}.png', {
-           minZoom: minzoom, maxZoom: maxzoom,
-           noWrap: false,
-           tileSize: 256,
-           continuousWorld: true,
-       });
-
-       wall_layer.addTo(map);
-
-       // the activeGeomId is used to denote the id of the currently edited
-       // or created geometry
-       var activeGeomId = null;
-       var activeFeatureGroup = null;
-       var layerdict = {};
-
-       // We define a empty draw control and add it to the map
-       var drawControl = new L.Control.Draw({
-           draw: false,
-           edit: false});
-       drawControl.setPosition("topright");
-       map.addControl(drawControl);
-
-       function annotateGeom(layer, geomRouteName){
-           // here we want to add popups below the route geometries with
-           // the route names as labels
-
-           /* var firstPoint = layer._layers._latlngs[0];
-              var lastPoint = layer._layers._latlngs[-1];
-
-              which one is below the other?
-              if(firstPoint[lat] < lastPoint[lat]){
-              var annotPoint = firstPoint;
-              }
-              else{
-              var annotPoint = lastPoint;
-              }
-
-              var popup = L.popup()
-              .setLatLng(annotPoint)
-              .setContent(geomRouteName)
-              .openOn(map);*/
-       }
-
-       function resetDrawControl(newDrawControl){
-           // utility function to reset the draw controls and (in case) provide
-           // new draw controls
-           map.removeControl(drawControl);
-           if(!(newDrawControl)){
-               var newDrawControl = new L.Control.Draw({
-                   draw: false,
-                   edit: false});
-           }
-           // we need to overwrite the global variable
-           // otherwise we successively add draw controls
-           drawControl = newDrawControl;
-           drawControl.setPosition("topright");
-
-           map.addControl(drawControl);
-       }
-
-
-       function onGeomSelect(e){
-	   // Store the active geom id of the featureGroup
-	   activeGeomId = e.target.routegeomid;
-	   // activeFeatureGroup = e.target;
-           // This is the on-click handler of the geometries
-           // We only add edit controls.
-           activeLayer = e.target;
-           // Edit controls
-           resetDrawControl(new L.Control.Draw({
-               draw: false,
-               edit: {
-                   featureGroup: activeLayer,
-                   remove: true,
-               }
-           }));
-           var toolbar;
-           for (var toolbarId in drawControl._toolbars) {
-               toolbar = drawControl._toolbars[toolbarId];
-               if (toolbar instanceof L.EditToolbar) {
-                   toolbar._modes.edit.handler.enable();
-               }
-           }
-           // drawControl.hideButton(); will come in future version
-
-
-       }
-
-       function addToLayerdict(geomid, layer){
-           // Utility function to add a pair of geomid and references
-           // to the layer to a dict, add the onClick handler and the layer to the map.
-           layerdict[geomid] = layer
-           layer.addTo(map);
-           layer.on('click', onGeomSelect);
-       }
-
-
-       // Now we initialize the existing route geometries
-       {% if wall_routegeomlist %}
-       var collection = {{ wall_routegeomlist|geojsonfeature|safe }};
-       var routenames = [];
-       var geomids = [];
-       {% for geom in wall_routegeomlist %}
-       routenames.push("{{ geom.route.name }}");
-       geomids.push("{{ geom.id }}");
-       {% endfor %}
-       for (var i = 0; i < collection.features.length; i++) {
-           if(collection.features[i].geometry){
-               var geoJsonFC = L.geoJson(collection.features[i]);
-	       var polyline = null;
-
-	       geoJsonFC.eachLayer(function (layer){
-		   polyline = L.polyline(layer.getLatLngs());
-	       });
-
-               console.log("Creating new feature group with polyline layer with id"+geomids[i])
-
-	       var featureGroup = L.featureGroup([polyline]);
-               featureGroup.routegeomid = geomids[i];
-               addToLayerdict(geomids[i], featureGroup)
-           }
-       }
-
-            if (Object.keys(layerdict).length > 1) {
-                map.fitBounds(layerdict[Object.keys(layerdict)[0]].getBounds());
+                map.addControl(drawControl);
             }
-       {% endif %}
+
+
+            function onGeomSelect(e) {
+                // Store the active geom id of the featureGroup
+                activeGeomId = e.target.routegeomid;
+                // activeFeatureGroup = e.target;
+                // This is the on-click handler of the geometries
+                // We only add edit controls.
+                activeLayer = e.target;
+                // Edit controls
+                resetDrawControl(new L.Control.Draw({
+                    draw: false,
+                    edit: {
+                        featureGroup: activeLayer,
+                        remove: true,
+                    }
+                }));
+                var toolbar;
+                for (var toolbarId in drawControl._toolbars) {
+                    toolbar = drawControl._toolbars[toolbarId];
+                    if (toolbar instanceof L.EditToolbar) {
+                        toolbar._modes.edit.handler.enable();
+                    }
+                }
+                // drawControl.hideButton(); will come in future version
+
+
+            }
+
+            function addToLayerdict(geomid, layer) {
+                // Utility function to add a pair of geomid and references
+                // to the layer to a dict, add the onClick handler and the layer to the map.
+                layerdict[geomid] = layer
+                layer.addTo(map);
+                layer.on('click', onGeomSelect);
+            }
+
+
+            // Now we initialize the existing route geometries
+            {% if wall_routegeomlist %}
+                var collection = {{ wall_routegeomlist|geojsonfeature|safe }};
+                var routenames = [];
+                var geomids = [];
+                {% for geom in wall_routegeomlist %}
+                    routenames.push("{{ geom.route.name }}");
+                    geomids.push("{{ geom.id }}");
+                {% endfor %}
+                for (var i = 0; i < collection.features.length; i++) {
+                    if (collection.features[i].geometry) {
+                        var geoJsonFC = L.geoJson(collection.features[i]);
+                        var polyline = null;
+
+                        geoJsonFC.eachLayer(function (layer) {
+                            polyline = L.polyline(layer.getLatLngs());
+                        });
+
+                        console.log("Creating new feature group with polyline layer with id" + geomids[i])
+
+                        var featureGroup = L.featureGroup([polyline]);
+                        featureGroup.routegeomid = geomids[i];
+                        addToLayerdict(geomids[i], featureGroup)
+                    }
+                }
+
+                if (Object.keys(layerdict).length > 1) {
+                    map.fitBounds(layerdict[Object.keys(layerdict)[0]].getBounds());
+                } else {
+                    var center_x = img_dim_x / 2;
+                    var center_y = img_dim_y / 2;
+                    var center_point = map.unproject([center_x, center_y], minzoom + 1);
+
+                    map.setView(center_point, minzoom + 1);
+                }
+            {% endif %}
 
 
 
-       document.addEventListener('newRouteEvent', function (e) {
+            document.addEventListener('newRouteEvent', function (e) {
 
-           activeGeomId = e.detail.geomid;
+                activeGeomId = e.detail.geomid;
 
-           // Draw controls
+                // Draw controls
 
-           resetDrawControl(new L.Control.Draw({
-               draw: {
-                   polyline: true,
-                   polygon: false,
-                   rectangle: false,
-                   circle: false,
-                   marker: false},
-               edit: false
-           }));
+                resetDrawControl(new L.Control.Draw({
+                    draw: {
+                        polyline: true,
+                        polygon: false,
+                        rectangle: false,
+                        circle: false,
+                        marker: false
+                    },
+                    edit: false
+                }));
 
-       });
+            });
 
-       document.addEventListener('editRouteEvent', function (e) {
+            document.addEventListener('editRouteEvent', function (e) {
 
-           activeGeomId = e.detail.geomid;
-           activeLayer = layerdict[activeGeomId];
+                activeGeomId = e.detail.geomid;
+                activeLayer = layerdict[activeGeomId];
 
-           // Edit controls
+                // Edit controls
 
-           resetDrawControl(new L.Control.Draw({
-               draw: false,
-               edit: {
-                   featureGroup: activeLayer,
-                   remove: true
-               }
-           }));
+                resetDrawControl(new L.Control.Draw({
+                    draw: false,
+                    edit: {
+                        featureGroup: activeLayer,
+                        remove: true
+                    }
+                }));
 
-       });
-
-
-       map.on('draw:created', function (e) {
-
-           // we select the drawn layer and write it to the map
-	   var featureGroup = L.featureGroup([e.layer]);
-	   featureGroup.addTo(map);
-	   featureGroup.on('click', onGeomSelect);
-
-	   // now we store it to the input
-           var gj_layer = e.layer.toGeoJSON();
-
-           // we add this layer to the lookup table
-           if(activeGeomId){
-               gj = JSON.stringify(gj_layer.geometry);
-               document.getElementById("geom_inputfield_"+activeGeomId).value = gj;
-
-	       // we add this layer to his own featuregroup
+            });
 
 
-               activeGeomId = null;
-           }
-           // remove the draw controls
-           resetDrawControl();
+            map.on('draw:created', function (e) {
 
-       });
+                // we select the drawn layer and write it to the map
+                var featureGroup = L.featureGroup([e.layer]);
+                featureGroup.addTo(map);
+                featureGroup.on('click', onGeomSelect);
 
+                // now we store it to the input
+                var gj_layer = e.layer.toGeoJSON();
 
+                // we add this layer to the lookup table
+                if (activeGeomId) {
+                    gj = JSON.stringify(gj_layer.geometry);
+                    document.getElementById("geom_inputfield_" + activeGeomId).value = gj;
 
-       map.on('draw:edited', function (e) {
-
-           //var layer = L.geoJson(e.layers.getLayers()[0].toGeoJSON());
-           //var layer = e.layers.getLayers()[0];
-           //var gj = JSON.stringify(layer.feature.geometry);
-	   var layers = e.layers;
-	   var gj = null;
-
-	   layers.eachLayer(function (layer) {
-	       gj = JSON.stringify(layer.toGeoJSON().geometry);
-	       console.log(gj);
-	   });
+                    // we add this layer to his own featuregroup
 
 
+                    activeGeomId = null;
+                }
+                // remove the draw controls
+                resetDrawControl();
 
-           // TODO: bad hack to find activeGeomId
-           document.getElementById("geom_inputfield_"+activeGeomId).value = gj;
+            });
 
-           // remove the draw controls
-           resetDrawControl();
-           activeGeomId = null;
 
-       });
+            map.on('draw:edited', function (e) {
 
-   }
+                //var layer = L.geoJson(e.layers.getLayers()[0].toGeoJSON());
+                //var layer = e.layers.getLayers()[0];
+                //var gj = JSON.stringify(layer.feature.geometry);
+                var layers = e.layers;
+                var gj = null;
 
-  </script>
+                layers.eachLayer(function (layer) {
+                    gj = JSON.stringify(layer.toGeoJSON().geometry);
+                    console.log(gj);
+                });
+
+
+                // TODO: bad hack to find activeGeomId
+                document.getElementById("geom_inputfield_" + activeGeomId).value = gj;
+
+                // remove the draw controls
+                resetDrawControl();
+                activeGeomId = null;
+
+            });
+
+        }
+
+    </script>
 
 {% endblock %}
 
 {% block mapobjects_info %}
-  Dude, You're looking at wall {{ wall.name }}
-  <br><br>
-  <!-- css styles for the selectable list. TODO: put tags in css files -->
-  <!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
+    Dude, You're looking at wall {{ wall.name }}
+    <br><br>
+    <!-- css styles for the selectable list. TODO: put tags in css files -->
+    <!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
 
 
-  <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
-  <form method="POST" action="{{ request.path|urlencode }}">
-    {% csrf_token %}
+    <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
+    <form method="POST" action="{{ request.path|urlencode }}">
+        {% csrf_token %}
 
-    <div id="routelist_div">
-      route list (click to edit):
-      <br>
+        <div id="routelist_div">
+            route list (click to edit):
+            <br>
 
-      <ol id="route_list">
-        {% for routegeom in wall_routegeomlist %}
-          <!-- We save geometry and route name in the list -->
-          <li class="ui-widget-content" value="{{ routegeom.id }}" data-geom="{{ routegeom.geom }}" data-name="{{ routegeom.route.name }}">
-            {{ routegeom.route.name }}
-            <input id="geom_inputfield_{{ routegeom.id }}" type="text" name="routegeomid_{{ routegeom.id }}" value="{{ routegeom.geom }}">
-          </li>
-          
-        {% endfor %}
-      </ol>
+            <ol id="route_list">
+                {% for routegeom in wall_routegeomlist %}
+                    <!-- We save geometry and route name in the list -->
+                    <li class="ui-widget-content" value="{{ routegeom.id }}" data-geom="{{ routegeom.geom }}"
+                        data-name="{{ routegeom.route.name }}">
+                        {{ routegeom.route.name }}
+                        <input id="geom_inputfield_{{ routegeom.id }}" type="text" name="routegeomid_{{ routegeom.id }}"
+                               value="{{ routegeom.geom }}">
+                    </li>
 
-      <br>
-    </div>
-    <input type="submit" value="speichern"/> 
-  </form>
+                {% endfor %}
+            </ol>
 
-    <form method="GET" action="{% url 'publish_wall' wall_id=wall.pk%}">
+            <br>
+        </div>
+        <input type="submit" value="speichern"/>
+    </form>
+
+    <form method="GET" action="{% url 'publish_wall' wall_id=wall.pk %}">
         {% csrf_token %}
         <input type="submit" value="publish wall">
     </form>
