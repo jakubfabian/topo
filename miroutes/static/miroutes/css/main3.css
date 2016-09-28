@@ -62,14 +62,13 @@ html, body {
     background: #ffffff;
     position: absolute;
     margin: 0 auto;
-    left: 0px;
+    left: 0;
     top: 110px;
     bottom: 30px;
     padding-left: 2px;
     padding-bottom: 2px;
     padding-top: 2px;
-    padding-right: 0px;
-    min-width: 5px;
+    padding-right: 2px;
     z-index: 1000;
     border-radius: 5px;
     border: solid 1px #dddddd;
@@ -111,12 +110,13 @@ html, body {
 
 
 .mapobjects-info .inner_container {
-    width: 350px;
+    min-width: 350px;
     box-sizing: border-box;
     padding: 10px;
     background: white;
     border-radius: 5px;
     overflow-y: auto;
+    overflow-x: hidden;
     display: block;
 }
 

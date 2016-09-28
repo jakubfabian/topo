@@ -98,6 +98,7 @@
 
                     $search_field = $('#search-field')
                     $search_field.select2({
+                        placeholder: 'search ...',
                         debug: true,
                         ajax: {
                             url: "http://{{ request.get_host }}/miroutes/search/",
@@ -146,13 +147,7 @@
 
     {% endblock %}
 
-    {% if show_edit_pane %}
 
-        <div id="edit_pane">
-            {% block edit_pane %}
-            {% endblock %}
-        </div>
-    {% endif %}
 
 
 
@@ -163,7 +158,13 @@
         <div id="toggle_content">◀</div>
 
         <div class="inner_container">
+            {% if show_edit_pane %}
 
+                <div id="edit_pane">
+                    {% block edit_pane %}
+                    {% endblock %}
+                </div>
+            {% endif %}
             {% block mapobjects_info %}
             {% endblock %}
         </div>

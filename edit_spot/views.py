@@ -72,18 +72,21 @@ def link_routes_to_wall(request, wall_id, **kwargs):
         # Get route ids from right hand side list in template
         route_onwall_ids = request.POST.getlist('routes_onwall', None)
         print request.POST, ':: route_onwall_ids', route_onwall_ids
-        if len(route_onwall_ids) != 0:
-            # Routes which are moved from the spot's route pool to this wall are added
-            routes_toadd = spotroutelist.filter(pk__in=route_onwall_ids).exclude(walls=wallview)
-            for route in routes_toadd:
-                geom_obj = RouteGeometry(route=route, on_wallview=wallview, geom=None)
-                geom_obj.save()
 
-            # Routes that are not on wall list anymore get detached
-            routes_todel = wallroutelist.exclude(pk__in=route_onwall_ids)
-            for route in routes_todel:
-                rg = route.routegeometry_set.filter(on_wallview=wallview)
-                rg.delete()
+        # Jones Wed 28 Sep TODO: check why there was a check for 0 routes, forbidden to unselect all?
+        #if len(route_onwall_ids) != 0:
+
+        # Routes which are moved from the spot's route pool to this wall are added
+        routes_toadd = spotroutelist.filter(pk__in=route_onwall_ids).exclude(walls=wallview)
+        for route in routes_toadd:
+            geom_obj = RouteGeometry(route=route, on_wallview=wallview, geom=None)
+            geom_obj.save()
+
+        # Routes that are not on wall list anymore get detached
+        routes_todel = wallroutelist.exclude(pk__in=route_onwall_ids)
+        for route in routes_todel:
+            rg = route.routegeometry_set.filter(on_wallview=wallview)
+            rg.delete()
 
     # take relative complement for spotroutelist:
     # i.e. remove all routes in spotroutelist that are already at wall

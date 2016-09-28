@@ -1,16 +1,13 @@
 
 #edit_pane {
-    position: absolute;
-    top: 110px;
-    left: 300px;
-    width: 500px;
+    width: 800px;
     padding: 5px;
     padding-left: 10px;
     padding-right: 10px;
     z-index: 50;
-    border-radius: 10px;
     background: #ffffff;
     border-radius: 5px;
+    box-sizing: border-box;
     border: 1px solid #dddddd;
 }
 
