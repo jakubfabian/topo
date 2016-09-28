@@ -142,6 +142,7 @@ $(document).ready(function () {
        var drawControl = new L.Control.Draw({
            draw: false,
            edit: false});
+       drawControl.setPosition("topright");
        map.addControl(drawControl);
 
        function annotateGeom(layer, geomRouteName){
@@ -177,6 +178,8 @@ $(document).ready(function () {
            // we need to overwrite the global variable
            // otherwise we successively add draw controls
            drawControl = newDrawControl;
+           drawControl.setPosition("topright");
+
            map.addControl(drawControl);
        }
 
