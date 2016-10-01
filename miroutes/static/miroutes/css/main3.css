@@ -187,3 +187,21 @@ html, body {
     color: #ffffff;
     text-shadow: 2px 2px 6px #000000;
 }
+
+.clear_float {
+    clear: both;
+}
+
+/* Fake table divs */
+
+.tb_table {
+    display: table;
+}
+
+.tb_row {
+    display: table-row;
+}
+
+.tb_cell {
+    display: table-cell;
+}
