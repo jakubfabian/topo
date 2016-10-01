@@ -27,6 +27,11 @@
             background: #dddddd;
             border-radius: 10px;
             padding: 3px;
+            display: table;
+        }
+
+        .select_row {
+            display: table-row;
         }
 
         #wrapper_select ul {
@@ -36,6 +41,8 @@
         #wrapper_select .title {
             font-size: 120%;
             font-weight: bold;
+            display: table-cell;
+            width: 48%;
         }
 
         #wrapper_select ul li {
@@ -51,14 +58,20 @@
         .right_pane li {
             background: rgba(110, 206, 53, 0.41);
         }
+
         #wrapper_select ul li.ui-selecting {
             background: #FECA40;
         }
 
         .left_pane, .right_pane {
-            width: 48%;
+            display: table-cell;
             padding: 5px;
-            float: left;
+
+        }
+
+        .left_pane ul, .right_pane ul {
+            max-height: 300px;
+            overflow-y: auto;
         }
 
         .clear_float {
@@ -158,27 +171,35 @@
     <!-- css styles for the selectable list. TODO: put tags in css files -->
     <!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
     <div id="wrapper_select">
-        <div class="left_pane">
-            <div class="title">Routepool on spot "{{ spot.name }}"</div>
-            <ul id="selectable">
-                {% for route in spot_routelist %}
-                    <li class="ui-widget-content" name="route_onspot" value="{{ route.id }}">{{ route.name }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        <div class="right_pane">
-
+        <div class="select_row">
             <div class="title">
-            Routes linked to wall "{{ wall.name }}"
+                Routepool on spot "{{ spot.name }}"
+
             </div>
-            <ul id="selected_routes">
-                <!-- This list contains the routes that are selected -->
-                {% for route in wall_routelist %}
-                    <li class="ui-widget-content" name="route_selected" value="{{ route.id }}">{{ route.name }}</li>
-                {% endfor %}
-            </ul>
+            <div class="title">
+                Routes linked to wall "{{ wall.name }}"
+            </div>
+
         </div>
-        <div class="clear_float"></div>
+        <div class="select_row">
+            <div class="left_pane">
+                <ul id="selectable">
+                    {% for route in spot_routelist %}
+                        <li class="ui-widget-content" name="route_onspot" value="{{ route.id }}">{{ route.name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="right_pane">
+
+
+                <ul id="selected_routes">
+                    <!-- This list contains the routes that are selected -->
+                    {% for route in wall_routelist %}
+                        <li class="ui-widget-content" name="route_selected" value="{{ route.id }}">{{ route.name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
     </div>
     <br/>
 
