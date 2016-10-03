@@ -70,7 +70,7 @@
 
 
 {% endblock %}
-<div id="body-content">
+<div id="body-content" class="container">
     <div class="row">
         <div class="col-md-3">
             {% include "breadcrumbs.html" %}
@@ -90,7 +90,12 @@
         </div>
     </div>
     <div class="row map-row">
-        <div id="info-container" class="col-md-3">
+        <div id="content" class="col-lg-9 col-lg-push-3">
+            {% include "search_container.html" %}
+
+            {% block content %}Default template content -- there is nothing to see here...{% endblock %}
+        </div>
+        <div id="info-container" class="col-lg-3 col-lg-pull-9">
             {% if show_edit_pane %}
 
                 <div id="edit_pane">
@@ -101,21 +106,15 @@
             {% block mapobjects_info %}
             {% endblock %}
         </div>
-        <div id="content" class="col-md-9">
-            {% include "search_container.html" %}
 
-            {% block content %}Default template content -- there is nothing to see here...{% endblock %}
-        </div>
     </div>
-    <div id="footer" class="row">
-        <div class="col-md-12">
+    <div id="footer" class="navbar-fixed-bottom row">
 
-            {% block footer %}
-                (c) die Kletteraffen
-                </div>
-            {% endblock %}
+        {% block footer %}
+            (c) die Kletteraffen
+        {% endblock %}
+
     </div>
-</div>
 </div>
 
 

@@ -8,7 +8,6 @@ html {
 
 html body {
     height: 100%;
-    overflow: hidden;
 }
 
 html body #body-content {
@@ -46,11 +45,17 @@ html body #body-content {
 }
 
 .map-row {
-    height: calc(100% - 100px);
+    height: 100%;
 }
 
 #content {
     height: 100%;
+}
+
+@media (max-device-width: 900px) {
+    #content {
+        height: 65%;
+    }
 }
 
 #footer {
@@ -100,7 +105,6 @@ html body #body-content {
     font-size: 120%;
     box-sizing: border-box;
 }
-
 
 #login-menu {
     padding-top: 8px;
