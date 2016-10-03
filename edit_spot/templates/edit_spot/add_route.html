@@ -13,7 +13,27 @@
 
 {% block content %}
 
-
+    <div class="tb_cell">
+        <h2>Existing Routes:</h2>
+        <div class="existing_routes_box">
+            <table style="width:100%">
+                <tr>
+                    <th>name</th>
+                    <th>grade</th>
+                    <th>length</th>
+                    <th>rating</th>
+                </tr>
+                {% for route in route_list %}
+                    <tr>
+                        <td><a href="{% url "route_detail" route_id=route.pk %}">{{ route.name }} </a></td>
+                        <td>{{ route.grade }}</td>
+                        <td>{{ route.length }}</td>
+                        <td>{{ route.rating }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
 
 
 
@@ -43,27 +63,7 @@
                     <input type="submit" value="cancel">
                 </form>
             </div>
-            <div class="tb_cell">
-                <h2>Existing Routes:</h2>
-                <div class="existing_routes_box">
-                    <table style="width:100%">
-                        <tr>
-                            <th>name</th>
-                            <th>grade</th>
-                            <th>length</th>
-                            <th>rating</th>
-                        </tr>
-                        {% for route in route_list %}
-                            <tr>
-                                <td><a href="{% url "route_detail" route_id=route.pk %}">{{ route.name }} </a></td>
-                                <td>{{ route.grade }}</td>
-                                <td>{{ route.length }}</td>
-                                <td>{{ route.rating }}</td>
-                            </tr>
-                        {% endfor %}
-                    </table>
-                </div>
-            </div>
+
         </div>
     </div>
 {% endblock %}

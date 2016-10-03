@@ -1,94 +1,80 @@
 * {
     font-family: 'PT Sans', sans-serif;
-    margin: 0;
-    padding: 0;
 }
 
-html, body {
-    width: 100%;
-    background: #476b4c;
+html {
+    height: 100%;
 }
 
-#user-menu {
+html body {
+    height: 100%;
+    overflow: hidden;
+}
+
+html body #body-content {
     position: absolute;
-    top: 0;
+    top: 57px;
+    right: 0;
     left: 0;
-    height: 57px;
     width: 100%;
+    height: 100%;
+}
+
+#header {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    background-color: #4C4;
+    height: 57px;
     background: url('../../img/header2.jpg');
     background-position: right;
     border-bottom: 3px solid black;
-}
-
-.leaflet-top {
-    top: 20px;
-    right: 20px;
+    width: 100%;
 }
 
 #logo {
-    z-index: 55;
-    position: absolute;
+    position: relative;
     top: 5px;
     left: 8px;
     height: 50px;
 }
 
-.leaflet-container, #wallmap {
-    position: absolute;
-    top: 58px;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 1;
-    background: url('../../img/map_bg.jpg');
-    background-repeat: repeat;
+.wall_route_list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.map-row {
+    height: calc(100% - 100px);
+}
+
+#content {
+    height: 100%;
 }
 
 #footer {
-    display: none;
+    background: url('../../img/header2.jpg');
+    background-position: bottom;
+    text-align: center;
+    color: #ffffff;
+    font-weight: bold;
+    text-shadow: #0a0a0a 2px 2px;
+    height: 30px;
 }
 
-/*#footer {*/
-/*position: absolute;*/
-/*z-index: 50;*/
-/*bottom: 0;*/
-/*height: 30px;*/
-/*background:red;*/
-/*left: 0;*/
-/*right: 0;*/
-/*}*/
-
-.mapobjects-info {
-    background: #ffffff;
-    position: absolute;
-    margin: 0 auto;
-    left: 0;
-    top: 110px;
-    bottom: 30px;
-    padding-left: 2px;
-    padding-bottom: 2px;
-    padding-top: 2px;
-    padding-right: 2px;
-    z-index: 1000;
-    border-radius: 5px;
-    border: solid 1px #dddddd;
+.leaflet-container, #wallmap {
+    z-index: 1;
+    background: url('../../img/map_bg.jpg');
+    background-repeat: repeat;
+    height: 100%;
 }
 
-#toggle_content {
-    color: #666666;
-    position: relative;
-    top: -3px;
-    height: 26px;
-    padding-left: 5px;
-    padding-right: 5px;
-    background: #ffffff;
-    z-index: 99000;
-    float: right;
-    border-radius: 5px;
-    border: solid 1px #dddddd;
+#info-container {
+    overflow-y: auto;
 }
 
-.mapobjects-info ul {
+#info-container ul {
     list-style-type: none;
 }
 
@@ -96,34 +82,10 @@ html, body {
     /*display: none !important;*/
 }
 
-#content {
-    width: 350px;
-    height: 100%;
-    box-sizing: border-box;
-    padding: 10px;
-    margin-top: 150px;
-    background: white;
-    border-radius: 5px;
-    overflow-y: auto;
-    display: block;
-}
-
-
-.mapobjects-info .inner_container {
-    min-width: 350px;
-    box-sizing: border-box;
-    padding: 10px;
-    background: white;
-    border-radius: 5px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    display: block;
-}
-
 #search-container {
     position: absolute;
-    top: 87px;
-    right: 80px;
+    top: 10px;
+    right: 60px;
     width: 250px;
     z-index: 50;
     border-radius: 10px;
@@ -140,48 +102,12 @@ html, body {
 }
 
 
-#breadcrumbs {
-    position: absolute;
-    top: 65px;
-    left: 10px;
-    padding: 5px;
-    padding-left: 10px;
-    padding-right: 10px;
-    z-index: 50;
-    background: #ffffff;
-    border-radius: 5px;
-    border: 1px solid #dddddd;
-}
-
-
-#top_buttons {
-    position: absolute;
-    top: 9px;
-    left: 300px;
-}
-
 #login-menu {
-    position: absolute;
-    top: 9px;
-    right: 8px;
+    padding-top: 8px;
+    padding-right: 8px;
+    text-align: right;
 }
 
-#top_buttons a, #login-menu a {
-    display: inline-block;
-    border-radius: 5px;
-    border: solid 2px black;
-    padding: 5px 12px 5px 12px;
-    width: 67px;
-    margin: 0;
-    text-align: center;
-    background: white;
-    text-decoration: none;
-    color: black;
-}
-
-#top_buttons a:hover, #login-menu a:hover {
-    background: #c8d9cc;
-}
 .loginname {
     font-weight: bold;
     color: #ffffff;

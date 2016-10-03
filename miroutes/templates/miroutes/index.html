@@ -53,14 +53,15 @@
     {% leaflet_map "spots_map" callback="window.map_init" %}
 {% endblock %}
 
+{% block infobar %}
+    Spots: {{ spot_listing|length }} | Walls: {{ wall_listing|length }} | Routes: {{ route_listing|length }}
+{% endblock %}
 {% block mapobjects_info %}
 
-    Spots: {{ spot_listing|length }} <br>
-    Walls: {{ wall_listing|length }} <br>
-    Routes: {{ route_listing|length }} <br>
 
-    <h2>Spots</h2>
-    <ul>
+
+    <a id="spots_expand" href="#spots" data-toggle="collapse">Spots (click to expand)</a>
+    <ul id="spots" class="collapse">
         {% for spot in spot_listing %}
             <li>
                 <a class="spot_entry" href="{% url "spot_detail" spot_id=spot.pk %} ">{{ spot.name }}</a>
@@ -68,9 +69,10 @@
         {% endfor %}
     </ul>
 
-    <h2>Walls</h2>
+    <br />
+    <a id="walls_expand" href="#walls" data-toggle="collapse">Walls (click to expand)</a>
 
-    <ul>
+    <ul id="walls" class="collapse">
         {% for wall in wall_listing %}
             <li><a href="{% url "wall_detail" wall_id=wall.pk %}">{{ wall.name }}</a></li>
         {% endfor %}

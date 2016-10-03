@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 {% load static %}
 
@@ -12,152 +12,85 @@
 
     </title>
 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     {% block extra_assets %}{% endblock %}
 
-    <link href="{% static "miroutes/bower_components/select2/dist/css/select2.min.css" %}" rel="stylesheet"/>
+    <link href="{% static "miroutes/bower_components/select2/dist/css/select2.min.css" %}" type="text/css"
+          rel="stylesheet"/>
     <link href="{% static "miroutes/bower_components/leaflet.markercluster/dist/MarkerCluster.css" %}"
-          rel="stylesheet"/>
+          type="text/css" rel="stylesheet"/>
     <link href="{% static "miroutes/bower_components/leaflet.markercluster/dist/MarkerCluster.Default.css" %}"
-          rel="stylesheet"/>
+          type="text/css" rel="stylesheet"/>
     <script type="text/javascript" src={% static "miroutes/bower_components/jquery/dist/jquery.min.js" %}></script>
     <script type="text/javascript" src={% static "miroutes/bower_components/jquery-ui/jquery-ui.min.js" %}></script>
     <script type="text/javascript" src="{% static "miroutes/bower_components/select2/dist/js/select2.js" %}"></script>
     <script type="text/javascript"
             src="{% static "miroutes/bower_components/leaflet.markercluster/dist/leaflet.markercluster.js" %}"></script>
+    <link href="{% static "miroutes/bower_components/bootstrap/dist/css/bootstrap.min.css" %}" type="text/css"
+          rel="stylesheet"/>
+    <link href="{% static "miroutes/bower_components/bootstrap/dist/css/bootstrap-theme.min.css" %}" type="text/css"
+          rel="stylesheet"/>
+    <script type="text/javascript"
+            src="{% static "miroutes/bower_components/bootstrap/dist/js/bootstrap.min.js" %}"></script>
 
     {% block main-css %}
         <link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href={% static "miroutes/css/main3.css" %}/>
     {% endblock %}
 
-    <script type="text/javascript">
-        <!--
-        $.fn.extend({
-            toggleText: function (a, b) {
-                if (this.text() == a) {
-                    this.text(b);
-                }
-                else {
-                    this.text(a)
-                }
-            }
-        });
-        $(document).ready(function () {
-            $('#toggle_content').click(function (val) {
-                $('.inner_container').toggle("slide", {"direction": "left"});
-                $('#toggle_content').toggleText("◀", "▶");
-            });
-        });
-
-        -->
-    </script>
-
 </head>
 
 <body>
-<div id="contentcontainer">
 
-    {% block header %}
-
-
-        <div id="user-menu">
-            <a href="/miroutes">
-                <img id="logo" src="{% static "miroutes/img/logo.png" %}"/>
-            </a>
-            <div id="top_buttons">
-                {% block top_buttons %}
-                    <a id="add_spot_button" href="{% url 'add_spot' %}">&#10133; Spot</a>
-                {% endblock %}
+{% block header %}
+    <div id="header" class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <a href="/miroutes">
+                    <img id="logo" src="{% static "miroutes/img/logo.png" %}"/>
+                </a>
             </div>
-            <div id="login-menu">
+
+            <div id="login-menu" class="col-md-9">
                 {% if user.is_anonymous %}
-                    <a id="login_button" href="{% url 'django.contrib.auth.views.login' %}?next={{ request.path }}">Login</a>
-                    <a id="register_button" href="{% url 'users.views.register' %}">Register</a>
+                    <a id="login_button" class="btn btn-default"
+                       href="{% url 'django.contrib.auth.views.login' %}?next={{ request.path }}">Login</a>
+                    <a id="register_button" class="btn btn-default" href="{% url 'users.views.register' %}">Register</a>
                 {% else %}
                     <span class="loginname">User: {{ user }} &lt;{{ user.email }}&gt;</span>
                     &nbsp;
-                    <a id="logout_button" href="{% url 'django.contrib.auth.views.logout' %}?next={{ request.path }}">logout</a>
+                    <a id="logout_button" class="btn btn-default"
+                       href="{% url 'django.contrib.auth.views.logout' %}?next={{ request.path }}">logout</a>
                     &nbsp;&nbsp;
                 {% endif %}
             </div>
-
-            <div id="search-container">
-
-
-                <select id="search-field" multiple="multiple">
-                </select>
-                <script type="text/javascript">
-
-                    function formatRepo(repo) {
-                        return repo.name;
-                    }
-
-                    function formatRepoSelection(repo) {
-                        return repo.name;
-                    }
-
-                    $search_field = $('#search-field')
-                    $search_field.select2({
-                        placeholder: 'search ...',
-                        debug: true,
-                        ajax: {
-                            url: "http://{{ request.get_host }}/miroutes/search/",
-                            dataType: 'json',
-                            quietMillis: 100,
-                            minimumInputLength: 1,
-                            data: function (params) {
-                                return {
-                                    q: params.term, // search term
-                                    page: params.page
-                                };
-                            },
-                            results: function (data) {
-                                console.log(data);
-                                return {
-                                    results: data.items
-                                };
-                            }
-                        }
-                    });
-
-                    $search_field.on("select2:select", function (entry) {
-                        location.href = entry.params.data.url
-                    });
-                    $('#search-field').focus();
-                </script>
-
-            </div>
-
-            <div id="breadcrumbs">
-                {% include "breadcrumbs.html" %}
-            </div>
-
-
-        </div> <!-- user menu -->
-
-        <div id="messages">
-            {% if messages %}
-                <ul class="messages">
-                    {% for message in messages %}
-                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
         </div>
-
-    {% endblock %}
-
-
-
-
-
-    <div id="content">
-        {% block content %}Default template content -- there is nothing to see here...{% endblock %}
     </div>
-    <div class="mapobjects-info">
-        <div id="toggle_content">◀</div>
 
-        <div class="inner_container">
+
+{% endblock %}
+<div id="body-content">
+    <div class="row">
+        <div class="col-md-3">
+            {% include "breadcrumbs.html" %}
+        </div>
+        <div class="col-md-9">
+            {% block infobar %}
+            {% endblock %}
+            <div id="messages">
+                {% if messages %}
+                    <ul class="messages">
+                        {% for message in messages %}
+                            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="row map-row">
+        <div id="info-container" class="col-md-3">
             {% if show_edit_pane %}
 
                 <div id="edit_pane">
@@ -168,14 +101,23 @@
             {% block mapobjects_info %}
             {% endblock %}
         </div>
-    </div>
+        <div id="content" class="col-md-9">
+            {% include "search_container.html" %}
 
+            {% block content %}Default template content -- there is nothing to see here...{% endblock %}
+        </div>
+    </div>
+    <div id="footer" class="row">
+        <div class="col-md-12">
+
+            {% block footer %}
+                (c) die Kletteraffen
+                </div>
+            {% endblock %}
+    </div>
+</div>
 </div>
 
-{% block footer %}
-    <div id="footer">
-        (c) die Kletteraffen
-    </div>
-{% endblock %}
+
 </body>
 </html>

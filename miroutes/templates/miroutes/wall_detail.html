@@ -10,19 +10,11 @@
     {% load geojson_tags %}
     {% leaflet_js %}
     {% leaflet_css %}
-{% endblock %}
 
-{% block content %}
-    <script>
+    <script type="text/javascript">
         window.onload = function () {
             map_init();
         }
-    </script>
-
-
-    <div id="wallmap"></div>
-
-    <script type="text/javascript">
 
         function map_init() {
 
@@ -86,9 +78,13 @@
             {% endif %}
         }
     </script>
-    <br>
-    <br>
-    <br>
+
+{% endblock %}
+
+{% block content %}
+
+
+    <div id="wallmap"></div>
 
 {% endblock %}
 
@@ -97,7 +93,7 @@
     <br/>
     {% if wallview.is_dev %}
         <a href="{% url "wall_detail" wall_id=wall.id %}">Show live wall view</a>
-        <br />
+        <br/>
         <!-- if you are the owner or a manager -->
         <a href={% url "link_routes_to_wall" wall_id=wall.id %}>Edit {{ wall.name }}</a>
     {% else %}
@@ -116,22 +112,13 @@
         <br>
         <br>
 
-        <table width="100%">
-
+        <ul class="wall_route_list">
             {% for routegeom in wall_route_geom_list %}
-                <tr>
-                    <td>
-                        <a href="{% url "route_detail" route_id=routegeom.route.pk %}"> {{ routegeom.route.name }}</a>
-                    </td>
-                    <td>
-                        {{ routegeom.route.grade }}
-                    </td>
-                    <td>
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
+                <li><a href="{% url "route_detail" route_id=routegeom.route.pk %}">( {{ routegeom.route.grade }}
+                    ) {{ routegeom.route.name }}</a></li>
 
+            {% endfor %}
+        </ul>
     {% else %}
         <p>Currently no routes are available in {{ wall.name }}</p>
     {% endif %}

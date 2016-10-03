@@ -28,6 +28,13 @@ class AddSpotTest(MitopoTestCase):
         # WHEN the loginbutton is clicked
         # AND the user credentials are input and submitted
 
+        spots_list = self.ensure_present("#spots_expand")
+        spots_list.click()
+
+        one_spot = self.ensure_present("#spots li a")
+        one_spot.click()
+
+
         spot_button = self.ensure_present("#add_spot_button")
         spot_button.click()
 
@@ -48,7 +55,7 @@ class AddSpotTest(MitopoTestCase):
         # THEN the user should be logged in (name instead of loginbutton visible)
         # AND after logout should be back to the start page
 
-        header = self.ensure_present(".inner_container h1")
+        header = self.ensure_present("#info-container h1")
         self.assertEqual(header.text, "Add new Spot")
 
         markers_before = self.browser.find_elements_by_css_selector("img.leaflet-marker-icon")
@@ -71,7 +78,7 @@ class AddSpotTest(MitopoTestCase):
         spot_name_input = self.ensure_present("input#id_name")
         spot_name_input.send_keys(rand_name)
 
-        submit_button = self.ensure_present(".mapobjects-info form input[type=submit]")
+        submit_button = self.ensure_present("#info-container form input[type=submit]")
         submit_button.click()
 
         # Find newly created spot in all spots list
