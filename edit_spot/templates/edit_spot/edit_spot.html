@@ -76,14 +76,14 @@
                 <a class="nav-link" href="{% url "add_route" spot_id=spot.pk %}">Routepool</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">ChooseWall</a>
+                <a class="nav-link" href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">Choose Wall</a>
             </li>
             {% if last_wall_id %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url "link_routes_to_wall" wall_id=last_wall_id %}">LinkRoutesToWall</a>
+                    <a class="nav-link" href="{% url "link_routes_to_wall" wall_id=last_wall_id %}">Link Routes to Wall</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url "draw_routes" wall_id=last_wall_id %}">DrawRoutesOnWall</a>
+                    <a class="nav-link" href="{% url "draw_routes" wall_id=last_wall_id %}">Draw Routes on Wall</a>
                 </li>
             {% endif %}&nbsp;
 

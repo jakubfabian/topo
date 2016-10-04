@@ -77,7 +77,7 @@ function map_init_basic(map, options) {
 {% block edit_pane %}
 <a href="{% url "edit_spot" spot_id=spot.pk %}">Edit Spot</a> &nbsp;
 <a href="{% url "add_route" spot_id=spot.pk %}">Routepool</a>&nbsp;
-<a href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">ChooseWall</a>&nbsp;
+<a href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">Choose Wall</a>&nbsp;
 {% endblock %}
 
 {% block content %}
