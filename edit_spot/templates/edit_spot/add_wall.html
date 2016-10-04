@@ -72,7 +72,6 @@ function map_init_basic(map, options) {
 
     </script>
 
-    {% leaflet_map "wallmap" callback="window.map_init_basic" %}
 {% endblock %}
 
 {% block edit_pane %}
@@ -81,6 +80,9 @@ function map_init_basic(map, options) {
 <a href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">ChooseWall</a>&nbsp;
 {% endblock %}
 
+{% block content %}
+        {% leaflet_map "wallmap" callback="window.map_init_basic" %}
+{% endblock %}
 
 {% block mapobjects_info %}
     <h1>Add new wall</h1>
