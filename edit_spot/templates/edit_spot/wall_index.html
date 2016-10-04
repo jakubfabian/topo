@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block extra_assets %}
-<link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
+    <link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
 
     {% load leaflet_tags %}
     {% load geojson_tags %}
@@ -48,31 +48,51 @@
         }
 
     </script>
+    <div class="row">
 
-    {% leaflet_map "walls" callback="window.map_init" %}
-
-{% endblock %}
-
-{% block edit_pane %}
-<a href="{% url "edit_spot" spot_id=spot.pk %}">Edit Spot</a> &nbsp;
-<a href="{% url "add_route" spot_id=spot.pk %}">Routepool</a>&nbsp;
-<a href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">ChooseWall</a>&nbsp;
-{% endblock %}
-
-{% block mapobjects_info %}
-
-    Number of Walls: {{ wall_listing|length }} <br>
-
-    <form action="{% url 'add_wall' spot_id=spot.pk%}">
-        <input id="add_wall_button" type="submit" value="Add new wall">
-    </form>
-
-    <h2>Edit Walls:</h2>
-    <ul>
-        {% for wall in wall_listing %}
-            <li>
-                <a class="wall_entry" href="{% url 'link_routes_to_wall' wall_id=wall.pk %}">{{ wall.name }}</a>
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url "edit_spot" spot_id=spot.pk %}">Edit Spot</a> &nbsp;
             </li>
-        {% endfor %}
-    </ul>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url "add_route" spot_id=spot.pk %}">Routepool</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">ChooseWall</a>
+            </li>
+            {% if last_wall_id %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url "link_routes_to_wall" wall_id=last_wall_id %}">LinkRoutesToWall</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url "draw_routes" wall_id=last_wall_id %}">DrawRoutesOnWall</a>
+                </li>
+            {% endif %}
+
+        </ul>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            Number of Walls: {{ wall_listing|length }} <br>
+
+            <form action="{% url 'add_wall' spot_id=spot.pk %}">
+                <input id="add_wall_button" type="submit" value="Add new wall">
+            </form>
+
+            <h2>Edit Walls:</h2>
+            <ul>
+                {% for wall in wall_listing %}
+                    <li>
+                        <a class="wall_entry" href="{% url 'link_routes_to_wall' wall_id=wall.pk %}">{{ wall.name }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-md-9">
+
+            {% leaflet_map "walls" callback="window.map_init" %}
+
+        </div>
+    </div>
+
 {% endblock %}

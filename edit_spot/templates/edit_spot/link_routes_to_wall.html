@@ -10,14 +10,6 @@
     <link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
 {% endblock %}
 
-{% block edit_pane %}
-    <a href="{% url "edit_spot" spot_id=spot.pk %}">Edit Spot</a> &nbsp;
-    <a href="{% url "add_route" spot_id=spot.pk %}">Routepool</a>&nbsp;
-    <a href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">ChooseWall</a>&nbsp;
-    <a href="{% url "link_routes_to_wall" wall_id=wall.pk %}">LinkRoutesToWall</a>&nbsp;
-    <a href="{% url "draw_routes" wall_id=wall.pk %}">DrawRoutesOnWall</a>&nbsp;
-{% endblock %}
-
 {% block content %}
 
     <style>
@@ -153,60 +145,95 @@
 
         });
     </script>
+
+    <div class="row">
+
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url "edit_spot" spot_id=spot.pk %}">Edit Spot</a> &nbsp;
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url "add_route" spot_id=spot.pk %}">Routepool</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">ChooseWall</a>
+            </li>
+            {% if last_wall_id %}
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url "link_routes_to_wall" wall_id=last_wall_id %}">LinkRoutesToWall</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url "draw_routes" wall_id=last_wall_id %}">DrawRoutesOnWall</a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="#">LinkRoutesToWall</a>
+                </li>
+            {% endif %}&nbsp;
+
+        </ul>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <br/>
+
+            <h1>Link routes to wall "{{ wall.name }}"</h1>
+            <br/>
+
+            Click route to link or unlink
+            <br/>
+            <br/>
+
+            <!-- css styles for the selectable list. TODO: put tags in css files -->
+            <!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
+            <div id="wrapper_select">
+                <div class="select_row">
+                    <div class="title">
+                        Routepool on spot "{{ spot.name }}"
+
+                    </div>
+                    <div class="title">
+                        Routes linked to wall "{{ wall.name }}"
+                    </div>
+
+                </div>
+                <div class="select_row">
+                    <div class="left_pane">
+                        <ul id="selectable">
+                            {% for route in spot_routelist %}
+                                <li class="ui-widget-content" name="route_onspot"
+                                    value="{{ route.id }}">{{ route.name }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="right_pane">
+
+
+                        <ul id="selected_routes">
+                            <!-- This list contains the routes that are selected -->
+                            {% for route in wall_routelist %}
+                                <li class="ui-widget-content" name="route_selected"
+                                    value="{{ route.id }}">{{ route.name }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <br/>
+
+            <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
+            <form method="POST" action="{{ request.path|urlencode }}">
+                {% csrf_token %}
+                <div class="route_chooser"></div>
+                <input type="submit" value="speichern"/>
+            </form>
+        </div>
+    </div>
 {% endblock %}
 
 
 
 
 {% block mapobjects_info %}
-    <br/>
 
-    <h1>Link routes to wall "{{ wall.name }}"</h1>
-    <br/>
-
-    Click route to link or unlink
-    <br/>
-    <br/>
-
-    <!-- css styles for the selectable list. TODO: put tags in css files -->
-    <!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
-    <div id="wrapper_select">
-        <div class="select_row">
-            <div class="title">
-                Routepool on spot "{{ spot.name }}"
-
-            </div>
-            <div class="title">
-                Routes linked to wall "{{ wall.name }}"
-            </div>
-
-        </div>
-        <div class="select_row">
-            <div class="left_pane">
-                <ul id="selectable">
-                    {% for route in spot_routelist %}
-                        <li class="ui-widget-content" name="route_onspot" value="{{ route.id }}">{{ route.name }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            <div class="right_pane">
-
-
-                <ul id="selected_routes">
-                    <!-- This list contains the routes that are selected -->
-                    {% for route in wall_routelist %}
-                        <li class="ui-widget-content" name="route_selected" value="{{ route.id }}">{{ route.name }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-    </div>
-    <br/>
-
-    <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
-    <form method="POST" action="{{ request.path|urlencode }}">
-        {% csrf_token %}
-        <div class="route_chooser"></div>
-        <input type="submit" value="speichern"/>
-    </form>
 {% endblock %}

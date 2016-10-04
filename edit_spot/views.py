@@ -20,17 +20,22 @@ def index(request):
     context = {'spot_listing': spot_listing}
     return render(request, 'edit_spot/index.html', context)
 
+
 @permission_required('miroutes.wall.can_change')
 def wall_index(request, spot_id):
     """
     Display all walls on spot and give user possibility to create new ones
     """
     spot = get_object_or_404(Spot, pk=spot_id)
+
     wall_listing = Wall.objects.filter(spot__id=spot_id).order_by('name')
     context = {'wall_listing': wall_listing,
-            'spot':spot,
-            'show_edit_pane': True}
+               'spot': spot,
+               'show_edit_pane': True}
+    if request.session.get('last_wall_id'):
+        context['last_wall_id'] = request.session['last_wall_id']
     return render(request, 'edit_spot/wall_index.html', context)
+
 
 @permission_required('miroutes.wall.can_change')
 def publish_wall(request, wall_id):
@@ -41,7 +46,8 @@ def publish_wall(request, wall_id):
     wall.publish_dev_view()
     wall.is_active = True
     wall.save()
-    return redirect(reverse('spot_detail', kwargs={'spot_id':wall.spot.id}))
+    return redirect(reverse('spot_detail', kwargs={'spot_id': wall.spot.id}))
+
 
 @permission_required('miroutes.wall.can.change')
 def link_routes_to_wall(request, wall_id, **kwargs):
@@ -59,6 +65,8 @@ def link_routes_to_wall(request, wall_id, **kwargs):
       A HTML web page generated from the wall_edit.html template
     """
     wall = get_object_or_404(Wall, pk=wall_id)
+    request.session['last_wall_id'] = wall_id
+
     wallview = wall.dev_view
 
     # routes on the dev view
@@ -74,7 +82,7 @@ def link_routes_to_wall(request, wall_id, **kwargs):
         print request.POST, ':: route_onwall_ids', route_onwall_ids
 
         # Jones Wed 28 Sep TODO: check why there was a check for 0 routes, forbidden to unselect all?
-        #if len(route_onwall_ids) != 0:
+        # if len(route_onwall_ids) != 0:
 
         # Routes which are moved from the spot's route pool to this wall are added
         routes_toadd = spotroutelist.filter(pk__in=route_onwall_ids).exclude(walls=wallview)
@@ -113,7 +121,11 @@ def link_routes_to_wall(request, wall_id, **kwargs):
                'wall_routelist': wallroutelist,
                'show_edit_pane': True}
 
+    if request.session.get('last_wall_id'):
+        context['last_wall_id'] = request.session['last_wall_id']
+
     return render(request, 'edit_spot/link_routes_to_wall.html', context)
+
 
 @permission_required('miroutes.wall.can_add')
 def add_wall(request, spot_id, **kwargs):
@@ -130,16 +142,16 @@ def add_wall(request, spot_id, **kwargs):
             form.save()
             return wall_index(request, spot.pk)
     else:
-        form = WallForm(initial={'spot':spot})
+        form = WallForm(initial={'spot': spot})
 
     wall_list = spot.wall_set.all().order_by('name')
 
     context = {
-            'spot':spot,
-            'wall_list': wall_list,
-            'show_edit_pane' : True,
-            'form' : form
-            }
+        'spot': spot,
+        'wall_list': wall_list,
+        'show_edit_pane': True,
+        'form': form
+    }
     return render(request, 'edit_spot/add_wall.html', context)
 
 
@@ -148,6 +160,8 @@ def add_spot(request, **kwargs):
     """
     Adding a new spot.
     """
+    request.session.pop('last_wall_id', None)
+
     if request.method == 'POST':
 
         form = SpotForm(request.POST)
@@ -161,8 +175,8 @@ def add_spot(request, **kwargs):
 
     context = {
         'spot_list': spot_list,
-        'show_edit_pane' : True,
-        'form' : form
+        'show_edit_pane': True,
+        'form': form
     }
     return render(request, 'edit_spot/add_spot.html', context)
 
@@ -172,6 +186,9 @@ def edit_spot(request, spot_id):
     """
     Alter location and meta info of spot
     """
+
+    request.session.pop('last_wall_id', None)
+
     spot_list = Spot.objects.exclude(pk=spot_id).order_by('name')
     spot = get_object_or_404(Spot, pk=spot_id)
 
@@ -184,11 +201,11 @@ def edit_spot(request, spot_id):
     else:
         form = SpotForm(instance=spot)
 
-
     context = {'spot': spot,
-            'spot_list': spot_list,
-            'show_edit_pane' : True,
-            'form': form}
+               'spot_list': spot_list,
+               'show_edit_pane': True,
+               'form': form}
+
     return render(request, 'edit_spot/edit_spot.html', context)
 
 
@@ -206,17 +223,22 @@ def add_route(request, spot_id, **kwargs):
             form.save()
     else:
         form = RouteForm(initial={'spot': spot})
-        #form = RouteForm()
+        # form = RouteForm()
 
     route_list = spot.route_set.all().order_by('name')
 
     context = {
         'spot': spot,
         'route_list': route_list,
-        'form' : form,
-        'show_edit_pane' : True
+        'form': form,
+        'show_edit_pane': True
     }
+
+    if request.session.get('last_wall_id'):
+        context['last_wall_id'] = request.session['last_wall_id']
+
     return render(request, 'edit_spot/add_route.html', context)
+
 
 @permission_required('miroutes.wall.can.change')
 def draw_routes(request, wall_id, **kwargs):
@@ -226,6 +248,7 @@ def draw_routes(request, wall_id, **kwargs):
 
     """
     wall = get_object_or_404(Wall, pk=wall_id)
+    request.session['last_wall_id'] = wall_id
     wallview = wall.dev_view
 
     # also get all geoms asociated with wall routes
@@ -242,12 +265,13 @@ def draw_routes(request, wall_id, **kwargs):
                 # ipdb.set_trace()
                 geom_obj.save()
 
-
-
     context = {'wall': wall,
-            'wallview': wallview,
-            'wall_routegeomlist': wallroutegeomlist,
-            'show_edit_pane': True}
+               'spot': wall.spot,
+               'wallview': wallview,
+               'wall_routegeomlist': wallroutegeomlist,
+               'show_edit_pane': True}
+
+    if request.session.get('last_wall_id'):
+        context['last_wall_id'] = request.session['last_wall_id']
 
     return render(request, 'edit_spot/draw_routes.html', context)
-

@@ -9,61 +9,84 @@
 
     <link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
 
-{% endblock %}
 
+{% endblock %}
 {% block content %}
 
-    <div class="tb_cell">
-        <h2>Existing Routes:</h2>
-        <div class="existing_routes_box">
-            <table style="width:100%">
-                <tr>
-                    <th>name</th>
-                    <th>grade</th>
-                    <th>length</th>
-                    <th>rating</th>
-                </tr>
-                {% for route in route_list %}
-                    <tr>
-                        <td><a href="{% url "route_detail" route_id=route.pk %}">{{ route.name }} </a></td>
-                        <td>{{ route.grade }}</td>
-                        <td>{{ route.length }}</td>
-                        <td>{{ route.rating }}</td>
-                    </tr>
-                {% endfor %}
-            </table>
-        </div>
+    <div class="row">
+
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url "edit_spot" spot_id=spot.pk %}">Edit Spot</a> &nbsp;
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="{% url "add_route" spot_id=spot.pk %}">Routepool</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">ChooseWall</a>
+            </li>
+            {% if last_wall_id %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url "link_routes_to_wall" wall_id=last_wall_id %}">LinkRoutesToWall</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url "draw_routes" wall_id=last_wall_id %}">DrawRoutesOnWall</a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="#">LinkRoutesToWall</a>
+                </li>
+            {% endif %}&nbsp;
+
+        </ul>
     </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="tb_table">
+                <div class="tb_row">
+                    <div class="tb_cell">
+                        <h2>Add new Route</h2>
 
+                        <form method="POST">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <input type="submit" value="save">
+                        </form>
 
+                        <form method="GET" action="{% url 'edit_spot' spot_id=spot.pk %}">
+                            {% csrf_token %}
+                            <input type="submit" value="cancel">
+                        </form>
+                    </div>
 
-{% endblock %}
-
-{% block edit_pane %}
-    <a href="{% url "edit_spot" spot_id=spot.pk %}">Edit Spot</a> &nbsp;
-    <a href="{% url "add_route" spot_id=spot.pk %}">Routepool</a>&nbsp;
-    <a href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">ChooseWall</a>&nbsp;
-    LinkRoutesToWall &nbsp;
-{% endblock %}
-
-{% block mapobjects_info %}
-    <div class="tb_table">
-        <div class="tb_row">
-            <div class="tb_cell">
-                <h2>Add new Route</h2>
-
-                <form method="POST">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <input type="submit" value="save">
-                </form>
-
-                <form method="GET" action="{% url 'edit_spot' spot_id=spot.pk %}">
-                    {% csrf_token %}
-                    <input type="submit" value="cancel">
-                </form>
+                </div>
             </div>
+        </div>
+        <div class="col-md-6">
 
+            <div class="tb_cell">
+                <h2>Existing Routes:</h2>
+                <div class="existing_routes_box">
+                    <table style="width:100%">
+                        <tr>
+                            <th>name</th>
+                            <th>grade</th>
+                            <th>length</th>
+                            <th>rating</th>
+                        </tr>
+                        {% for route in route_list %}
+                            <tr>
+                                <td><a href="{% url "route_detail" route_id=route.pk %}">{{ route.name }} </a></td>
+                                <td>{{ route.grade }}</td>
+                                <td>{{ route.length }}</td>
+                                <td>{{ route.rating }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
+
+
 {% endblock %}

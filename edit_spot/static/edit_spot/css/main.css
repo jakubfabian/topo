@@ -24,6 +24,14 @@
 
 }
 
+.nav-link.active {
+    background: deepskyblue;
+}
+
+#spotmap, #wallmap {
+    height: 800px;
+}
+
 /*.existing_routes_box {*/
 /*max-height: 500px;*/
 /*overflow-y: auto;*/

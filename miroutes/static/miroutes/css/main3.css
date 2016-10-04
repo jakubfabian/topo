@@ -68,7 +68,7 @@ html body #body-content {
     height: 30px;
 }
 
-.leaflet-container, #wallmap {
+.leaflet-container {
     z-index: 1;
     background: url('../../img/map_bg.jpg');
     background-repeat: repeat;

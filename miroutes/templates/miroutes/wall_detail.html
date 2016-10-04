@@ -94,11 +94,11 @@
     {% if wallview.is_dev %}
         <a href="{% url "wall_detail" wall_id=wall.id %}">Show live wall view</a>
         <br/>
-        <!-- if you are the owner or a manager -->
-        <a href={% url "link_routes_to_wall" wall_id=wall.id %}>Edit {{ wall.name }}</a>
-    {% else %}
-        <a href="{% url "wall_detail_dev" wall_id=wall.id %}">Show dev wall view</a>
     {% endif %}
+
+    <!-- if you are the owner or a manager -->
+    <a href={% url "draw_routes" wall_id=wall.id %}>Edit {{ wall.name }}</a>
+
 
 
 

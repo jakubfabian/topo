@@ -39,6 +39,15 @@
         <link rel="stylesheet" href={% static "miroutes/css/main3.css" %}/>
     {% endblock %}
 
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if ($.trim($("#info-container").html()) == '') {
+                $('#info-container').remove();
+                $('#content').removeClass('col-lg-9').removeClass('col-lg-push-3').addClass('col-lg-12');
+            }
+        });
+    </script>
+
 </head>
 
 <body>
@@ -95,17 +104,7 @@
 
             {% block content %}Default template content -- there is nothing to see here...{% endblock %}
         </div>
-        <div id="info-container" class="col-lg-3 col-lg-pull-9">
-            {% if show_edit_pane %}
-
-                <div id="edit_pane">
-                    {% block edit_pane %}
-                    {% endblock %}
-                </div>
-            {% endif %}
-            {% block mapobjects_info %}
-            {% endblock %}
-        </div>
+        <div id="info-container" class="col-lg-3 col-lg-pull-9">{% block mapobjects_info %}{% endblock %}</div>
 
     </div>
     <div id="footer" class="navbar-fixed-bottom row">

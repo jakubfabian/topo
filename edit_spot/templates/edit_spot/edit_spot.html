@@ -7,7 +7,7 @@
 
 {% block extra_assets %}
 
-<link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
+    <link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
 
     {% load leaflet_tags %}
     {% load geojson_tags %}
@@ -34,7 +34,7 @@
 
             editSpotIcon = L.icon({
                 iconUrl: '{% static "edit_spot/img/edit_marker_icon.png" %}',
-                iconSize: [25,41], // size of the icon
+                iconSize: [25, 41], // size of the icon
                 iconAnchor: [12, 41], // point of the icon which will correspond to marker's location
                 popupAnchor: [1, -34] // point from which the popup should open relative to the iconAnchor
             });
@@ -66,32 +66,54 @@
 {% endblock %}
 
 {% block content %}
-    {% leaflet_map "spotmap" callback="window.map_init_basic" %}
-{% endblock %}
+    <div class="row">
 
-{% block edit_pane %}
-<a href="{% url "edit_spot" spot_id=spot.pk %}">Edit Spot</a> &nbsp;
-<a href="{% url "add_route" spot_id=spot.pk %}">Routepool</a>&nbsp;
-<a href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">ChooseWall</a>&nbsp;
-{% endblock %}
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" href="{% url "edit_spot" spot_id=spot.pk %}">Edit Spot</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url "add_route" spot_id=spot.pk %}">Routepool</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">ChooseWall</a>
+            </li>
+            {% if last_wall_id %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url "link_routes_to_wall" wall_id=last_wall_id %}">LinkRoutesToWall</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url "draw_routes" wall_id=last_wall_id %}">DrawRoutesOnWall</a>
+                </li>
+            {% endif %}&nbsp;
 
-{% block mapobjects_info %}
-<h1>Edit Spot :: {{spot.name}}</h1>
+        </ul>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <h1>Edit Spot :: {{ spot.name }}</h1>
 
-    <form method="POST" action="{% url "edit_spot" spot_id=spot.pk %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="save">
-    </form>
+            <form method="POST" action="{% url "edit_spot" spot_id=spot.pk %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="submit" value="save">
+            </form>
 
-    <form method="GET" action="{% url "edit_spot_index" %}">
-        {% csrf_token %}
-        <input type="submit" value="cancel">
-    </form>
-<p>
-    <form method="GET" action="{% url "add_route" spot_id=spot.pk %}">
-        {% csrf_token %}
-        <input type="submit" value="Add routes">
-    </form>
-</p>
+            <form method="GET" action="{% url "edit_spot_index" %}">
+                {% csrf_token %}
+                <input type="submit" value="cancel">
+            </form>
+            <p>
+            <form method="GET" action="{% url "add_route" spot_id=spot.pk %}">
+                {% csrf_token %}
+                <input type="submit" value="Add routes">
+            </form>
+            </p>
+        </div>
+        <div class="col-md-9">
+            {% leaflet_map "spotmap" callback="window.map_init_basic" %}
+        </div>
+    </div>
+
+
 {% endblock %}
