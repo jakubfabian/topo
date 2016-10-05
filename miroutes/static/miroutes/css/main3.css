@@ -12,7 +12,7 @@ html body {
 
 html body #body-content {
     position: absolute;
-    top: 57px;
+    top: 85px;
     right: 0;
     left: 0;
     width: 100%;
@@ -25,7 +25,7 @@ html body #body-content {
     right: 0;
     top: 0;
     background-color: #4C4;
-    height: 57px;
+    height: 60px;
     background: url('../../img/header2.jpg');
     background-position: right;
     border-bottom: 3px solid black;
@@ -89,7 +89,7 @@ html body #body-content {
 
 #search-container {
     position: absolute;
-    top: 10px;
+    top: -65px;
     right: 60px;
     width: 250px;
     z-index: 50;
@@ -110,12 +110,18 @@ html body #body-content {
     padding-top: 8px;
     padding-right: 8px;
     text-align: right;
+    float: right;
+}
+
+#breadcrumbs {
+    padding-top: 8px;
+    padding-right: 8px;
+    text-align: left;
+    float: left;
 }
 
 .loginname {
     font-weight: bold;
-    color: #ffffff;
-    text-shadow: 2px 2px 6px #000000;
 }
 
 .clear_float {

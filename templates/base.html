@@ -61,7 +61,13 @@
                 </a>
             </div>
 
-            <div id="login-menu" class="col-md-9">
+        </div>
+        <div class="col-md-3">
+          <div id="breadcrumbs" class="col-md-3">
+            {% include "breadcrumbs.html" %}
+          </div>
+          
+          <div id="login-menu" class="col-md-3">
                 {% if user.is_anonymous %}
                     <a id="login_button" class="btn btn-default"
                        href="{% url 'django.contrib.auth.views.login' %}?next={{ request.path }}">Login</a>
@@ -81,9 +87,6 @@
 {% endblock %}
 <div id="body-content" class="container">
     <div class="row">
-        <div class="col-md-3">
-            {% include "breadcrumbs.html" %}
-        </div>
         <div class="col-md-9">
             {% block infobar %}
             {% endblock %}
@@ -107,13 +110,15 @@
         <div id="info-container" class="col-lg-3 col-lg-pull-9">{% block mapobjects_info %}{% endblock %}</div>
 
     </div>
+    <!--
     <div id="footer" class="navbar-fixed-bottom row">
 
         {% block footer %}
             (c) die Kletteraffen
         {% endblock %}
 
-    </div>
+</div>
+-->
 </div>
 
 
