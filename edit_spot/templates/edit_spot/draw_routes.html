@@ -153,8 +153,8 @@
 
                     // we choose a default zoom level of 2 that matches either the width (approx.) or the
                     // height of the container
-                    var minzoom = 2;
-                    var startzoom = 2;
+                    var minzoom = 1;
+                    var startzoom = 1;
 
                     var map = L.map('wallmap', {
                         minZoom: minzoom,
@@ -292,14 +292,18 @@
                             }
                         }
 
-                        if (Object.keys(layerdict).length > 1) {
-                            map.fitBounds(layerdict[Object.keys(layerdict)[0]].getBounds());
+                        if (Object.keys(layerdict).length >= 1) {
+                            layer = L.geoJson(collection);
+                            layer.addTo(map);
+                            map.fitBounds(layer.getBounds());
+                            map.removeLayer(layer);
+                            //map.fitBounds(layerdict[Object.keys(layerdict)[0]].getBounds());
                         } else {
                             var center_x = img_dim_x / 2;
                             var center_y = img_dim_y / 2;
-                            var center_point = map.unproject([center_x, center_y], minzoom + 1);
+                            var center_point = map.unproject([center_x, center_y], minzoom);
 
-                            map.setView(center_point, minzoom + 1);
+                            map.setView(center_point, minzoom);
                         }
                     {% endif %}
 

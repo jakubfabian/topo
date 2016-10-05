@@ -30,8 +30,8 @@
 
             // we choose a default zoom level of 2 that matches either the width (approx.) or the
             // height of the container
-            var minzoom = 2;
-            var startzoom = 4;
+            var minzoom = 1;
+            var startzoom = 1;
 
             var aspectRatio = img_dim_x / img_dim_y;
             {#            if (aspectRatio < 1) {#}
@@ -55,7 +55,7 @@
             map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
 
             var wall_layer = L.tileLayer('{{ wall.get_tiles_url }}/{z}/{x}/{y}.png', {
-                minZoom: 1, maxZoom: maxzoom,
+                minZoom: 0, maxZoom: maxzoom,
                 noWrap: false,
                 tileSize: 256,
                 continuousWorld: true,
@@ -65,16 +65,16 @@
 
             var center_x = img_dim_x / 2;
             var center_y = img_dim_y / 2;
-            var center_point = map.unproject([center_x, center_y], minzoom + 1);
+            var center_point = map.unproject([center_x, center_y], startzoom);
 
-            map.setView(center_point, minzoom + 1);
+            map.setView(center_point, startzoom);
 
             // If there is a route list we add it to the map
             {% if wall_route_geom_list %}
                 var collection = {{ wall_route_geom_list|geojsonfeature|safe }};
                 layer = L.geoJson(collection);
                 layer.addTo(map);
-                map.fitBounds(layer.getBounds().pad(0.5))
+                map.fitBounds(layer.getBounds())
             {% endif %}
         }
     </script>
