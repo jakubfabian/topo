@@ -1,3 +1,6 @@
+"""Views related to the *edit* workflow, i.e., pages on which
+route/wall/spot-related content is modified.
+"""
 from django.shortcuts import get_object_or_404, render, redirect
 
 from django.contrib.auth.decorators import permission_required, login_required
@@ -258,12 +261,16 @@ def draw_routes(request, wall_id, **kwargs):
         for key in request.POST.keys():
             if key.startswith('routegeomid_'):
                 geomstr = request.POST.get(key)
-                rgid = key.split('_')[1]
-                geom_obj = RouteGeometry.objects.get(pk=rgid)
-                geom_obj.geom = geomstr
-                # import ipdb
-                # ipdb.set_trace()
-                geom_obj.save()
+                # If the geometry is not drawn on the image
+                # we just leave everything as is
+                if geomstr != 'None':
+                    print "Geometrystring: {}".format(geomstr)
+                    rgid = key.split('_')[1]
+                    geom_obj = RouteGeometry.objects.get(pk=rgid)
+                    geom_obj.geom = geomstr
+                    # import ipdb
+                    # ipdb.set_trace()
+                    geom_obj.save()
 
     context = {'wall': wall,
                'spot': wall.spot,

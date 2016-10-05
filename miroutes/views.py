@@ -1,3 +1,4 @@
+"""Views for *consumers* of spot/wall/route information."""
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
 from django.core.urlresolvers import reverse
