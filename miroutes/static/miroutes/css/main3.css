@@ -89,8 +89,8 @@ html body #body-content {
 
 #search-container {
     position: absolute;
-    top: -65px;
-    right: 60px;
+    top: -90px;
+    right: 10px;
     width: 250px;
     z-index: 50;
     border-radius: 10px;
