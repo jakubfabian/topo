@@ -1,23 +1,31 @@
 {% if route %}
-    <a href="/miroutes">Home</a>
-    ::
-    <a href=" {% url "spot_detail" spot_id=route.spot.pk %} "> {{ route.spot.name }}</a>
-    ::
-    <a href=" {% url "route_detail" route_id=route.pk %} "> {{ route.name }}</a>
+
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/miroutes">Home</a></li>
+        <li class="breadcrumb-item"><a href=" {% url "spot_detail" spot_id=route.spot.pk %} "> {{ route.spot.name }}</a>
+        </li>
+        <li class="breadcrumb-item active"><a href=" {% url "route_detail" route_id=route.pk %} "> {{ route.name }}</a>
+        </li>
+    </ol>
 
 {% elif wall %}
-    <a href="/miroutes">Home</a>
-    ::
-    <a href=" {% url "spot_detail" spot_id=wall.spot.pk %} "> {{ wall.spot.name }}</a>
-    ::
-    <a href=" {% url "wall_detail" wall_id=wall.pk %} "> {{ wall.name }}</a>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/miroutes">Home</a></li>
+        <li class="breadcrumb-item"><<a href=" {% url "spot_detail" spot_id=wall.spot.pk %} "> {{ wall.spot.name }}</a>
+        </li>
+        <li class="breadcrumb-item active"><a href=" {% url "wall_detail" wall_id=wall.pk %} "> {{ wall.name }}</a></li>
+    </ol>
+
 
 {% elif spot %}
-    <a href="/miroutes">Home</a>
-    ::
-    <a href=" {% url "spot_detail" spot.pk %} "> {{ spot.name }}</a>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/miroutes">Home</a></li>
+        <li class="breadcrumb-item active"><a href=" {% url "spot_detail" spot.pk %} "> {{ spot.name }}</a></li>
+    </ol>
 
 {% else %}
-    <a href="/miroutes">Home</a>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/miroutes">Home</a></li>
+    </ol>
 
 {% endif %}

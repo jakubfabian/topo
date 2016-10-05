@@ -7,7 +7,6 @@
 
 {% block extra_assets %}
 
-    <link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
 
     {% load leaflet_tags %}
     {% load geojson_tags %}
@@ -65,6 +64,12 @@
     </script>
 {% endblock %}
 
+{% block overwrite_styles %}
+
+    <link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
+
+{% endblock %}
+
 {% block content %}
     <div class="row">
 
@@ -89,8 +94,8 @@
 
         </ul>
     </div>
-    <div class="row">
-        <div class="col-md-3">
+    <div class="row full-height">
+        <div class="col-md-3 full-height">
             <h1>Edit Spot :: {{ spot.name }}</h1>
 
             <form method="POST" action="{% url "edit_spot" spot_id=spot.pk %}">
@@ -110,7 +115,7 @@
             </form>
             </p>
         </div>
-        <div class="col-md-9">
+        <div class="col-md-9 full-height">
             {% leaflet_map "spotmap" callback="window.map_init_basic" %}
         </div>
     </div>

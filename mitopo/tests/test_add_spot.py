@@ -2,9 +2,7 @@ from utils import MitopoTestCase
 
 
 class AddSpotTest(MitopoTestCase):
-
     def test_need_login_for_add_spot(self):
-
         # uncomment this to add an artifical slow down of X milliseconds to every call
         # of self.ensure_present or self.ensure_absent. You can also put additional slow
         # downs in the code by using self.try_slow_down() at the locations where you want
@@ -31,17 +29,10 @@ class AddSpotTest(MitopoTestCase):
         spots_list = self.ensure_present("#spots_expand")
         spots_list.click()
 
-        one_spot = self.ensure_present("#spots li a")
-        one_spot.click()
+        self.ensure_absent("#add_spot_button")
 
-
-        spot_button = self.ensure_present("#add_spot_button")
-        spot_button.click()
-
-
-
-        #login_button = self.ensure_present("#login_button")
-        #login_button.click()
+        login_button = self.ensure_present("#login_button")
+        login_button.click()
 
         username_input = self.ensure_present("input#id_username")
         username_input.send_keys("root")
@@ -51,6 +42,15 @@ class AddSpotTest(MitopoTestCase):
 
         submit_login = self.ensure_present("input#submit_login")
         submit_login.click()
+
+        self.ensure_present("span.loginname")
+        self.ensure_present("#logout_button")
+
+        spots_list = self.ensure_present("#spots_expand")
+        spots_list.click()
+
+        spot_button = self.ensure_present("#add_spot_button")
+        spot_button.click()
 
         # THEN the user should be logged in (name instead of loginbutton visible)
         # AND after logout should be back to the start page
@@ -70,7 +70,9 @@ class AddSpotTest(MitopoTestCase):
 
         markers = self.browser.find_elements_by_css_selector("img.leaflet-marker-icon")
 
-        self.assertEqual(len(markers), len(markers_before)+1, "Marker_count should be exactly one more or we could not put a new marker on the map markercount: (after_add={0:} before_add={1:})".format(len(markers), len(markers_before)))
+        self.assertEqual(len(markers), len(markers_before) + 1,
+                         "Marker_count should be exactly one more or we could not put a new marker on the map markercount: (after_add={0:} before_add={1:})".format(
+                             len(markers), len(markers_before)))
 
         import random
         rand_name = "testspot_%08x" % random.getrandbits(32)
@@ -82,9 +84,11 @@ class AddSpotTest(MitopoTestCase):
         submit_button.click()
 
         # Find newly created spot in all spots list
-        spot_label = self.browser.find_element_by_xpath("//*[contains(@class, 'spot_entry') and text()='{0:}']".format(rand_name))
-        
+        spot_label = self.browser.find_element_by_xpath(
+            "//*[contains(@class, 'spot_entry') and text()='{0:}']".format(rand_name))
+
 
 if __name__ == "__main__":
     import unittest
+
     unittest.main()

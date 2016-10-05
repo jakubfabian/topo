@@ -13,7 +13,6 @@
     {% leaflet_js plugins="forms" %}
     {% leaflet_css plugins="forms" %}
 
-    <link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
     <style>
 
         #route_list .ui-selecting {
@@ -27,6 +26,12 @@
 
 
     </style>
+{% endblock %}
+
+{% block overwrite_styles %}
+
+    <link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
+
 {% endblock %}
 
 {% block content %}
@@ -62,8 +67,6 @@
         });
     </script>
 
-
-
     <div class="row">
 
         <ul class="nav nav-tabs">
@@ -78,10 +81,12 @@
             </li>
             {% if last_wall_id %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url "link_routes_to_wall" wall_id=last_wall_id %}">Link Routes to Wall</a>
+                    <a class="nav-link" href="{% url "link_routes_to_wall" wall_id=last_wall_id %}">Link Routes to
+                        Wall</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="{% url "draw_routes" wall_id=last_wall_id %}">Draw Routes on Wall</a>
+                    <a class="nav-link active" href="{% url "draw_routes" wall_id=last_wall_id %}">Draw Routes on
+                        Wall</a>
                 </li>
             {% else %}
                 <li class="nav-item">
@@ -91,50 +96,11 @@
 
         </ul>
     </div>
-    <div class="row">
-        <div class="col-md-3">
-            Dude, You're looking at wall {{ wall.name }}
-            <br><br>
-            <!-- css styles for the selectable list. TODO: put tags in css files -->
-            <!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
-            <a href="{% url "wall_detail" wall_id=wall.pk %}">Show live wall</a>
-            <br><br>
+    <div class="row full-height">
 
+        <div class="col-lg-9 col-lg-push-3 full-height">
+            <div id="wallmap" class="full-height"></div>
 
-            <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
-            <form method="POST" action="{{ request.path|urlencode }}">
-                {% csrf_token %}
-
-                <div id="routelist_div">
-                    route list (click to edit):
-                    <br>
-
-                    <ol id="route_list">
-                        {% for routegeom in wall_routegeomlist %}
-                            <!-- We save geometry and route name in the list -->
-                            <li class="ui-widget-content" value="{{ routegeom.id }}" data-geom="{{ routegeom.geom }}"
-                                data-name="{{ routegeom.route.name }}">
-                                {{ routegeom.route.name }}
-                                <input id="geom_inputfield_{{ routegeom.id }}" type="text"
-                                       name="routegeomid_{{ routegeom.id }}"
-                                       value="{{ routegeom.geom }}">
-                            </li>
-
-                        {% endfor %}
-                    </ol>
-
-                    <br>
-                </div>
-                <input type="submit" value="speichern"/>
-            </form>
-
-            <form method="GET" action="{% url 'publish_wall' wall_id=wall.pk %}">
-                {% csrf_token %}
-                <input type="submit" value="publish wall">
-            </form>
-        </div>
-        <div class="col-md-8">
-            <div id="wallmap" class="custom-leaflet-container"></div>
             <script type="text/javascript">
 
                 // The leaflet part
@@ -398,6 +364,48 @@
                 }
 
             </script>
+
+        </div>
+        <div class="col-lg-3 col-lg-pull-9 full-height">
+            Dude, You're looking at wall {{ wall.name }}
+            <br><br>
+            <!-- css styles for the selectable list. TODO: put tags in css files -->
+            <!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
+            <a href="{% url "wall_detail" wall_id=wall.pk %}">Show live wall</a>
+            <br><br>
+
+
+            <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
+            <form method="POST" action="{{ request.path|urlencode }}">
+                {% csrf_token %}
+
+                <div id="routelist_div">
+                    route list (click to edit):
+                    <br>
+
+                    <ol id="route_list">
+                        {% for routegeom in wall_routegeomlist %}
+                            <!-- We save geometry and route name in the list -->
+                            <li class="ui-widget-content" value="{{ routegeom.id }}" data-geom="{{ routegeom.geom }}"
+                                data-name="{{ routegeom.route.name }}">
+                                {{ routegeom.route.name }}
+                                <input id="geom_inputfield_{{ routegeom.id }}" type="hidden"
+                                       name="routegeomid_{{ routegeom.id }}"
+                                       value="{{ routegeom.geom }}">
+                            </li>
+
+                        {% endfor %}
+                    </ol>
+
+                    <br>
+                </div>
+                <input type="submit" value="speichern"/>
+            </form>
+
+            <form method="GET" action="{% url 'publish_wall' wall_id=wall.pk %}">
+                {% csrf_token %}
+                <input type="submit" value="publish wall">
+            </form>
         </div>
     </div>
 

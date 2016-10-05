@@ -2,41 +2,21 @@
     font-family: 'PT Sans', sans-serif;
 }
 
-html {
+html, body {
     height: 100%;
-}
-
-html body {
-    height: 100%;
-}
-
-html body #body-content {
-    position: absolute;
-    top: 85px;
-    right: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    overflow-x: hidden;
 }
 
 #header {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    background-color: #4C4;
-    height: 60px;
     background: url('../../img/header2.jpg');
     background-position: right;
     border-bottom: 3px solid black;
-    width: 100%;
 }
 
 #logo {
-    position: relative;
-    top: 5px;
-    left: 8px;
-    height: 50px;
+    margin: 8px;
+    height: 100%;
+    width: 100%;
 }
 
 .wall_route_list {
@@ -44,8 +24,12 @@ html body #body-content {
     overflow-y: auto;
 }
 
-.map-row {
+.full-height {
     height: 100%;
+}
+
+#body-content {
+    height: calc(100% - 100px);
 }
 
 #content {
@@ -56,16 +40,6 @@ html body #body-content {
     #content {
         height: 65%;
     }
-}
-
-#footer {
-    background: url('../../img/header2.jpg');
-    background-position: bottom;
-    text-align: center;
-    color: #ffffff;
-    font-weight: bold;
-    text-shadow: #0a0a0a 2px 2px;
-    height: 30px;
 }
 
 .leaflet-container {
@@ -89,11 +63,12 @@ html body #body-content {
 
 #search-container {
     position: absolute;
-    top: -90px;
-    right: 10px;
+    float: left;
     width: 250px;
     z-index: 50;
     border-radius: 10px;
+    margin-top: 5px;
+    margin-left: 5px;
 }
 
 #search-field {
@@ -106,38 +81,18 @@ html body #body-content {
     box-sizing: border-box;
 }
 
-#login-menu {
-    padding-top: 8px;
-    padding-right: 8px;
-    text-align: right;
-    float: right;
-}
-
-#breadcrumbs {
-    padding-top: 8px;
-    padding-right: 8px;
-    text-align: left;
-    float: left;
-}
-
 .loginname {
     font-weight: bold;
 }
 
-.clear_float {
-    clear: both;
+#breadcrumbs {
+    padding-top: 8px;
 }
 
-/* Fake table divs */
-
-.tb_table {
-    display: table;
-}
-
-.tb_row {
-    display: table-row;
-}
-
-.tb_cell {
-    display: table-cell;
+#login-menu {
+    text-align: right;
+    padding-top: 8px;
+    padding-right: 30px;
+    color: #ffffff;
+    text-shadow: #000000 2px 2px;
 }
