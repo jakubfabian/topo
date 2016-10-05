@@ -5,7 +5,7 @@ from django.db import models
 from djgeojson.fields import LineStringField
 from djgeojson.fields import PointField
 
-from miroutes.image_tiler import tile_image
+from miroutes.tasks import tile_image
 
 RATING_CHOICES = ((1, 'poor'),
                   (2, 'ok'),
@@ -175,7 +175,7 @@ class Wall(models.Model):
             return "exists"
         try:
             print("tiles_file_path does not exist", storage.path(file_path), storage.path(tiles_file_path))
-            tile_image(storage.path(file_path), storage.path(tiles_file_path))
+            tile_image.delay(storage.path(file_path), storage.path(tiles_file_path))
             return "success"
         except:
             return "error"

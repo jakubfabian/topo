@@ -1,17 +1,39 @@
 version: '2'
 services:
-  db:
+  postgresql:
     image: postgres
     ports:
       - "5432:5432"
+
   web:
     build: .
     depends_on:
-      - db
+      - postgresql
+      - rabbitmq
     command: bash -c "sleep 5;bower install --allow-root;python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
     ports:
       - "8000:8000"
     links:
-      - db
+      - postgresql
+      - rabbitmq
+
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  worker:
+    build: .
+    environment:
+      - C_FORCE_ROOT=true
+      - DATABASE_HOST=postgresql
+      - BROKER_URL=amqp://guest:guest@rabbitmq//
+    command: bash -c "while ! nc -z rabbitmq 5672; do sleep 1; done ; celery -A mitopo worker -E -l info --concurrency=2"
+    volumes:
+      - .:/code
+    links:
+      - postgresql
+      - rabbitmq

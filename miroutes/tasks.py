@@ -1,4 +1,8 @@
+from __future__ import absolute_import
 
+from celery import shared_task,task
+
+@shared_task(ignore_result=True)
 def tile_image(src, dst, tile_width=256):
     """
     Tile an image for use in leafletjs
@@ -44,7 +48,7 @@ def tile_image(src, dst, tile_width=256):
             newheight = np.int(2**np.ceil(np.log2(height)))
             hpercent = (newheight/float(height))
             newwidth = np.int(width*hpercent)
-            
+
         image = image.resize((newwidth, newheight), Image.ANTIALIAS)
 
         # Overwrite image with enlarged version
@@ -52,8 +56,8 @@ def tile_image(src, dst, tile_width=256):
 
         # Convert Image to RGBA to use alpha channel to get transparent edge areas (where no image is defined)
         image2 = Image.new('RGBA', image.size)
-        image2.paste(image,(0,0)) 
-        print( image2.size)
+        image2.paste(image,(0,0))
+        print(image2.size)
 
         # Max number of zoom levels:
         zoom_levels = np.int( np.ceil( np.log2( np.max(image.size) /tile_width) ))

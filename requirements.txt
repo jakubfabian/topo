@@ -7,7 +7,4 @@ ipdb
 jsonfield
 Pillow
 numpy
-
-
-
-
+celery

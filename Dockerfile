@@ -1,6 +1,6 @@
 FROM python:2.7
 ENV PYTHONUNBUFFERED 1
-RUN apt-get update && apt-get install -y libgdal-dev python-gdal npm && ln -s /usr/bin/nodejs /usr/bin/node && npm install -g bower
+RUN apt-get update && apt-get install -y libgdal-dev python-gdal npm netcat && ln -s /usr/bin/nodejs /usr/bin/node && npm install -g bower
 RUN mkdir /code
 WORKDIR /code
 ADD requirements.txt /code/
