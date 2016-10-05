@@ -11,7 +11,7 @@
 {% elif wall %}
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/miroutes">Home</a></li>
-        <li class="breadcrumb-item"><<a href=" {% url "spot_detail" spot_id=wall.spot.pk %} "> {{ wall.spot.name }}</a>
+        <li class="breadcrumb-item"><a href=" {% url "spot_detail" spot_id=wall.spot.pk %} "> {{ wall.spot.name }}</a>
         </li>
         <li class="breadcrumb-item active"><a href=" {% url "wall_detail" wall_id=wall.pk %} "> {{ wall.name }}</a></li>
     </ol>

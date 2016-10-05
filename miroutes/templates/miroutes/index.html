@@ -55,13 +55,21 @@
 {% endblock %}
 
 {% block infobar %}
-    Spots: {{ spot_listing|length }} | Walls: {{ wall_listing|length }} | Routes: {{ route_listing|length }}
+    <div class="counters">
+        <span class="glyphicon glyphicon-map-marker spot-icon" aria-hidden="true"></span>
+        Spots: {{ spot_listing|length }} &nbsp;&nbsp;
+        <span class="glyphicon glyphicon-tent wall-icon" aria-hidden="true"></span>
+        Walls: {{ wall_listing|length }} &nbsp;&nbsp;
+        <span class="glyphicon glyphicon-sort route-icon" aria-hidden="true"></span>
+        Routes: {{ route_listing|length }}
+    </div>
 {% endblock %}
 {% block mapobjects_info %}
 
 
 
-    <a id="spots_expand" href="#spots" data-toggle="collapse">Spots (click to expand)</a>
+    <a id="spots_expand" href="#spots" data-toggle="collapse"><span class="glyphicon glyphicon-map-marker spot-icon" aria-hidden="true"></span>
+ Spots (click to expand)</a>
     <ul id="spots" class="collapse">
         {% for spot in spot_listing %}
             <li>
@@ -69,16 +77,17 @@
             </li>
         {% endfor %}
         {% if perms.miroutes.add_spot %}
-        <li>
-          <a id="add_spot_button" class="btn btn-default" href="{% url 'add_spot' %}"><b>Add Spot</b></a>
-        </li>
+            <li>
+                <a id="add_spot_button" class="btn btn-default" href="{% url 'add_spot' %}"><b>Add Spot</b></a>
+            </li>
         {% endif %}
 
     </ul>
 
 
-    <br />
-    <a id="walls_expand" href="#walls" data-toggle="collapse">Walls (click to expand)</a>
+    <br/>
+    <a id="walls_expand" href="#walls" data-toggle="collapse"><span class="glyphicon glyphicon-tent wall-icon" aria-hidden="true"></span>
+ Walls (click to expand)</a>
 
     <ul id="walls" class="collapse">
         {% for wall in wall_listing %}
