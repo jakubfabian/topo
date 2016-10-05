@@ -67,7 +67,14 @@
                 <a class="spot_entry" href="{% url "spot_detail" spot_id=spot.pk %} ">{{ spot.name }}</a>
             </li>
         {% endfor %}
+        {% if perms.miroutes.add_spot %}
+        <li>
+          <a id="add_spot_button" class="btn btn-default" href="{% url 'add_spot' %}"><b>Add Spot</b></a>
+        </li>
+        {% endif %}
+
     </ul>
+
 
     <br />
     <a id="walls_expand" href="#walls" data-toggle="collapse">Walls (click to expand)</a>

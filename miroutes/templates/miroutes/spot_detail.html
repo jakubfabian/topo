@@ -78,9 +78,8 @@
         <p>Currently no walls are available in {{ spot.name }}</p>
     {% endif %}
 
+    {% if perms.miroutes.change_spot %}
     <a class="btn btn-default" href="{% url 'edit_spot' spot_id=spot.id %}">Edit Spot</a>
-    <a id="add_spot_button" class="btn btn-default" href="{% url 'add_spot' %}">Add Spot</a>
-    {% if perms.miroutes.add_wall %}
     {% endif %}
 
 {% endblock %}
