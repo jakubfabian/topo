@@ -57,12 +57,18 @@
 {% block header %}
     <div id="header" class="row">
         <div class="row">
-            <div class="col-xs-6 col-md-2">
+            <div class="col-xs-3 col-md-2">
                 <a href="/miroutes">
                     <img id="logo" src="{% static "miroutes/img/logo.png" %}"/>
                 </a>
             </div>
-            <div class="col-xs-6 col-md-4">
+            <div class="col-xs-9 col-md-2">
+                    {% include 'search_container.html' %}
+            </div>
+
+            <div class="clearfix hidden-md hidden-lg"></div>
+
+            <div class="col-xs-12 col-md-2">
 
                 <div id="breadcrumbs">
                     {% include "breadcrumbs.html" %}
