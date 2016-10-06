@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 
 {% block title %}
     Mitopo.de - Spot Detail
@@ -31,8 +32,27 @@
             map.options.maxZoom = 15;
             markers = new L.MarkerClusterGroup();
             markers.addLayer(group);
-            map.addLayer(markers);
 
+            {% if spot.parking_geom %}
+            var editParkingIcon = L.icon({
+                iconUrl: '{% static "edit_spot/img/edit_parking_icon.png" %}',
+                iconSize: [30, 30], // size of the icon
+                iconAnchor: [15, 15], // point of the icon which will correspond to marker's location
+                popupAnchor: [1, -34] // point from which the popup should open relative to the iconAnchor
+            });
+
+            var editing_Parking = {{ spot|geojsonfeature:":parking_geom"|safe }};
+            var editParkingLayer = L.geoJson(editing_Parking, {
+                pointToLayer: function (feature, latlng) {
+                    park_marker = L.marker(latlng, {icon: editParkingIcon});
+                    return park_marker;
+                }
+            });
+
+            markers.addLayer(editParkingLayer);
+            {% endif %}
+            
+            map.addLayer(markers);
             if (markerArray.length > 1) {
                 map.fitBounds(group.getBounds());
             } else {

@@ -1,4 +1,5 @@
 from datetime import date
+from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -21,9 +22,31 @@ GRADE_SYSTEMS = (
 
 
 class Spot(models.Model):
+    """A spot denotes a region with multiple associated walls.
+
+    The walls within a spot should have a common approach.
+
+    Example:
+        Schoenhofen is a spot.
+        Eisenbahnerwand is a wall.
+    """
+
+    DURATION_CHOICES = (
+        (timedelta(minutes=15), '15 minutes or less'),
+        (timedelta(minutes=30), '30 minutes'),
+        (timedelta(hours=1), '1 hour'),
+        (timedelta(hours=2), '2 hours'),
+        (timedelta(hours=3), 'more than 3 hours'))
     name = models.CharField(max_length=100)
-    description = models.CharField(max_length=10000, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
     geom = PointField()
+    parking_description = models.TextField(blank=True, null=True)
+    parking_geom = PointField(blank=True, null=True)
+    approach = models.TextField(blank=True, null=True)
+    approach_time = models.DurationField(
+        choices=DURATION_CHOICES,
+        default=timedelta(minutes=15))
+
 
     def __str__(self):
         return self.name
@@ -66,8 +89,6 @@ class WallView(models.Model):
     Attributes:
         is_dev (boolean): Flags the development version of the wall.
         wall (Wall): The wall object the view is bound to.
-        approach (TextField): Details on the approach to the wall
-        approach_time (DurationField): How long does the approach take?
         morning_sun, midday_sun, afternoon_sun (BooleanField): 
             Is the sun shining in the morning/midday/afternoon?
         children_friendly (IntegerField): A children-friendly rating (5 choices).
@@ -83,8 +104,6 @@ class WallView(models.Model):
 
     wall = models.ForeignKey('Wall')
     is_dev = models.BooleanField(default=False)
-    approach = models.TextField(blank=True, null=True)
-    approach_time = models.DurationField(blank=True, null=True)
 
     morning_sun = models.NullBooleanField(blank=True, null=True)
     midday_sun = models.NullBooleanField(blank=True, null=True)

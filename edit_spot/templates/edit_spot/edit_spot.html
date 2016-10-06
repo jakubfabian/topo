@@ -15,7 +15,11 @@
 
 
     <script type="text/javascript">
-        function map_init_basic(map, options) {
+      function map_init_basic(map, options) {
+          // keep a global reference to map
+          // we want to override the on-click handler later
+          window.map = map;
+          
             map.options.maxZoom = 17;
             map.zoomControl.setPosition("topright");
 
@@ -37,31 +41,74 @@
                 iconAnchor: [12, 41], // point of the icon which will correspond to marker's location
                 popupAnchor: [1, -34] // point from which the popup should open relative to the iconAnchor
             });
+            editParkingIcon = L.icon({
+                iconUrl: '{% static "edit_spot/img/edit_parking_icon.png" %}',
+                iconSize: [30, 30], // size of the icon
+                iconAnchor: [15, 15], // point of the icon which will correspond to marker's location
+                popupAnchor: [1, -34] // point from which the popup should open relative to the iconAnchor
+            });
 
             var editing_Spot = {{ spot|geojsonfeature|safe }};
-            var edit_marker;
+          var editing_Parking = {{ spot|geojsonfeature:":parking_geom"|safe }};
+          
+          // edit and park marker are make available globally
+          edit_marker = null;
+          park_marker = null;
+            
             editSpotLayer = L.geoJson(editing_Spot, {
                 pointToLayer: function (feature, latlng) {
                     edit_marker = L.marker(latlng, {icon: editSpotIcon});
                     return edit_marker;
                 }
             });
-            map.addLayer(editSpotLayer);
-            map.setView(edit_marker.getLatLng(), 15);
 
-            map.on('click', function (e) {
-                edit_marker.setLatLng(e.latlng);
-                var geojson = {
-                    "type": "Point",
-                    "coordinates": L.GeoJSON.latLngToCoords(e.latlng)
-                };
-
-                document.getElementById("id_geom").value = JSON.stringify(geojson);
+            editParkingLayer = L.geoJson(editing_Parking, {
+                pointToLayer: function (feature, latlng) {
+                    park_marker = L.marker(latlng, {icon: editParkingIcon});
+                    return park_marker;
+                }
             });
+
+            map.addLayer(editSpotLayer);
+            map.addLayer(editParkingLayer);
+            if(park_marker){
+                map.fitBounds([edit_marker.getLatLng(), park_marker.getLatLng()])
+            }else{
+                map.setView(edit_marker.getLatLng(), 15);
+            }
 
         }
 
-    </script>
+        function on_spot_location(edit){
+            if(edit == 'spot'){
+                window.map.on('click', function (e) {
+                    window.edit_marker.setLatLng(e.latlng);
+                    var geojson = {
+                        "type": "Point",
+                        "coordinates": L.GeoJSON.latLngToCoords(e.latlng)
+                    };
+
+                    document.getElementById("id_geom").value = JSON.stringify(geojson);
+                });
+            }else if(edit == 'parking'){
+                window.map.on('click', function (e) {
+                    if(window.park_marker){
+                        window.park_marker.setLatLng(e.latlng);
+                    }else{
+                        window.park_marker = L.marker(e.latlng, {icon: editParkingIcon}).addTo(window.map);
+                    }
+                    var geojson = {
+                        "type": "Point",
+                        "coordinates": L.GeoJSON.latLngToCoords(e.latlng)
+                    };
+
+                    document.getElementById("id_parking_geom").value = JSON.stringify(geojson);
+                });
+            }                    
+            
+        }
+
+        </script>
 {% endblock %}
 
 {% block overwrite_styles %}
@@ -99,7 +146,9 @@
             <h1>Edit Spot :: {{ spot.name }}</h1>
 
             <form method="POST" action="{% url "edit_spot" spot_id=spot.pk %}">
-                {% csrf_token %}
+              {% csrf_token %}
+              <input type="button" value="Locate spot" onclick="on_spot_location('spot');" />
+              <input type="button" value="Locate parking" onclick="on_spot_location('parking');" />
                 {{ form.as_p }}
                 <input type="submit" value="save">
             </form>
