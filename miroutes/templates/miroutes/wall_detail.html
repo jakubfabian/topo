@@ -51,8 +51,10 @@
             map.zoomControl.setPosition("topright");
 
             var southWest = map.unproject([0, img_dim_y], map.getMaxZoom());
-            var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
-            map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
+             var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
+             var imBounds = new L.LatLngBounds(southWest, northEast);
+             map.setMaxBounds(imBounds);
+             map.fitBounds(imBounds);
 
             var wall_layer = L.tileLayer('{{ wall.get_tiles_url }}/{z}/{x}/{y}.png', {
                 minZoom: 0, maxZoom: maxzoom,
@@ -71,10 +73,10 @@
 
             // If there is a route list we add it to the map
             {% if wall_route_geom_list %}
-                var collection = {{ wall_route_geom_list|geojsonfeature|safe }};
-                layer = L.geoJson(collection);
-                layer.addTo(map);
-                map.fitBounds(layer.getBounds())
+             var collection = {{ wall_route_geom_list|geojsonfeature|safe }};
+             layer = L.geoJson(collection);
+             layer.addTo(map);
+             //map.fitBounds(layer.getBounds());
             {% endif %}
         }
     </script>
