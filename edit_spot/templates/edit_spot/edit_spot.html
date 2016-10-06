@@ -79,12 +79,32 @@
 
         }
 
-        function toggle_locate(toggle){
-            if(toggle == 'spot'){
+        function toggle_locate_spot(){
+            if($("#parking_locate_button").hasClass('active')){
+                $("#parking_locate_button").removeClass('active');
                 window.map.off('click', on_parking_location);
-                window.map.on('click', on_spot_location);
-            }else if(toggle == 'parking'){
+            }
+
+            if($("#spot_locate_button").hasClass('active')){
+                $("#spot_locate_button").removeClass('active')
                 window.map.off('click', on_spot_location);
+            } else {
+                $("#spot_locate_button").addClass('active')
+                window.map.on('click', on_spot_location);
+            }
+
+        }
+        function toggle_locate_parking(){
+            if($("#spot_locate_button").hasClass('active')){
+                $("#spot_locate_button").removeClass('active');
+                window.map.off('click', on_spot_location);
+            }
+
+            if($("#parking_locate_button").hasClass('active')){
+                $("#parking_locate_button").removeClass('active')
+                window.map.off('click', on_parking_location);
+            } else {
+                $("#parking_locate_button").addClass('active')
                 window.map.on('click', on_parking_location);
             }
         }
@@ -157,10 +177,13 @@
 
             <form method="POST" action="{% url "edit_spot" spot_id=spot.pk %}">
               {% csrf_token %}
-              <input type="button" value="Locate spot" onclick="toggle_locate('spot');" />
-              <input type="button" value="Locate parking" onclick="toggle_locate('parking');" />
+              <div class="button" id="spot_locate_button" onclick="toggle_locate_spot();">Locate spot</div>
+              <div class="button" id="parking_locate_button" onclick="toggle_locate_parking();" >Locate parking</div>
+              <br>
+              <div>
                 {{ form.as_p }}
-                <input type="submit" value="save">
+              </div>
+              <input type="submit" value="save">
             </form>
 
             <form method="GET" action="{% url "edit_spot_index" %}">

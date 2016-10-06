@@ -12,6 +12,22 @@
     height: calc(100% - 135px);
 }
 
+.button{
+    color: #333;
+    width: auto;
+    text-align: center;
+    padding: 5px 10px;
+    margin: 3px;
+    background: #f0f0f0;
+    line-height: 1.5em;
+    height: auto;
+}
+
+.button.active {
+    background: #ea0000;
+    color: #fff;
+}
+
 /*.existing_routes_box {*/
 /*max-height: 500px;*/
 /*overflow-y: auto;*/
