@@ -157,6 +157,8 @@
                     });
                     drawControl.setPosition("topright");
                     map.addControl(drawControl);
+                    polylinecontrol = new L.Draw.Polyline(map, drawControl.options.polyline);
+
 
                     function annotateGeom(layer, geomRouteName) {
                         // here we want to add popups below the route geometries with
@@ -199,6 +201,9 @@
 
 
                     function onGeomSelect(e) {
+                        // disable polyline control
+                        polylinecontrol.disable();
+
                         // Store the active geom id of the featureGroup
                         activeGeomId = e.target.routegeomid;
                         // activeFeatureGroup = e.target;
@@ -213,6 +218,8 @@
                                 remove: true,
                             }
                         }));
+                        
+                        // we immediately go to edit mode
                         var toolbar;
                         for (var toolbarId in drawControl._toolbars) {
                             toolbar = drawControl._toolbars[toolbarId];
@@ -265,7 +272,7 @@
 
 
                     document.addEventListener('newRouteEvent', function (e) {
-
+                        
                         activeGeomId = e.detail.geomid;
 
                         // Draw controls
@@ -280,16 +287,23 @@
                             },
                             edit: false
                         }));
+                        // let us enable the polyline tool
+                        // but be careful to disable when we click somewhere else!
+                        // This includes events: editRoute, GeomSelect, newRoute
+                        // polylinecontrol = new L.Draw.Polyline(map, drawControl.options.polyline);
+                        polylinecontrol.enable();
 
                     });
 
                     document.addEventListener('editRouteEvent', function (e) {
-
+                        // disable polylinecontrol
+                        polylinecontrol.disable();
+                        
                         activeGeomId = e.detail.geomid;
                         activeLayer = layerdict[activeGeomId];
 
+                        
                         // Edit controls
-
                         resetDrawControl(new L.Control.Draw({
                             draw: false,
                             edit: {
@@ -297,6 +311,15 @@
                                 remove: true
                             }
                         }));
+
+                        // in case we edit we immediately go to edit mode
+                        var toolbar;
+                        for (var toolbarId in drawControl._toolbars) {
+                            toolbar = drawControl._toolbars[toolbarId];
+                            if (toolbar instanceof L.EditToolbar) {
+                                toolbar._modes.edit.handler.enable();
+                            }
+                        }
 
                     });
 
