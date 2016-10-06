@@ -79,34 +79,44 @@
 
         }
 
-        function on_spot_location(edit){
-            if(edit == 'spot'){
-                window.map.on('click', function (e) {
-                    window.edit_marker.setLatLng(e.latlng);
-                    var geojson = {
-                        "type": "Point",
-                        "coordinates": L.GeoJSON.latLngToCoords(e.latlng)
-                    };
-
-                    document.getElementById("id_geom").value = JSON.stringify(geojson);
-                });
-            }else if(edit == 'parking'){
-                window.map.on('click', function (e) {
-                    if(window.park_marker){
-                        window.park_marker.setLatLng(e.latlng);
-                    }else{
-                        window.park_marker = L.marker(e.latlng, {icon: editParkingIcon}).addTo(window.map);
-                    }
-                    var geojson = {
-                        "type": "Point",
-                        "coordinates": L.GeoJSON.latLngToCoords(e.latlng)
-                    };
-
-                    document.getElementById("id_parking_geom").value = JSON.stringify(geojson);
-                });
-            }                    
-            
+        function toggle_locate(toggle){
+            if(toggle == 'spot'){
+                window.map.off('click', on_parking_location);
+                window.map.on('click', on_spot_location);
+            }else if(toggle == 'parking'){
+                window.map.off('click', on_spot_location);
+                window.map.on('click', on_parking_location);
+            }
         }
+            
+        
+        function on_spot_location(e){
+                window.edit_marker.setLatLng(e.latlng);
+                var geojson = {
+                    "type": "Point",
+                    "coordinates": L.GeoJSON.latLngToCoords(e.latlng)
+                };
+
+                document.getElementById("id_geom").value = JSON.stringify(geojson);
+        }
+        
+        function on_parking_location(e){
+            
+            if(window.park_marker){
+                window.park_marker.setLatLng(e.latlng);
+            }else{
+                window.park_marker = L.marker(e.latlng, {icon: editParkingIcon}).addTo(window.map);
+            }
+            var geojson = {
+                "type": "Point",
+                "coordinates": L.GeoJSON.latLngToCoords(e.latlng)
+            };
+            
+            document.getElementById("id_parking_geom").value = JSON.stringify(geojson);
+        }
+                            
+            
+        
 
         </script>
 {% endblock %}
@@ -147,8 +157,8 @@
 
             <form method="POST" action="{% url "edit_spot" spot_id=spot.pk %}">
               {% csrf_token %}
-              <input type="button" value="Locate spot" onclick="on_spot_location('spot');" />
-              <input type="button" value="Locate parking" onclick="on_spot_location('parking');" />
+              <input type="button" value="Locate spot" onclick="toggle_locate('spot');" />
+              <input type="button" value="Locate parking" onclick="toggle_locate('parking');" />
                 {{ form.as_p }}
                 <input type="submit" value="save">
             </form>
