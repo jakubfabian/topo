@@ -23,6 +23,17 @@
             background: #F39814;
             color: black;
         }
+        #route_list {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            width: 60%; }
+        
+        #selectable li {
+            margin: 3px;
+            padding: 0.4em;
+            font-size: 1.0em;
+            height: 18px; }
 
 
     </style>
@@ -181,6 +192,13 @@
                          .openOn(map);*/
                     }
 
+                    function hide (elements) {
+                        elements = elements.length ? elements : [elements];
+                        for (var index = 0; index < elements.length; index++) {
+                            elements[index].style.display = 'none';
+                        }
+                    }
+
                     function resetDrawControl(newDrawControl) {
                         // utility function to reset the draw controls and (in case) provide
                         // new draw controls
@@ -197,6 +215,7 @@
                         drawControl.setPosition("topright");
 
                         map.addControl(drawControl);
+                        hide($(".leaflet-draw-toolbar"));
                     }
 
 
@@ -206,30 +225,18 @@
 
                         // Store the active geom id of the featureGroup
                         activeGeomId = e.target.routegeomid;
-                        // activeFeatureGroup = e.target;
-                        // This is the on-click handler of the geometries
-                        // We only add edit controls.
-                        activeLayer = e.target;
-                        // Edit controls
-                        resetDrawControl(new L.Control.Draw({
-                            draw: false,
-                            edit: {
-                                featureGroup: activeLayer,
-                                remove: true,
-                            }
-                        }));
+
+                        // Select route in routelist
+                        var idstring = "#rl_element_" + activeGeomId;
+
+                        // Unselect all
+                        var allselected = $(".ui-selected", $("#route_list"));
+                        allselected.not(idstring).removeClass("ui-selected").addClass("ui-unselecting");
                         
-                        // we immediately go to edit mode
-                        var toolbar;
-                        for (var toolbarId in drawControl._toolbars) {
-                            toolbar = drawControl._toolbars[toolbarId];
-                            if (toolbar instanceof L.EditToolbar) {
-                                toolbar._modes.edit.handler.enable();
-                            }
-                        }
-                        // drawControl.hideButton(); will come in future version
+                        $(idstring).addClass("ui-selecting");
+                        var tmp = $('#route_list').data("ui-selectable")._mouseStop(null);
 
-
+                        
                     }
 
                     function addToLayerdict(geomid, layer) {
@@ -320,12 +327,16 @@
                                 toolbar._modes.edit.handler.enable();
                             }
                         }
+                        // hide buttons "Save" and "Cancel". This is so dirty!
+                        hide($(".leaflet-draw-actions"));
 
                     });
 
 
+                    
                     map.on('draw:created', function (e) {
 
+                        polylinecontrol.disable();
                         // we select the drawn layer and write it to the map
                         var featureGroup = L.featureGroup([e.layer]);
                         featureGroup.addTo(map);
@@ -398,7 +409,7 @@
                     <ol id="route_list">
                         {% for routegeom in wall_routegeomlist %}
                             <!-- We save geometry and route name in the list -->
-                            <li class="ui-widget-content" value="{{ routegeom.id }}" data-geom="{{ routegeom.geom }}"
+                            <li class="ui-widget-content" id="rl_element_{{ routegeom.id }}" value="{{ routegeom.id }}" data-geom="{{ routegeom.geom }}"
                                 data-name="{{ routegeom.route.name }}">
                                 {{ routegeom.route.name }}
                                 <input id="geom_inputfield_{{ routegeom.id }}" type="hidden"

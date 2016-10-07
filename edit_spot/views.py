@@ -263,7 +263,7 @@ def draw_routes(request, wall_id, **kwargs):
                 geomstr = request.POST.get(key)
                 # If the geometry is not drawn on the image
                 # we just leave everything as is
-                if geomstr != 'None':
+                if geomstr != 'None' and geomstr != '':
                     print "Geometrystring: {}".format(geomstr)
                     rgid = key.split('_')[1]
                     geom_obj = RouteGeometry.objects.get(pk=rgid)
