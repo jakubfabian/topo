@@ -12,6 +12,7 @@
     {% leaflet_js %}
     {% leaflet_css %}
 
+
     <script type="text/javascript">
 
         function map_init(map, options) {
@@ -29,7 +30,7 @@
 
             var group = L.featureGroup(markerArray);
 
-            map.options.maxZoom = 15;
+            map.options.maxZoom = 17;
             markers = new L.MarkerClusterGroup();
             markers.addLayer(group);
 
