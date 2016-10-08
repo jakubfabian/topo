@@ -119,11 +119,10 @@
                     polyline = L.polyline(layer.getLatLngs());
                 });
                 
-                console.log("Creating new feature group with polyline layer with id" + geomids[i])
+                console.log("Creating new feature group with polyline layer with id" + geomids[i]);
                 
                 var featureGroup = L.featureGroup([polyline]);
-                featureGroup.routegeomid = geomids[i];
-                addToLayerdict(geomids[i], featureGroup)
+                addToLayerdict(geomids[i], featureGroup);
             }
         }
         
@@ -192,6 +191,7 @@
     function addToLayerdict(geomid, layer) {
         // Utility function to add a pair of geomid and references
         // to the layer to a dict, add the onClick handler and the layer to the map.
+        layer.routegeomid = geomid;
         layerdict[geomid] = layer;
         layer.addTo(map);
         layer.on('click', on_click_polyline);
@@ -444,7 +444,7 @@
                     <ol id="route_list">
                         {% for routegeom in wall_routegeomlist %}
                             <!-- We save geometry and route name in the list -->
-                            <li class="ui-widget-content" value="{{ routegeom.id }}"
+                            <li id="rl_element_{{ routegeom.id}}" class="ui-widget-content" value="{{ routegeom.id }}"
                                 data-name="{{ routegeom.route.name }}">
                                 {{ routegeom.route.name }}
                                 <input id="geom_inputfield_{{ routegeom.id }}" type="hidden"
