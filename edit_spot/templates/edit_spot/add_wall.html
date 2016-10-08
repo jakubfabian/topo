@@ -23,20 +23,13 @@ function map_init_basic(map, options) {
     var existingwalls = {{ wall_list|geojsonfeature|safe }};
     existingwallsLayer = L.geoJson(existingwalls, {
         pointToLayer: function (feature, latlng) {
-            return L.marker(latlng);
+            return L.marker(latlng, {icon: LeafletWallIcon});
         }
     });
 
     markers = new L.MarkerClusterGroup();
     markers.addLayer(existingwallsLayer);
     map.addLayer(markers);
-
-    editwallIcon = L.icon({
-        iconUrl: '{% static "edit_spot/img/edit_marker_icon.png" %}',
-        iconSize: [25,41], // size of the icon
-        iconAnchor: [12, 41], // point of the icon which will correspond to marker's location
-        popupAnchor: [1, -34] // point from which the popup should open relative to the iconAnchor
-    });
 
     var newwall;
 
@@ -45,7 +38,7 @@ function map_init_basic(map, options) {
         var edit_marker;
         editSpotLayer = L.geoJson(editing_Spot, {
             pointToLayer: function (feature, latlng) {
-                edit_marker = L.marker(latlng);
+                edit_marker = L.marker(latlng, {icon: LeafletWallIcon});
                 return edit_marker;
             }
         });
@@ -56,7 +49,7 @@ function map_init_basic(map, options) {
 
     map.on('click', function (e) {
         if (newwall === undefined) {
-            newwall = new L.marker(e.latlng, {icon: editwallIcon}).addTo(map);
+            newwall = new L.marker(e.latlng, {icon: LeafletEditWallIcon}).addTo(map);
         } else {
             newwall.setLatLng(e.latlng);
         }

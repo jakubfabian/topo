@@ -1,0 +1,47 @@
+{% comment %}
+I guess this has to be a included template instead of just a js import because we want the static paths to be resolved with the local contexts
+{% endcomment %}
+
+{% load static %}
+<script type="text/javascript">
+
+var LeafletWallIcon = L.icon({
+    iconUrl: '{% static "miroutes/img/leaflet_wall_icon.png" %}',
+    iconSize: [30, 30], // size of the icon
+    iconAnchor: [15, 15], // point of the icon which will correspond to marker's location
+    popupAnchor: [1, -34] // point from which the popup should open relative to the iconAnchor
+});
+
+LeafletEditWallIcon = L.icon({
+    iconUrl: '{% static "edit_spot/img/edit_marker_icon.png" %}',
+    iconSize: [25,41], // size of the icon
+    iconAnchor: [12, 41], // point of the icon which will correspond to marker's location
+    popupAnchor: [1, -34] // point from which the popup should open relative to the iconAnchor
+});
+
+
+var LeafletParkingIcon = L.icon({
+    iconUrl: '{% static "edit_spot/img/edit_parking_icon.png" %}',
+    iconSize: [30, 30], // size of the icon
+    iconAnchor: [15, 15], // point of the icon which will correspond to marker's location
+    popupAnchor: [1, -34] // point from which the popup should open relative to the iconAnchor
+});
+var LeafletEditParkingIcon = L.icon({
+    iconUrl: '{% static "edit_spot/img/edit_parking_icon.png" %}',
+    iconSize: [30, 30], // size of the icon
+    iconAnchor: [15, 15], // point of the icon which will correspond to marker's location
+    popupAnchor: [1, -34] // point from which the popup should open relative to the iconAnchor
+});
+
+
+LeafletEditSpotIcon = L.icon({
+    iconUrl: '{% static "edit_spot/img/edit_marker_icon.png" %}',
+    iconSize: [25, 41], // size of the icon
+    iconAnchor: [12, 41], // point of the icon which will correspond to marker's location
+    popupAnchor: [1, -34] // point from which the popup should open relative to the iconAnchor
+});
+
+
+
+</script>
+
