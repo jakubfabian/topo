@@ -2,7 +2,11 @@
 {% load staticfiles %}
 
 {% block title %}
-    Mitopo.de - Add new Route
+  {% if editing %}
+    Mitopo.de - Editing route {{ route.name }}
+  {% else %}
+    Mitopo.de - Add route
+  {% endif %}
 {% endblock %}
 
 {% block extra_assets %}
@@ -41,7 +45,13 @@
             <div class="tb_table">
                 <div class="tb_row">
                     <div class="tb_cell">
-                        <h2>Add new Route</h2>
+                      <h2>
+                        {% if editing %}
+                          {{ spot.name }} :: Edit route {{route.name}}
+                        {% else %}
+                          {{ spot.name }} :: Add route
+                        {% endif %}
+                      </h2>
 
                         <form method="POST">
                             {% csrf_token %}
@@ -61,7 +71,7 @@
         <div class="col-md-6 white-background">
 
             <div class="tb_cell">
-                <h2>Existing Routes:</h2>
+                <h2>Existing Routes <a href="{% url "add_route" spot_id=spot.pk %}">{{ editing|yesno:"(add),," }}</a></h2>
                 <div class="existing_routes_box">
                     <table style="width:100%">
                         <tr>
@@ -76,6 +86,7 @@
                                 <td>{{ route.grade }}</td>
                                 <td>{{ route.length }}</td>
                                 <td>{{ route.rating }}</td>
+                                <td><a href="{% url "edit_route" route_id=route.pk %}">edit</a></td>
                             </tr>
                         {% endfor %}
                     </table>

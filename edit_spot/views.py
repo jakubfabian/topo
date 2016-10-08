@@ -231,6 +231,7 @@ def add_route(request, spot_id, **kwargs):
     route_list = spot.route_set.all().order_by('name')
 
     context = {
+        'editing': False,
         'spot': spot,
         'route_list': route_list,
         'form': form,
@@ -240,7 +241,40 @@ def add_route(request, spot_id, **kwargs):
     if request.session.get('last_wall_id'):
         context['last_wall_id'] = request.session['last_wall_id']
 
-    return render(request, 'edit_spot/add_route.html', context)
+    return render(request, 'edit_spot/edit_route.html', context)
+
+@permission_required('miroutes.spot.can_add')
+def edit_route(request, route_id, **kwargs):
+    """
+    Adding a new Route.
+    """
+    route = get_object_or_404(Route, pk=route_id)
+    spot = route.spot
+
+    if request.method == 'POST':
+
+        form = RouteForm(request.POST, instance=route)
+        if form.is_valid():
+            form.save()
+    else:
+        form = RouteForm(initial={'spot': spot}, instance=route)
+        # form = RouteForm()
+
+    route_list = spot.route_set.all().order_by('name')
+
+    context = {
+        'editing': True,
+        'spot': spot,
+        'route': route,
+        'route_list': route_list,
+        'form': form,
+        'show_edit_pane': True
+    }
+
+    if request.session.get('last_wall_id'):
+        context['last_wall_id'] = request.session['last_wall_id']
+
+    return render(request, 'edit_spot/edit_route.html', context)
 
 
 @permission_required('miroutes.wall.can.change')
