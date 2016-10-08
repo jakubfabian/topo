@@ -8,11 +8,12 @@ from djgeojson.fields import PointField
 
 from miroutes.tasks import tile_image
 
-RATING_CHOICES = ((1, 'poor'),
-                  (2, 'ok'),
-                  (3, 'not bad'),
-                  (4, 'good'),
-                  (5, 'excellent'))
+RATING_CHOICES = (
+    (1, 'poor'),
+    (2, 'ok'),
+    (3, 'not bad'),
+    (4, 'good'),
+    (5, 'excellent'))
 
 GRADE_SYSTEMS = (
     (0, 'France'),
@@ -46,6 +47,7 @@ class Spot(models.Model):
     approach_time = models.DurationField(
         choices=DURATION_CHOICES,
         default=timedelta(minutes=15))
+    grade_system = models.IntegerField(default=0, choices=GRADE_SYSTEMS)
 
 
     def __str__(self):
@@ -308,16 +310,6 @@ class Route(models.Model):
         description: Comments and caveats on the route.
         
     """
-    GRADE_CHOICES = [(('5a', '5a'),
-                      ('5b', '5b'),
-                      ('5c', '5c'),
-                      ('6a', '6a'),
-                      ('6b', '6b'),
-                      ('6c', '6c'),
-                      ('7a', '7a')),
-                     (('5-', '5-'),
-                      ('5', '5'),
-                      ('5+', '5+'))]
 
     # Every route is located at a climbing spot
     spot = models.ForeignKey(Spot, default=None)
@@ -327,14 +319,14 @@ class Route(models.Model):
 
     name = models.CharField(max_length=100)
 
-    grade = models.CharField(max_length=4, blank=True, null=True)
+    grade = models.IntegerField()
 
-    rating = models.IntegerField(default='1', choices=RATING_CHOICES)
+    rating = models.IntegerField(blank=True, null=True, choices=RATING_CHOICES)
 
     length = models.IntegerField(blank=True, null=True)
 
     number_of_bolts = models.IntegerField(blank=True, null=True)
-    security_rating = models.IntegerField(default=3)
+    security_rating = models.IntegerField(blank=True, null=True, choices=RATING_CHOICES)
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):

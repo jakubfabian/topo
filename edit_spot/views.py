@@ -225,7 +225,7 @@ def add_route(request, spot_id, **kwargs):
         if form.is_valid():
             form.save()
     else:
-        form = RouteForm(initial={'spot': spot})
+        form = RouteForm(spot, initial={'spot': spot})
         # form = RouteForm()
 
     route_list = spot.route_set.all().order_by('name')
@@ -253,11 +253,11 @@ def edit_route(request, route_id, **kwargs):
 
     if request.method == 'POST':
 
-        form = RouteForm(request.POST, instance=route)
+        form = RouteForm(spot, request.POST, instance=route)
         if form.is_valid():
             form.save()
     else:
-        form = RouteForm(initial={'spot': spot}, instance=route)
+        form = RouteForm(spot, initial={'spot': spot}, instance=route)
         # form = RouteForm()
 
     route_list = spot.route_set.all().order_by('name')
