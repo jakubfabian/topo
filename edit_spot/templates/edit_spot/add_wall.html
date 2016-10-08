@@ -23,7 +23,7 @@ function map_init_basic(map, options) {
     var existingwalls = {{ wall_list|geojsonfeature|safe }};
     existingwallsLayer = L.geoJson(existingwalls, {
         pointToLayer: function (feature, latlng) {
-            return L.marker(latlng);
+            return L.marker(latlng, {icon: LeafletWallIcon});
         }
     });
 
@@ -38,7 +38,7 @@ function map_init_basic(map, options) {
         var edit_marker;
         editSpotLayer = L.geoJson(editing_Spot, {
             pointToLayer: function (feature, latlng) {
-                edit_marker = L.marker(latlng);
+                edit_marker = L.marker(latlng, {icon: LeafletWallIcon});
                 return edit_marker;
             }
         });
