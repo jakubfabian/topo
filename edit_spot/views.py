@@ -241,7 +241,7 @@ def add_route(request, spot_id, **kwargs):
     if request.session.get('last_wall_id'):
         context['last_wall_id'] = request.session['last_wall_id']
 
-    return render(request, 'edit_spot/edit_route.html', context)
+    return render(request, 'edit_spot/edit_routepool.html', context)
 
 @permission_required('miroutes.spot.can_add')
 def edit_route(request, route_id, **kwargs):
@@ -274,7 +274,7 @@ def edit_route(request, route_id, **kwargs):
     if request.session.get('last_wall_id'):
         context['last_wall_id'] = request.session['last_wall_id']
 
-    return render(request, 'edit_spot/edit_route.html', context)
+    return render(request, 'edit_spot/edit_routepool.html', context)
 
 
 @permission_required('miroutes.wall.can.change')
