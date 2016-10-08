@@ -31,7 +31,7 @@
             {% for wall in wall_listing %}
                 var coord = L.latLng({{ wall.geom.coordinates }});
                 var newcoord = L.latLng(coord.lng, coord.lat);
-                var mc = new L.marker(newcoord);
+                var mc = new L.marker(newcoord, {icon: LeafletWallIcon});
                 mc.bindPopup("<a href={% url "wall_detail" wall_id=wall.id %}>{{wall.name}}</a>");
                 markerArray.push(mc);
             {% endfor %}

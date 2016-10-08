@@ -31,13 +31,6 @@ function map_init_basic(map, options) {
     markers.addLayer(existingwallsLayer);
     map.addLayer(markers);
 
-    editwallIcon = L.icon({
-        iconUrl: '{% static "edit_spot/img/edit_marker_icon.png" %}',
-        iconSize: [25,41], // size of the icon
-        iconAnchor: [12, 41], // point of the icon which will correspond to marker's location
-        popupAnchor: [1, -34] // point from which the popup should open relative to the iconAnchor
-    });
-
     var newwall;
 
     if(existingwalls.features.length === 0) {
@@ -56,7 +49,7 @@ function map_init_basic(map, options) {
 
     map.on('click', function (e) {
         if (newwall === undefined) {
-            newwall = new L.marker(e.latlng, {icon: editwallIcon}).addTo(map);
+            newwall = new L.marker(e.latlng, {icon: LeafletEditWallIcon}).addTo(map);
         } else {
             newwall.setLatLng(e.latlng);
         }

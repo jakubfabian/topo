@@ -35,21 +35,8 @@
             markers.addLayer(existingSpotsLayer);
             map.addLayer(markers);
 
-            editSpotIcon = L.icon({
-                iconUrl: '{% static "edit_spot/img/edit_marker_icon.png" %}',
-                iconSize: [25, 41], // size of the icon
-                iconAnchor: [12, 41], // point of the icon which will correspond to marker's location
-                popupAnchor: [1, -34] // point from which the popup should open relative to the iconAnchor
-            });
-            editParkingIcon = L.icon({
-                iconUrl: '{% static "edit_spot/img/edit_parking_icon.png" %}',
-                iconSize: [30, 30], // size of the icon
-                iconAnchor: [15, 15], // point of the icon which will correspond to marker's location
-                popupAnchor: [1, -34] // point from which the popup should open relative to the iconAnchor
-            });
-
             var editing_Spot = {{ spot|geojsonfeature|safe }};
-          var editing_Parking = {{ spot|geojsonfeature:":parking_geom"|safe }};
+            var editing_Parking = {{ spot|geojsonfeature:":parking_geom"|safe }};
           
           // edit and park marker are make available globally
           edit_marker = null;
@@ -57,14 +44,14 @@
             
             editSpotLayer = L.geoJson(editing_Spot, {
                 pointToLayer: function (feature, latlng) {
-                    edit_marker = L.marker(latlng, {icon: editSpotIcon});
+                    edit_marker = L.marker(latlng, {icon: LeafletEditSpotIcon});
                     return edit_marker;
                 }
             });
 
             editParkingLayer = L.geoJson(editing_Parking, {
                 pointToLayer: function (feature, latlng) {
-                    park_marker = L.marker(latlng, {icon: editParkingIcon});
+                    park_marker = L.marker(latlng, {icon: LeafletEditParkingIcon});
                     return park_marker;
                 }
             });
@@ -125,7 +112,7 @@
             if(window.park_marker){
                 window.park_marker.setLatLng(e.latlng);
             }else{
-                window.park_marker = L.marker(e.latlng, {icon: editParkingIcon}).addTo(window.map);
+                window.park_marker = L.marker(e.latlng, {icon: LeafletEditParkingIcon}).addTo(window.map);
             }
             var geojson = {
                 "type": "Point",
