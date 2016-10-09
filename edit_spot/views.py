@@ -221,7 +221,7 @@ def add_route(request, spot_id, **kwargs):
 
     if request.method == 'POST':
 
-        form = RouteForm(request.POST)
+        form = RouteForm(spot, request.POST)
         if form.is_valid():
             form.save()
     else:
