@@ -315,7 +315,7 @@ class Route(models.Model):
     spot = models.ForeignKey(Spot, default=None)
     # The relation to one or many walls is via the geometry of the route
     walls = models.ManyToManyField(WallView, through='RouteGeometry')
-    climbers = models.ManyToManyField(User, through='Climb')
+    climbers = models.ManyToManyField(User, through='Ascent')
 
     name = models.CharField(max_length=100)
 
@@ -342,7 +342,7 @@ class RouteGeometry(models.Model):
     geom = LineStringField()
 
 
-class Climb(models.Model):
+class Ascent(models.Model):
     """
     Relates a user (climber) to a route "through" the details of
     a climbing attempt.
