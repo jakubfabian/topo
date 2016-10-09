@@ -21,6 +21,27 @@ GRADE_SYSTEMS = (
     (2, 'UK'),
     (3, 'Sierra'))
 
+GRADE_CHOICES = (
+       (101, '4b+'),
+       (102, '4c-'),
+       (103, '4c'),
+       (104, '4c+'),
+       (105, '5a-'),
+       (201, 'IV-'),
+       (202, 'IV'),
+       (203, 'IV+'),
+       (204, 'V-'),
+       (205, 'V'),
+       (301, 'S, 4a'),
+       (302, 'HS, 4b'),
+       (303, 'VS, 4c'),
+       (304, 'HVS, 5a'),
+       (305, 'E1, 5b'),
+       (401, '5.4'),
+       (402, '5.5'),
+       (403, '5.6'),
+       (404, '5.7'),
+       (405, '5.8'))
 
 class Spot(models.Model):
     """A spot denotes a region with multiple associated walls.
@@ -319,7 +340,7 @@ class Route(models.Model):
 
     name = models.CharField(max_length=100)
 
-    grade = models.IntegerField()
+    grade = models.IntegerField(choices=GRADE_CHOICES)
 
     rating = models.IntegerField(blank=True, null=True, choices=RATING_CHOICES)
 

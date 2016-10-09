@@ -115,11 +115,23 @@
         <br>
 
         <ul class="wall_route_list">
+              <table style="width:100%">
+                        <tr>
+                            <th>name</th>
+                            <th>grade</th>
+                            <th>length</th>
+                            <th>rating</th>
+                        </tr>
             {% for routegeom in wall_route_geom_list %}
-                <li><a href="{% url "route_detail" route_id=routegeom.route.pk %}">( {{ routegeom.route.grade }}
-                    ) {{ routegeom.route.name }}</a></li>
+                            <tr>
+                                <td><a href="{% url "route_detail" route_id=routegeom.route.pk %}">{{ routegeom.route.name }} </a></td>
+                                <td>{{ routegeom.route.get_grade_display }}</td>
+                                <td>{{ routegeom.route.length }}</td>
+                                <td>{{ routegeom.route.rating }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
 
-            {% endfor %}
         </ul>
     {% else %}
         <p>Currently no routes are available in {{ wall.name }}</p>
