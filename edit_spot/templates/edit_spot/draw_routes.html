@@ -240,16 +240,14 @@
         polylinecontrol.disable();
     }
 
-    function on_edit_route (geomid, cell) {
+    function on_edit_route (geomid) {
     // disable polylinecontrol
         clean_handles();
 
-        $(cell).children('img')
+        $("#edit_route_img_id_" + geomid)
             .attr('src', "{% static "edit_spot/img/save.png" %}")
-            .attr('width', '18');
-        $(cell).click( function (){
-            clean_handles();
-        });
+            .attr('class', 'draw_route_tool_img')
+            .attr('onclick', 'clean_handles()');
     
 
         activeGeomId = geomid;
@@ -281,24 +279,9 @@
 
 
     function on_click_polyline(e) {
-        // Here we just use the iQuery framework to
-        // select the corresponding route in the list selector
-        //
-        
-        // Store the active geom id of the featureGroup
-        activeGeomId = e.target.routegeomid;
+        // when the polyline is clicked we call the edit routine
+        on_edit_route(e.target.routegeomid);
 
-        // Select route in routelist
-        var idstring = "#rl_element_" + activeGeomId;
-
-        // Unselect all
-        var allselected = $(".ui-selected", $("#route_list"));
-        allselected.not(idstring).removeClass("ui-selected").addClass("ui-unselecting");
-                        
-        $(idstring).addClass("ui-selecting");
-        $('#route_list').data("ui-selectable")._mouseStop(null);
-
-                        
     }
 
 
@@ -368,21 +351,21 @@
         if(geomstring == "None"){
             $("#routetable tr:last td:nth-child(4)").append($('<img>')
                                                             .attr('src', "{% static "edit_spot/img/edit.png" %}")
-                                                            .attr('width', '18')
+                                                            .attr('class', 'draw_route_tool_img')
                                                             .attr('onclick', "on_new_route({{ routegeom.id }})")
                                                            );
         }else{
-            var cell = $("#routetable tr:last td:nth-child(4)");
-            cell.append($('<img>')
-                        .attr('src', "{% static "edit_spot/img/edit-1.png" %}")
-                        .attr('width', '18')
-                       );
-            cell.click(function() {
-                on_edit_route({{ routegeom.id }}, this);
-            });
+            // Note that we choose a id for the image tag
+            // to find it easily in the on_edit_route func and change the img.
+            $("#routetable tr:last td:nth-child(4)").append($('<img>')
+                                                            .attr('id', "edit_route_img_id_{{ routegeom.id }}")
+                                                            .attr('src', "{% static "edit_spot/img/edit-1.png" %}")
+                                                            .attr('class', 'draw_route_tool_img')
+                                                            .attr('onclick', "on_edit_route({{ routegeom.id }})")
+                                                           );
             $("#routetable tr:last td:nth-child(5)").append($('<img>')
                                                             .attr('src', "{% static "edit_spot/img/garbage.png" %}")
-                                                            .attr('width', '18')
+                                                            .attr('class', 'draw_route_tool_img')
                                                             .attr('onclick', "on_del_route({{ routegeom.id }})")
                                                            );
         }
