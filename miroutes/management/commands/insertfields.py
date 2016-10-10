@@ -32,7 +32,7 @@ class Command(BaseCommand):
         w.background_img.save('seewand_pano.png', File(open(fname_image)))
 
         for j in range(0, 30):
-            r = Route(name="testRoute" + str(j), grade="5b", spot=s)
+            r = Route(name="testRoute" + str(j), grade="201", spot=s)
             r.save()
 
             route_geom = {u'coordinates': [[90 + j * 3, -i] for i in xrange(9, 25)], u'type': u'LineString'}
@@ -48,7 +48,7 @@ class Command(BaseCommand):
         w.save()
         w.background_img.save('lost_arrow.png', File(open(fname_image)))
 
-        r = Route(name="testRoute1", grade="6b", spot=s2)
+        r = Route(name="testRoute1", grade=101, spot=s2)
         r.save()
 
         route_geom = {u'coordinates': [[90, -i] for i in xrange(9, 25)], u'type': u'LineString'}
