@@ -12,8 +12,8 @@ docker rmi $(docker images | grep topo_web | awk '{ print $3 }')
 
 if [ "$1" == "force" ]; then
    echo "== deleting also images =="
-   docker rmi $(docker images -q)
+   docker rmi --force $(docker images -q)
 fi
 
 sudo rm -rf */migrations
-
+sudo rm -rf www/media/wall_pictures/background/*

@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'edit_spot',
     'users',
     'reversion',
+    'dbbackup',  # django-dbbackup
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -101,11 +102,10 @@ WSGI_APPLICATION = 'mitopo.wsgi.application'
 
 DATABASES = {
     'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 	'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres',
         'USER': 'postgres',
+	'PASSWORD': '',
         'HOST': 'postgresql',
         'PORT': 5432,
     }
@@ -176,3 +176,7 @@ LEAFLET_CONFIG = {
 }
 
 LOGIN_URL="/users/login"
+
+# Paths for database backups
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join( WEB_ROOT, 'backups')}

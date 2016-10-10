@@ -8,3 +8,4 @@ jsonfield
 Pillow
 numpy
 celery
+django-dbbackup
