@@ -372,46 +372,6 @@
         {% endfor %}
     }
     
-                
-    function route_selector_setup() {
-        //Main entry point. All init is done here
-
-        // route list selections
-        $("#route_list").selectable({
-            // on select we do something
-            selected: function (event, ui) {
-                // only one item can be selected!
-                $(ui.selected).siblings().removeClass("ui-selected");
-                $(ui.selected).addClass("ui-selected");
-                // toggle mode!
-                if ($(ui.selected).hasClass('click-selected')) {
-                    $(ui.selected).removeClass('ui-selected click-selected');
-                    clean_handles();
-                    return;
-                } else {
-                    $(ui.selected).addClass('click-selected');
-
-                }
-
-                activeGeomId = $(ui.selected).val();
-                var inputfield = document.getElementById("geom_inputfield_" + activeGeomId);
-
-                var geomstring = inputfield.value;
-                
-                
-                if (geomstring == "None") {
-                    on_new_route();
-                } else {
-                    on_edit_route();
-                }
-            },
-            unselected: function (event, ui) {
-                $(ui.unselected).removeClass('click-selected');
-                clean_handles();
-            }
-        });
-    }
-
 
     $(document).ready(function () {
         map_init('wallmap');
@@ -511,7 +471,6 @@
                 </tbody>
               </table>
                       
-              <button onclick="generate_routelist()">Generate Routelist</button>
             </div>
 
             <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
