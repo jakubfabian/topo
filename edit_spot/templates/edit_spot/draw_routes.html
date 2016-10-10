@@ -154,6 +154,7 @@
             // remove the draw controls
             resetDrawControl();
             activeGeomId = null;
+            generate_routelist();
 
         });
 
@@ -182,6 +183,7 @@
             // remove the draw controls
             resetDrawControl();
             // activeGeomId = null;
+            generate_routelist();
         
         });
 
@@ -238,10 +240,19 @@
         polylinecontrol.disable();
     }
 
-    function on_edit_route () {
-        // disable polylinecontrol
+    function on_edit_route (geomid, cell) {
+    // disable polylinecontrol
         clean_handles();
 
+        $(cell).children('img')
+            .attr('src', "{% static "edit_spot/img/save.png" %}")
+            .attr('width', '18');
+        $(cell).click( function (){
+            clean_handles();
+        });
+    
+
+        activeGeomId = geomid;
         var activeLayer = layerdict[activeGeomId];
 
                         
@@ -292,7 +303,9 @@
 
 
 
-    function on_new_route () {
+    function on_new_route (geomid) {
+        activeGeomId = geomid;
+        
         // Draw controls
 
         resetDrawControl(new L.Control.Draw({
@@ -313,7 +326,9 @@
 
     }
 
-    function on_del_route () {
+    function on_del_route (geomid) {
+        activeGeomId = geomid;
+        
         clean_handles();
         try{
             map.removeLayer(layerdict[activeGeomId]);
@@ -322,9 +337,57 @@
         }
 
         document.getElementById("geom_inputfield_" + activeGeomId).value = "None";
+        generate_routelist()
 
     }
 
+    function generate_routelist(){
+        // generate a list of routes in the list with id #routelist
+        // clear table
+        $("#routetable tbody").remove();
+        $("#routetable").append($('<tbody>'));
+        {% for routegeom in wall_routegeomlist %}
+        $("#routetable").find('tbody')
+            .append($('<tr>')
+                    .append($('<td>')
+                            .text('{{ routegeom.route.name }}')
+                           )
+                    .append($('<td>')
+                            .text('{{ routegeom.route.get_grade_display }}')
+                           )
+                    .append($('<td>')
+                            .text('{{ routegeom.route.rating }}')
+                           )
+                    .append($('<td>'))
+                    .append($('<td>'))
+                   );
+                
+        // Check if there is a geometry string
+        var geomstring = $("#geom_inputfield_{{ routegeom.id }}").val();
+        
+        if(geomstring == "None"){
+            $("#routetable tr:last td:nth-child(4)").append($('<img>')
+                                                            .attr('src', "{% static "edit_spot/img/edit.png" %}")
+                                                            .attr('width', '18')
+                                                            .attr('onclick', "on_new_route({{ routegeom.id }})")
+                                                           );
+        }else{
+            var cell = $("#routetable tr:last td:nth-child(4)");
+            cell.append($('<img>')
+                        .attr('src', "{% static "edit_spot/img/edit-1.png" %}")
+                        .attr('width', '18')
+                       );
+            cell.click(function() {
+                on_edit_route({{ routegeom.id }}, this);
+            });
+            $("#routetable tr:last td:nth-child(5)").append($('<img>')
+                                                            .attr('src', "{% static "edit_spot/img/garbage.png" %}")
+                                                            .attr('width', '18')
+                                                            .attr('onclick', "on_del_route({{ routegeom.id }})")
+                                                           );
+        }
+        {% endfor %}
+    }
     
                 
     function route_selector_setup() {
@@ -369,7 +432,8 @@
 
     $(document).ready(function () {
         map_init('wallmap');
-        route_selector_setup();
+        //route_selector_setup();
+        generate_routelist();
     });
   </script>
 
@@ -413,7 +477,6 @@
               
               // The leaflet part
 
-
               function annotateGeom(layer, geomRouteName) {
                         // here we want to add popups below the route geometries with
                         // the route names as labels
@@ -435,7 +498,9 @@
                          .openOn(map);*/
               }
 
-            </script>
+
+
+              </script>
 
         </div>
         <div class="col-lg-3 col-lg-pull-9 white-background full-height">
@@ -446,32 +511,35 @@
             <a href="{% url "wall_detail" wall_id=wall.pk %}">Show live wall</a>
             <br><br>
 
+            <div id="routelist_div">
+              route list (click to edit):
+              <br>
+              <table id="routetable" style="width:100%">
+                <thead>
+                  <tr>
+                    <th>name</th>
+                    <th>grade</th>
+                    <th>rating</th>
+                    <th></th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+                      
+              <button onclick="generate_routelist()">Generate Routelist</button>
+            </div>
 
             <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
             <form method="POST" action="{{ request.path|urlencode }}">
                 {% csrf_token %}
-
-                <div id="routelist_div">
-                    route list (click to edit):
-                    <br>
-
-                    <ol id="route_list">
-                        {% for routegeom in wall_routegeomlist %}
-                            <!-- We sbave geometry and route name in the list -->
-                            <li id="rl_element_{{ routegeom.id}}" class="ui-widget-content" value="{{ routegeom.id }}"
-                                data-name="{{ routegeom.route.name }}">
-                              <div class="routelist_name">{{ routegeom.route.name }}</div>
-                                <input id="geom_inputfield_{{ routegeom.id }}" type="hidden"
-                                       name="routegeomid_{{ routegeom.id }}"
-                                       value="{{ routegeom.geom }}">
-                            </li>
-
-                        {% endfor %}
-                    </ol>
-
-                    <br>
-                    <button type="button" class="btn btn-default" id="clear_route_button" onclick="on_del_route()">Clear route</button>
-                </div>
+                
+                {% for routegeom in wall_routegeomlist %}
+                  <input id="geom_inputfield_{{ routegeom.id }}" type="hidden"
+                         name="routegeomid_{{ routegeom.id }}"
+                         value="{{ routegeom.geom }}">                
+                {% endfor %}
                 <input type="submit" value="speichern"/>
             </form>
 
