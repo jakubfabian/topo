@@ -181,7 +181,7 @@
 
             // remove the draw controls
             resetDrawControl();
-            activeGeomId = null;
+            // activeGeomId = null;
         
         });
 
@@ -313,6 +313,18 @@
 
     }
 
+    function on_del_route () {
+        clean_handles();
+        try{
+            map.removeLayer(layerdict[activeGeomId]);
+        }catch(err){
+            console.log("Could not delete layer " + activeGeomId)
+        }
+
+        document.getElementById("geom_inputfield_" + activeGeomId).value = "None";
+
+    }
+
     
                 
     function route_selector_setup() {
@@ -335,8 +347,10 @@
 
                 }
 
-                var geomstring = $(ui.selected).children("input").val();
                 activeGeomId = $(ui.selected).val();
+                var inputfield = document.getElementById("geom_inputfield_" + activeGeomId);
+
+                var geomstring = inputfield.value;
                 
                 
                 if (geomstring == "None") {
@@ -443,10 +457,10 @@
 
                     <ol id="route_list">
                         {% for routegeom in wall_routegeomlist %}
-                            <!-- We save geometry and route name in the list -->
+                            <!-- We sbave geometry and route name in the list -->
                             <li id="rl_element_{{ routegeom.id}}" class="ui-widget-content" value="{{ routegeom.id }}"
                                 data-name="{{ routegeom.route.name }}">
-                                {{ routegeom.route.name }}
+                              <div class="routelist_name">{{ routegeom.route.name }}</div>
                                 <input id="geom_inputfield_{{ routegeom.id }}" type="hidden"
                                        name="routegeomid_{{ routegeom.id }}"
                                        value="{{ routegeom.geom }}">
@@ -456,6 +470,7 @@
                     </ol>
 
                     <br>
+                    <button type="button" class="btn btn-default" id="clear_route_button" onclick="on_del_route()">Clear route</button>
                 </div>
                 <input type="submit" value="speichern"/>
             </form>
@@ -469,3 +484,4 @@
 
 
 {% endblock %}
+

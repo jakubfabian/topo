@@ -294,16 +294,17 @@ def draw_routes(request, wall_id, **kwargs):
         for key in request.POST.keys():
             if key.startswith('routegeomid_'):
                 geomstr = request.POST.get(key)
-                # If the geometry is not drawn on the image
-                # we just leave everything as is
-                if geomstr != 'None' and geomstr != '':
-                    print "Geometrystring: {}".format(geomstr)
-                    rgid = key.split('_')[1]
-                    geom_obj = RouteGeometry.objects.get(pk=rgid)
-                    geom_obj.geom = geomstr
-                    # import ipdb
-                    # ipdb.set_trace()
-                    geom_obj.save()
+                # If the geomstr is empty we set to None
+                if geomstr == 'None' or geomstr == '':
+                    geomstr = None
+                    
+                print "Geometrystring: {}".format(geomstr)
+                rgid = key.split('_')[1]
+                geom_obj = RouteGeometry.objects.get(pk=rgid)
+                geom_obj.geom = geomstr
+                # import ipdb
+                # ipdb.set_trace()
+                geom_obj.save()
 
     context = {'wall': wall,
                'spot': wall.spot,
