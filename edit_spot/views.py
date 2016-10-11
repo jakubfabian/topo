@@ -97,17 +97,12 @@ def link_routes_to_wall(request, wall_id, **kwargs):
             rg = route.routegeometry_set.filter(on_wallview=wallview)
             rg.delete()
 
-    # annotate with active walls
+    # annotate with walls (dev walls get an asterisk on front)
     active_walldict = {}
     for route in spotroutelist:
         active_walllist = [view.wall.name for view in route.walls.filter(is_dev=False)]
-        if active_walllist:
-            if len(active_walllist) == 1:
-                active_walldict[route.id] = active_walllist[0]
-            else:
-                active_walldict[route.id] = ", ".join(active_walllist)
-        else:
-            active_walldict[route.id] = ""
+        dev_walllist = ['*'+view.wall.name for view in route.walls.filter(is_dev=True)]
+        active_walldict[route.id] = ", ".join(dev_walllist + active_walllist)
 
     # routes on the dev view
     wallroutelist = wallview.route_set.all()
