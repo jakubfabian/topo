@@ -11,6 +11,8 @@ from miroutes.models import Spot
 from miroutes.models import Wall
 from miroutes.models import Route
 from miroutes.models import RouteGeometry
+from miroutes.models import GRADE_CHOICES
+
 from .forms import SpotForm, RouteForm, WallForm
 
 
@@ -220,6 +222,14 @@ def edit_spot(request, spot_id):
     return render(request, 'edit_spot/edit_spot.html', context)
 
 
+def get_grade_choices(spot):
+    """
+    We use the spot's grade system entry to limit the possible grade choices for routes
+    """
+    grade_choices = filter(lambda x: x[0]//100 == spot.grade_system+1, GRADE_CHOICES)
+    return grade_choices
+
+
 @permission_required('miroutes.spot.can_add')
 def add_route(request, spot_id, **kwargs):
     """
@@ -229,11 +239,11 @@ def add_route(request, spot_id, **kwargs):
 
     if request.method == 'POST':
 
-        form = RouteForm(request.POST)
+        form = RouteForm(request.POST, grade_choices=get_grade_choices(spot))
         if form.is_valid():
             form.save()
     else:
-        form = RouteForm(initial={'spot': spot})
+        form = RouteForm(initial={'spot': spot}, grade_choices=get_grade_choices(spot))
 
     route_list = spot.route_set.all().order_by('name')
 
@@ -260,11 +270,11 @@ def edit_route(request, route_id, **kwargs):
 
     if request.method == 'POST':
 
-        form = RouteForm(request.POST, instance=route)
+        form = RouteForm(request.POST, instance=route, grade_choices=get_grade_choices(spot))
         if form.is_valid():
             form.save()
     else:
-        form = RouteForm(initial={'spot': spot}, instance=route)
+        form = RouteForm(initial={'spot': spot}, instance=route, grade_choices=get_grade_choices(spot))
         # form = RouteForm()
 
     route_list = spot.route_set.all().order_by('name')
@@ -305,7 +315,7 @@ def draw_routes(request, wall_id, **kwargs):
                 # If the geomstr is empty we set to None
                 if geomstr == 'None' or geomstr == '':
                     geomstr = None
-                    
+
                 print "Geometrystring: {}".format(geomstr)
                 rgid = key.split('_')[1]
                 geom_obj = RouteGeometry.objects.get(pk=rgid)

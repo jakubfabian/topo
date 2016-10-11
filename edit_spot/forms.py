@@ -29,7 +29,13 @@ class WallForm(forms.ModelForm):
         exclude = ('',)
     #image = forms.ImageField()
 
+
 class RouteForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        grade_choices = kwargs.pop('grade_choices')
+        super(RouteForm, self).__init__(*args, **kwargs)
+        print 'In forms',grade_choices
+        self.fields['grade'] = forms.ChoiceField(choices=grade_choices)
     class Meta:
         model = Route
         exclude = ('climbers','walls')
