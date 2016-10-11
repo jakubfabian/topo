@@ -13,10 +13,20 @@
 
     <link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
 
-
 {% endblock %}
-{% block content %}
 
+{% block content %}
+  <script type="text/javascript">
+    // This is the widget part
+    $(document).ready(function () {
+        selectable_table = $('#routetable').DataTable({
+            "scrollY": "400px",
+            "scrollCollapse": true,
+            "paging": false
+        });
+    });
+  </script>
+                                                                                                                                                                                                                                        
     <div class="row">
 
         <ul class="nav nav-tabs">
@@ -73,13 +83,17 @@
             <div class="tb_cell">
                 <h2>Existing Routes <a href="{% url "add_route" spot_id=spot.pk %}">{{ editing|yesno:"(add),," }}</a></h2>
                 <div class="existing_routes_box">
-                    <table style="width:100%">
+                  <table id="routetable">
+                    <thead>
                         <tr>
                             <th>name</th>
                             <th>grade</th>
                             <th>length</th>
                             <th>rating</th>
+                            <th></th>
                         </tr>
+                    </thead>
+                    <tbody>
                         {% for route in route_list %}
                             <tr>
                                 <td><a href="{% url "route_detail" route_id=route.pk %}">{{ route.name }} </a></td>
@@ -88,8 +102,9 @@
                                 <td>{{ route.rating }}</td>
                                 <td><a href="{% url "edit_route" route_id=route.pk %}">edit</a></td>
                             </tr>
-                        {% endfor %}
-                    </table>
+                          {% endfor %}
+                    </tbody>
+                  </table>
                 </div>
             </div>
         </div>
