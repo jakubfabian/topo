@@ -25,7 +25,7 @@ class Command(BaseCommand):
         s2 = Spot(name="testSpot2", geom=gKochel2)
         s2.save()
 
-        fname_image = "/code/misc/kochel_seewand_pano.png"
+        fname_image = "/code/misc/kochel_wiesenwand.png"
 
         w = Wall(name="Wiesenwand", is_active=True, spot=s, geom=gWiesenwand)
         w.save()
