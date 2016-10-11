@@ -8,6 +8,8 @@ from djgeojson.fields import PointField
 
 from miroutes.tasks import tile_image
 
+from itertools import product
+
 RATING_CHOICES = (
     (1, 'poor'),
     (2, 'ok'),
@@ -21,17 +23,12 @@ GRADE_SYSTEMS = (
     (2, 'UK'),
     (3, 'Sierra'))
 
-GRADE_CHOICES = (
+GRADE_CHOICES = [
        (001, '4b+'),
        (002, '4c-'),
        (003, '4c'),
        (004, '4c+'),
        (005, '5a-'),
-       (101, 'IV-'),
-       (102, 'IV'),
-       (103, 'IV+'),
-       (104, 'V-'),
-       (105, 'V'),
        (201, 'S, 4a'),
        (202, 'HS, 4b'),
        (203, 'VS, 4c'),
@@ -41,7 +38,10 @@ GRADE_CHOICES = (
        (302, '5.5'),
        (303, '5.6'),
        (304, '5.7'),
-       (305, '5.8'))
+       (305, '5.8')]
+
+# UIAA system entries:
+GRADE_CHOICES += [ (100 + x,str(a)+b ) for x,(a,b) in enumerate( list(product(range(2,12), ['-','','+'])))]
 
 class Spot(models.Model):
     """A spot denotes a region with multiple associated walls.
