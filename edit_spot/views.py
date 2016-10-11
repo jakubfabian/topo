@@ -72,8 +72,6 @@ def link_routes_to_wall(request, wall_id, **kwargs):
 
     wallview = wall.dev_view
 
-    # routes on the dev view
-    wallroutelist = wallview.route_set.all()
 
     spot = wall.spot
     # all routes on the spot
@@ -94,10 +92,25 @@ def link_routes_to_wall(request, wall_id, **kwargs):
             geom_obj.save()
 
         # Routes that are not on wall list anymore get detached
-        routes_todel = wallroutelist.exclude(pk__in=route_onwall_ids)
+        routes_todel = wallview.route_set.exclude(pk__in=route_onwall_ids)
         for route in routes_todel:
             rg = route.routegeometry_set.filter(on_wallview=wallview)
             rg.delete()
+
+    # annotate with active walls
+    active_walldict = {}
+    for route in spotroutelist:
+        active_walllist = [view.wall.name for view in route.walls.filter(is_dev=False)]
+        if active_walllist:
+            if len(active_walllist) == 1:
+                active_walldict[route.id] = active_walllist[0]
+            else:
+                active_walldict[route.id] = ", ".join(active_walllist)
+        else:
+            active_walldict[route.id] = ""
+
+    # routes on the dev view
+    wallroutelist = wallview.route_set.all()
 
     # take relative complement for spotroutelist:
     # i.e. remove all routes in spotroutelist that are already at wall
@@ -108,7 +121,7 @@ def link_routes_to_wall(request, wall_id, **kwargs):
     spotwalllist = spotwalllist.exclude(pk=wall.id)
 
     # routes that are not on an active wall
-    spotroutesnotonwall = spotroutelist.filter(walls=None)
+    # spotroutesnotonwall = spotroutelist.filter(walls=None)
 
     # also get all geoms asociated with wall routes
     wallroutegeomlist = wallview.routegeometry_set.all()
@@ -120,8 +133,8 @@ def link_routes_to_wall(request, wall_id, **kwargs):
                'wall': wall,
                'wallview': wallview,
                'spot_routelist': spotroutelist,
-               'spot_routes_noton_wall': spotroutesnotonwall,
                'wall_routelist': wallroutelist,
+               'active_walldict': active_walldict,
                'show_edit_pane': True}
 
     if request.session.get('last_wall_id'):
