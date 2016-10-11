@@ -19,6 +19,7 @@
     "leaflet.markercluster": "0.5.0",
     "bootstrap": "3.3.7",
     "datatables.net": "^1.10.12",
-    "datatables.net-bs": "^1.10.12"
+    "datatables.net-bs": "^1.10.12",
+    "pt-sans": "latest"
   }
 }
