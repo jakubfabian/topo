@@ -15,6 +15,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     {% block extra_assets %}{% endblock %}
+
     {% include "leaflet_custom_icons.html" %}
 
     <link href="{% static "miroutes/bower_components/select2/dist/css/select2.min.css" %}" type="text/css"
@@ -38,7 +39,6 @@
     <script type="text/javascript" charset="utf8"
             src="{% static "miroutes/bower_components/datatables.net/js/jquery.dataTables.min.js" %}"></script>
     
-
     {% block main-css %}
         <link href='{% static "/miroutes/bower_components/pt-sans/styles/pt_sans.css" %}' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href={% static "miroutes/css/main3.css" %}/>

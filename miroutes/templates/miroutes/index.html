@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}
     Mitopo.de
@@ -29,7 +30,7 @@
             {% endfor %}
 
 
-            map.options.maxZoom = 15;
+            map.options.maxZoom = 17;
 
             var group = L.featureGroup(markerArray);
             markers = new L.MarkerClusterGroup();
@@ -45,19 +46,39 @@
                 map.fitBounds(group.getBounds());
             }
         }
-
     </script>
+
 {% endblock %}
 
 {% block content %}
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //map_init();
+            spottable = $('#spottable').DataTable({
+                "scrollY": "300px",
+                "scrollCollapse": true,
+                "paging": false
+            });
+            wallstable = $('#wallstable').DataTable({
+                "scrollY": "300px",
+                "scrollCollapse": true,
+                "paging": false
+            });
+        });
+    </script>
+
+
     {% leaflet_map "spots_map" callback="window.map_init" %}
+
 {% endblock %}
 
 {% block infobar %}
     <div class="counters">
         <span class="glyphicon glyphicon-map-marker spot-icon" aria-hidden="true"></span>
         Spots: {{ spot_listing|length }} &nbsp;&nbsp;
-        <span class="glyphicon glyphicon-tent wall-icon" aria-hidden="true"></span>
+        <span class="glyphicon" aria-hidden="true"></span>
+        <img src="{% static "miroutes/img/leaflet_wall_icon.png" %}" class="img-rounded" height="20">
         Walls: {{ wall_listing|length }} &nbsp;&nbsp;
         <span class="glyphicon glyphicon-sort route-icon" aria-hidden="true"></span>
         Routes: {{ route_listing|length }}
@@ -65,33 +86,78 @@
 {% endblock %}
 {% block mapobjects_info %}
 
+    <a id="spots_expand" href="#spots" data-toggle="collapse">
+        <span class="glyphicon glyphicon-map-marker spot-icon" aria-hidden="true"></span>
+        Spots (click to expand)
+    </a>
 
+    <span id="spots" class="collapse">
+        <table id="spottable" width="100%">
+            <br>
+            <thead>
+              <tr>
+                <th>Spot</th>
+                <th>Walls</th>
+                <th>Routes</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for spot in spot_listing %}
+                <tr>
+                    <td>
+                        <a href="{% url "spot_detail" spot_id=spot.pk %} ">
+                            {{ spot.name }}
+                        </a>
+                    </td>
+                    <td>
+                        <img src="{% static "miroutes/img/leaflet_wall_icon.png" %}" class="img-rounded" height="20">
+                        {{spot.wall_set.count}}
+                    </td>
+                    <td>
+                        <span class="glyphicon glyphicon-sort route-icon" aria-hidden="true"></span>
+                        {{spot.route_set.count}}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+          </table>
 
-    <a id="spots_expand" href="#spots" data-toggle="collapse"><span class="glyphicon glyphicon-map-marker spot-icon" aria-hidden="true"></span>
- Spots (click to expand)</a>
-    <ul id="spots" class="collapse">
-        {% for spot in spot_listing %}
-            <li>
-                <a class="spot_entry" href="{% url "spot_detail" spot_id=spot.pk %} ">{{ spot.name }}</a>
-            </li>
-        {% endfor %}
         {% if perms.miroutes.add_spot %}
-            <li>
-                <a id="add_spot_button" class="btn btn-default" href="{% url 'add_spot' %}"><b>Add Spot</b></a>
-            </li>
+            <br>
+                <a id="add_spot_button" class="btn btn-primary btn-xs" href="{% url 'add_spot' %}"><b>Add new Spot</b></a>
         {% endif %}
-
-    </ul>
-
+    </span>
 
     <br/>
-    <a id="walls_expand" href="#walls" data-toggle="collapse"><span class="glyphicon glyphicon-tent wall-icon" aria-hidden="true"></span>
- Walls (click to expand)</a>
 
-    <ul id="walls" class="collapse">
+    <a id="walls_expand" href="#walls" data-toggle="collapse">
+        <img src="{% static "miroutes/img/leaflet_wall_icon.png" %}" class="img-rounded" height="20">
+        Walls (click to expand)
+    </a>
+
+    <span id="walls" class="collapse">
+        <br>
+        <table id="wallstable" width="100%">
+            <thead>
+              <tr>
+                <th>Walls</th>
+                <th>Routes</th>
+              </tr>
+            </thead>
+            <tbody>
         {% for wall in wall_listing %}
-            <li><a href="{% url "wall_detail" wall_id=wall.pk %}">{{ wall.name }}</a></li>
-        {% endfor %}
-    </ul>
+                <tr>
+                    <td>
+                        <a href="{% url "wall_detail" wall_id=wall.pk %}">{{ wall.name }}</a>
+                    </td>
+                    <td>
+                        <span class="glyphicon glyphicon-sort route-icon" aria-hidden="true"></span>
+                        {{wall.pub_view.route_set.count}}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+    </span>
 
 {% endblock %}
