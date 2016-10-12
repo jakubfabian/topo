@@ -14,82 +14,197 @@
 {% endblock %}
 
 {% block content %}
-    <script type="text/javascript">
-      $(document).ready(function () {
-          map_init();
-          routetable = $('#routetable').DataTable({
-              "scrollY": "300px",
-              "scrollCollapse": true,
-              "paging": false,
-              "bFilter": false,
-              "bInfo": false
-          });
+  <script type="text/javascript">
+    $(document).ready(function () {
+        map_init();
+        routetable = $('#routetable').DataTable({
+            "scrollY": "300px",
+            "scrollCollapse": true,
+            "paging": false,
+            "bFilter": false,
+            "bInfo": false,
+            "bSort": false,
+        });
+        
+    });
 
-      });
+    function getColor(x) {
+        var diff = x%100;
+        return diff < 6     ?    '#ffffb2':
+            diff < 10     ?   '#fecc5c':
+            diff < 14     ?   '#fd8d3c':
+            diff < 18     ?   '#f03b20':
+            '#bd0026';
+    };
 
-        function map_init() {
+    function on_mouseover_polyline(){
+    };
 
-            var img_dim_string = '{{ wall.get_bg_img_size }}';
 
-            var img_dim = img_dim_string.split(',', 4);
-            var img_dim_x = parseFloat(img_dim[0]);
-            var img_dim_y = parseFloat(img_dim[1]);
-            var xzoom = parseFloat(img_dim[2]);
-            var yzoom = parseFloat(img_dim[3]);
+    function map_init() {
+        
+        var img_dim_string = '{{ wall.get_bg_img_size }}';
+        
+        var img_dim = img_dim_string.split(',', 4);
+        var img_dim_x = parseFloat(img_dim[0]);
+        var img_dim_y = parseFloat(img_dim[1]);
+        var xzoom = parseFloat(img_dim[2]);
+        var yzoom = parseFloat(img_dim[3]);
 
-            var maxzoom = Math.max(xzoom, yzoom);
+        var maxzoom = Math.max(xzoom, yzoom);
 
-            // we choose a default zoom level of 2 that matches either the width (approx.) or the
-            // height of the container
-            var minzoom = 1;
-            var startzoom = 1;
+        // we choose a default zoom level of 2 that matches either the width (approx.) or the
+        // height of the container
+        var minzoom = 1;
+        var startzoom = 1;
 
-            var aspectRatio = img_dim_x / img_dim_y;
-            {#            if (aspectRatio < 1) {#}
-            {#                // we resize the container to fit an image with aspectRatio < 1#}
-            {#                // the height is then fixed to 1024px#}
-            {#                var wall_width = 1024 * aspectRatio;#}
-            {#                // document.getElementById('wallmap').setAttribute("style","display:block;width:500px");#}
-            {#                document.getElementById('wallmap').style.width = wall_width + "px";#}
-            {#                document.getElementById('wallmap').style.height = 1024 + "px";#}
-            {#            }#}
+        var aspectRatio = img_dim_x / img_dim_y;
 
-            var map = L.map('wallmap', {
-                minZoom: minzoom,
-                maxZoom: maxzoom,
-                crs: L.CRS.Simple
+        window.map = L.map('wallmap', {
+            minZoom: minzoom,
+            maxZoom: maxzoom,
+            crs: L.CRS.Simple
             });
-            map.zoomControl.setPosition("topright");
+        map.zoomControl.setPosition("topright");
 
-            var southWest = map.unproject([0, img_dim_y], map.getMaxZoom());
-             var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
-             var imBounds = new L.LatLngBounds(southWest, northEast);
-             map.setMaxBounds(imBounds);
-             map.fitBounds(imBounds);
+        var southWest = map.unproject([0, img_dim_y], map.getMaxZoom());
+        var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
+        var imBounds = new L.LatLngBounds(southWest, northEast);
+        map.setMaxBounds(imBounds);
+        map.fitBounds(imBounds);
 
-            var wall_layer = L.tileLayer('{{ wall.get_tiles_url }}/{z}/{x}/{y}.png', {
-                minZoom: 0, maxZoom: maxzoom,
-                noWrap: false,
-                tileSize: 256,
-                continuousWorld: true,
-            });
+        var wall_layer = L.tileLayer('{{ wall.get_tiles_url }}/{z}/{x}/{y}.png', {
+            minZoom: 0, maxZoom: maxzoom,
+            noWrap: false,
+            tileSize: 256,
+            continuousWorld: true,
+        });
 
-            wall_layer.addTo(map);
+        wall_layer.addTo(map);
 
-            var center_x = img_dim_x / 2;
-            var center_y = img_dim_y / 2;
-            var center_point = map.unproject([center_x, center_y], startzoom);
+        var center_x = img_dim_x / 2;
+        var center_y = img_dim_y / 2;
+        var center_point = map.unproject([center_x, center_y], startzoom);
 
-            map.setView(center_point, startzoom);
+        map.setView(center_point, startzoom);
 
-            // If there is a route list we add it to the map
-            {% if wall_route_geom_list %}
-             var collection = {{ wall_route_geom_list|geojsonfeature|safe }};
-             layer = L.geoJson(collection);
-             layer.addTo(map);
-             //map.fitBounds(layer.getBounds());
-            {% endif %}
+        // If there is a route list we add it to the map
+        {% if wall_route_geom_list %}
+        window.layerdict = {};
+        var collection = {{ wall_route_geom_list|geojsonfeature|safe }};
+        var routegradedict = {};
+        var routenamedict = {};
+        var routeratingdict = {};
+        var geomids = [];
+        var anchorlist = [];
+             
+        {% for geom in wall_route_geom_list %}
+        // we extract all the info and put in dicts with
+        // geomid as the key
+        geomids.push("{{ geom.id }}");
+        routegradedict[{{ geom.id }}] = {{ geom.route.grade }};
+        routenamedict[{{ geom.id }}] = "{{ geom.route.name }}";
+        routeratingdict[{{ geom.id }}] = "{{ geom.route.rating }}";
+        {% endfor %}
+             
+        for (var i = 0; i < collection.features.length; i++) {
+            var geomid = geomids[i];
+            if (collection.features[i].geometry) {
+                var geoJsonFC = L.geoJson(collection.features[i]);
+                var polyline = null;
+                
+                geoJsonFC.eachLayer(function (layer) {
+                    polyline = L.polyline(layer.getLatLngs(), {
+                        color: getColor(routegradedict[geomid]),
+                        opacity: 1
+                    });
+                });
+
+                // we make a list of all lowest anchor points of the lines
+                // this is a list because we need a sortable!
+                var anchor = get_anchor(polyline);
+                anchorlist.push([geomid, anchor]);
+                
+                console.log("Creating new feature group with polyline layer with id" + geomids[i]);
+                
+                var featureGroup = L.featureGroup([polyline]);
+                addToLayerdict(geomid, featureGroup);
+            }
         }
+
+        // sort from left to right
+        anchorlist.sort(function (a, b){
+            a = a[1].lng;
+            b = b[1].lng;
+
+            return a < b ? -1 : (a > b ? 1 : 0);
+        });
+
+                
+        for (var i = 0; i < anchorlist.length; i++) {
+            var geomid = anchorlist[i][0];
+            
+            // generate the table
+                
+            $("#routetable").find('tbody')
+                .append($('<tr>')
+                        .attr('id', 'routegeomid_'+geomid)
+                        .append($('<td>')
+                                .text(i)
+                               )
+                        .append($('<td>')
+                                .text(routenamedict[geomid])
+                               )
+                        .append($('<td>')
+                                .text(routegradedict[geomid])
+                               )
+                        .append($('<td>')
+                                .text(routeratingdict[geomid])
+                               )
+                       );
+
+            // label the routes
+            
+            var myIcon = L.divIcon({
+                iconSize: new L.Point(20, 20),
+                html: i
+            });
+                
+            var routelabel = L.marker(anchorlist[i][1], {
+                icon: myIcon,
+            });
+        
+            routelabel.addTo(map);
+
+
+        }   
+        
+        
+
+        {% endif %}
+    }
+
+    function get_anchor(polyline){
+        var latlngs = polyline.getLatLngs();
+        var lowest = latlngs[0];
+        for (var i = 0; i < latlngs.length; i++) {
+            if(latlngs[i].lat < lowest.lat){
+                lowest = latlngs[i];
+            }
+        }
+
+        return lowest;
+    }
+
+    function addToLayerdict(geomid, layer) {
+        // Utility function to add a pair of geomid and references
+        // to the layer to a dict, add the onClick handler and the layer to the map.
+        layer.routegeomid = geomid;
+        layerdict[geomid] = layer;
+        layer.addTo(map);
+        layer.on('mouseover', on_mouseover_polyline);
+    }
+
     </script>
 
     <div id="wallmap"></div>
@@ -123,21 +238,13 @@
         <table id="routetable">
             <thead>
               <tr>
+                <th>pos</th>
                 <th>name</th>
                 <th>gra</th>
-                <th>len</th>
                 <th>rat</th>
               </tr>
             </thead>
             <tbody>
-              {% for routegeom in wall_route_geom_list %}
-                <tr>
-                  <td><a href="{% url "route_detail" route_id=routegeom.route.pk %}">{{ routegeom.route.name }} </a></td>
-                  <td>{{ routegeom.route.get_grade_display }}</td>
-                  <td>{{ routegeom.route.length }}</td>
-                  <td>{{ routegeom.route.rating }}</td>
-                </tr>
-              {% endfor %}
             </tbody>
           </table>
 
