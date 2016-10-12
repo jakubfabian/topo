@@ -126,7 +126,7 @@
             <tr>
               <td>{{ route.id }}</td>
               <td>{{ route.name }}</td>
-              <td>{{ route.grade }}</td>
+              <td>{{ route.get_grade_display }}</td>
               <td>
                 {{ active_walldict|get_item:route.id }}
               </td>
@@ -151,7 +151,7 @@
             <tr>
               <td>{{ route.id }}</td>
               <td>{{ route.name }}</td>
-              <td>{{ route.grade }}</td>
+              <td>{{ route.get_grade_display }}</td>
               <td>
                 {{ active_walldict|get_item:route.id }}
               </td>
