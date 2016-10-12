@@ -94,7 +94,7 @@ function map_init_basic(map, options) {
 {% block mapobjects_info %}
     <h1>{{ editing|yesno:"Edit wall, Add new Wall" }} {{ wall.name }}</h1>
 
-    <form method="POST" action="{% url 'add_wall' spot_id=spot.pk %}" enctype="multipart/form-data" >
+    <form method="POST" enctype="multipart/form-data" >
         {% csrf_token %}
         {{ form.as_p }}
         <input type="submit" value="save">
