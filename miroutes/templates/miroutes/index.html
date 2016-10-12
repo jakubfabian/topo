@@ -54,11 +54,13 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
-            //map_init();
+            //  FJ, TODO: The tables have a too small width when rendered here 
+            // -- this is maybe because the container is collapsed and Datatable computes the size of the table accordingly.. 
+            // but someone with more Javascript knowledge should get back here ... 
             spottable = $('#spottable').DataTable({
                 "scrollY": "300px",
                 "scrollCollapse": true,
-                "paging": false
+                "paging": false,
             });
             wallstable = $('#wallstable').DataTable({
                 "scrollY": "300px",
