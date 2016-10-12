@@ -11,10 +11,21 @@
     {% leaflet_js %}
     {% leaflet_css %}
 
+{% endblock %}
+
+{% block content %}
     <script type="text/javascript">
-        window.onload = function () {
-            map_init();
-        }
+      $(document).ready(function () {
+          map_init();
+          routetable = $('#routetable').DataTable({
+              "scrollY": "300px",
+              "scrollCollapse": true,
+              "paging": false,
+              "bFilter": false,
+              "bInfo": false
+          });
+
+      });
 
         function map_init() {
 
@@ -81,11 +92,6 @@
         }
     </script>
 
-{% endblock %}
-
-{% block content %}
-
-
     <div id="wallmap"></div>
 
 {% endblock %}
@@ -114,25 +120,27 @@
         <br>
         <br>
 
-        <ul class="wall_route_list">
-              <table style="width:100%">
-                        <tr>
-                            <th>name</th>
-                            <th>grade</th>
-                            <th>length</th>
-                            <th>rating</th>
-                        </tr>
-            {% for routegeom in wall_route_geom_list %}
-                            <tr>
-                                <td><a href="{% url "route_detail" route_id=routegeom.route.pk %}">{{ routegeom.route.name }} </a></td>
-                                <td>{{ routegeom.route.get_grade_display }}</td>
-                                <td>{{ routegeom.route.length }}</td>
-                                <td>{{ routegeom.route.rating }}</td>
-                            </tr>
-                        {% endfor %}
-                    </table>
+        <table id="routetable">
+            <thead>
+              <tr>
+                <th>name</th>
+                <th>gra</th>
+                <th>len</th>
+                <th>rat</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for routegeom in wall_route_geom_list %}
+                <tr>
+                  <td><a href="{% url "route_detail" route_id=routegeom.route.pk %}">{{ routegeom.route.name }} </a></td>
+                  <td>{{ routegeom.route.get_grade_display }}</td>
+                  <td>{{ routegeom.route.length }}</td>
+                  <td>{{ routegeom.route.rating }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
 
-        </ul>
     {% else %}
         <p>Currently no routes are available in {{ wall.name }}</p>
     {% endif %}
