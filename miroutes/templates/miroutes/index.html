@@ -25,7 +25,16 @@
                 var coord = L.latLng({{ spot.geom.coordinates }});
                 var newcoord = L.latLng(coord.lng, coord.lat);
                 var mc = new L.marker(newcoord);
-                mc.bindPopup("<a href={% url "spot_detail" spot_id=spot.id %}>{{spot.name}}</a>");
+                var popup_msg=`
+                    <a href={% url "spot_detail" spot_id=spot.id %}>{{spot.name}}</a>
+                    <br>
+                    <img src='{% static "miroutes/img/leaflet_wall_icon.png" %}' class='img-rounded' height='20'>
+                    {{spot.wall_set.count}}
+                    <br>
+                    <span class='glyphicon glyphicon-sort route-icon' aria-hidden='true'></span>
+                    {{spot.route_set.count}}`;
+                mc.bindPopup(popup_msg);
+                mc.on('mouseover', function (e) { this.openPopup(); });
                 markerArray.push(mc);
             {% endfor %}
 
