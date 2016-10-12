@@ -18,12 +18,12 @@
     // This is the widget part
     $(document).ready(function () {
         selectable_table = $('#selectable').DataTable({
-            "scrollY": "200px",
+            "scrollY": "400px",
             "scrollCollapse": true,
             "paging": false
         });
         selected_table = $('#selected').DataTable({
-            "scrollY": "200px",
+            "scrollY": "400px",
             "scrollCollapse": true,
             "paging": false
         });        
@@ -91,9 +91,9 @@
   <div class="col-md-12 white-background">
     <br>
 
-    <h1>Link routes to wall "{{ wall.name }}"</h1>
+    <h1>Link routes to wall "*{{ wall.name }}"</h1>
+    (*) This is the draft version of the wall.
     <br>
-
     Click route to link or unlink
     <br>
     <br>
@@ -101,12 +101,12 @@
     <!-- css styles for the selectable list. TODO: put tags in css files -->
     <!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
     <div class="left_pane">
-      <div class="title">
+      <div class="routelist_title">
         Routepool on spot "{{ spot.name }}"
       </div>
     </div>
     <div class="right_pane">
-      <div class="title">
+      <div class="routelist_title">
         Routes linked to wall "{{ wall.name }}"
       </div>
     </div>

@@ -35,12 +35,21 @@
 
 .left_pane{
     float: left;
-    width: 35%;
+    width: 42%;
 }
 
 .right_pane{
-    width: 35%;
-    margin-left: 40%;
+    width: 42%;
+    margin-left: 45%;
+}
+
+.routelist_title{
+    padding-bottom: 10px;
+    font-weight: bold;
+}
+
+.table-spacing{
+   border-spacing:5px;
 }
 
 /*.existing_routes_box {*/

@@ -2,7 +2,8 @@
 {% load staticfiles %}
 
 {% block title %}
-    Mitopo.de - Add new Wall
+  
+    Mitopo.de - {{ editing|yesno:"Edit wall, Add new Wall" }} {{ wall.name }}
 {% endblock %}
 
 {% block extra_assets %}
@@ -29,10 +30,23 @@ function map_init_basic(map, options) {
 
     markers = new L.MarkerClusterGroup();
     markers.addLayer(existingwallsLayer);
+
+
+    {% if editing %}
+    var editing_wall = {{ wall|geojsonfeature|safe }};
+
+    editing_wall_layer = L.geoJson(editing_wall, {
+        pointToLayer: function (feature, latlng) {
+            newwall = L.marker(latlng, {icon: LeafletEditWallIcon});
+            return newwall;
+        }
+    });
+    markers.addLayer(editing_wall_layer);
+    {% endif %}
+
     map.addLayer(markers);
 
-    var newwall;
-
+    
     if(existingwalls.features.length === 0) {
         var editing_Spot = {{ spot|geojsonfeature|safe }};
         var edit_marker;
@@ -78,7 +92,7 @@ function map_init_basic(map, options) {
 {% endblock %}
 
 {% block mapobjects_info %}
-    <h1>Add new wall</h1>
+    <h1>{{ editing|yesno:"Edit wall, Add new Wall" }} {{ wall.name }}</h1>
 
     <form method="POST" action="{% url 'add_wall' spot_id=spot.pk %}" enctype="multipart/form-data" >
         {% csrf_token %}

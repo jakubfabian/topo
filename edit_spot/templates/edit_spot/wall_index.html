@@ -32,7 +32,7 @@
                 var coord = L.latLng({{ wall.geom.coordinates }});
                 var newcoord = L.latLng(coord.lng, coord.lat);
                 var mc = new L.marker(newcoord, {icon: LeafletWallIcon});
-                mc.bindPopup("<a href={% url "wall_detail" wall_id=wall.id %}>{{wall.name}}</a>");
+                mc.bindPopup("<a href={% url "link_routes_to_wall" wall_id=wall.id %}>Link routes to {{wall.name}}</a>");
                 markerArray.push(mc);
             {% endfor %}
 
@@ -83,14 +83,22 @@
                 <input id="add_wall_button" type="submit" value="Add new wall">
             </form>
 
-            <h2>Edit Walls:</h2>
-            <ul>
+            <h2>Walls:</h2>
+            <table class="table-spacing">
                 {% for wall in wall_listing %}
-                    <li>
-                        <a class="wall_entry" href="{% url 'link_routes_to_wall' wall_id=wall.pk %}">{{ wall.name }}</a>
-                    </li>
+                  <tr>
+                    <td>
+                        {{ wall.name }}
+                    </td>
+                    <td>
+                        <a class="wall_entry" href="{% url 'link_routes_to_wall' wall_id=wall.pk %}">link routes</a>
+                    </td>                    
+                    <td>
+                        <a class="wall_entry" href="{% url 'edit_wall' wall_id=wall.pk %}">edit details</a>
+                    </td>
+                  </tr>
                 {% endfor %}
-            </ul>
+            </table>
         </div>
         <div class="col-md-9 full-height">
 

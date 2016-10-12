@@ -190,8 +190,14 @@ class Wall(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        update_img = False
+        if self.pk is not None:
+            # we create the tiles only if there is a new image
+            original_wall = Wall.objects.get(pk=self.pk)
+            update_img = original_wall.background_img != self.background_img
         super(Wall, self).save(*args, **kwargs)
-        self.create_tiles()
+        if update_img:
+            self.create_tiles()
         if not self.wallview_set.all():
             dev_view = WallView(wall=self, is_dev=True)
             dev_view.save()
