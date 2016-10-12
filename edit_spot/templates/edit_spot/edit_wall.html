@@ -62,7 +62,7 @@ function map_init_basic(map, options) {
     };
 
     map.on('click', function (e) {
-        if (newwall === undefined) {
+        if (typeof newwall == "undefined") {
             newwall = new L.marker(e.latlng, {icon: LeafletEditWallIcon}).addTo(map);
         } else {
             newwall.setLatLng(e.latlng);
