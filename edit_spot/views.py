@@ -160,12 +160,43 @@ def add_wall(request, spot_id, **kwargs):
     wall_list = spot.wall_set.all().order_by('name')
 
     context = {
+        'editing': False,
         'spot': spot,
         'wall_list': wall_list,
         'show_edit_pane': True,
         'form': form
     }
-    return render(request, 'edit_spot/add_wall.html', context)
+    return render(request, 'edit_spot/edit_wall.html', context)
+
+@permission_required('miroutes.wall.can_edit')
+def edit_wall(request, wall_id, **kwargs):
+    """
+    Editing a wall.
+    """
+
+    wall = get_object_or_404(Wall, pk=wall_id)
+    spot = wall.spot
+
+    if request.method == 'POST':
+
+        form = WallForm(request.POST, request.FILES, instance=wall)
+        if form.is_valid():
+            form.save()
+            return wall_index(request, spot.pk)
+    else:
+        form = WallForm(initial={'spot': spot}, instance=wall)
+
+    wall_list = spot.wall_set.exclude(pk=wall_id).order_by('name')
+
+    context = {
+        'editing': True,
+        'wall': wall,
+        'spot': spot,
+        'wall_list': wall_list,
+        'show_edit_pane': True,
+        'form': form
+    }
+    return render(request, 'edit_spot/edit_wall.html', context)
 
 
 @permission_required('miroutes.spot.can_add')
@@ -187,6 +218,7 @@ def add_spot(request, **kwargs):
     spot_list = Spot.objects.order_by('name')
 
     context = {
+        'editing': False,
         'spot_list': spot_list,
         'show_edit_pane': True,
         'form': form
