@@ -1,5 +1,6 @@
 from datetime import date
 from datetime import timedelta
+from ast import literal_eval
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -417,6 +418,23 @@ class Route(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def polylinecolor(self):
+        diff = (self.grade % 100)/10
+        colors = ['#FF00FF', # from pink (difficult)
+                  '#FF00C6',
+                  '#FF008D',
+                  '#FF0055',
+                  '#FF001C',
+                  '#FF1C00',
+                  '#FF5400',
+                  '#FF8D00',
+                  '#FFC600',
+                  '#FFFF00', # to yellow (easy)
+        ]
+        colors = colors[::-1]
+        return colors[diff]
+
 
 class RouteGeometry(models.Model):
     """
@@ -425,6 +443,17 @@ class RouteGeometry(models.Model):
     on_wallview = models.ForeignKey(WallView)
     route = models.ForeignKey(Route)
     geom = LineStringField()
+
+    @property
+    def anchorpoint(self):
+        """Search the lowest point of the linestring geometry,
+        if there is any.
+        """
+        if self.geom:
+            geom = literal_eval(self.geom)
+            yvals = [coord[1] for coord in geom['coordinates']]
+            return geom['coordinates'][yvals.index(min(yvals))]
+
 
 
 class Ascent(models.Model):

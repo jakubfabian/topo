@@ -13,6 +13,8 @@
 
 {% endblock %}
 
+{% load miroute_tags %}
+
 {% block content %}
   <script type="text/javascript">
     $(document).ready(function () {
@@ -25,7 +27,21 @@
             "bInfo": false,
             "bSort": false,
         });
+
+        $('#routetable tbody')
+            .on( 'mouseenter', 'tr', function () {
+                var pos = this.firstElementChild.innerHTML;
+                highlight_geometry(pos);
+                highlight_row(pos);
+            });
+        $('#routetable tbody')
+            .on( 'mouseleave', 'tr', function () {
+                var pos = this.firstElementChild.innerHTML;
+                un_highlight_geometry(pos);
+                un_highlight_row(pos);
+            });
         
+
     });
 
     function getColor(x) {
@@ -37,7 +53,13 @@
             '#bd0026';
     };
 
-    function on_mouseover_polyline(){
+    function on_mouseover_polyline(e){
+        highlight_geometry(e.target.label);
+        highlight_row(e.target.label);
+    };
+    function on_mouseout_polyline(e){
+        un_highlight_geometry(e.target.label);
+        un_highlight_row(e.target.label);
     };
 
 
@@ -89,123 +111,75 @@
         map.setView(center_point, startzoom);
 
         // If there is a route list we add it to the map
-        {% if wall_route_geom_list %}
+        {% if wall_routegeomlist %}
         window.layerdict = {};
-        var collection = {{ wall_route_geom_list|geojsonfeature|safe }};
-        var routegradedict = {};
-        var routegradelabeldict = {};
-        var routenamedict = {};
-        var routeratingdict = {};
-        var geomids = [];
-        var anchorlist = [];
-             
-        {% for geom in wall_route_geom_list %}
-        // we extract all the info and put in dicts with
-        // geomid as the key
-        geomids.push("{{ geom.id }}");
-        routegradelabeldict[{{ geom.id }}] = "{{ geom.route.get_grade_display }}";
-        routegradedict[{{ geom.id }}] = {{ geom.route.grade }};
-        routenamedict[{{ geom.id }}] = "{{ geom.route.name }}";
-        routeratingdict[{{ geom.id }}] = "{{ geom.route.rating }}";
-        {% endfor %}
 
-             
-        for (var i = 0; i < collection.features.length; i++) {
-            var geomid = geomids[i];
-            if (collection.features[i].geometry) {
-                var geoJsonFC = L.geoJson(collection.features[i]);
-                var polyline = null;
-                
-                geoJsonFC.eachLayer(function (layer) {
-                    polyline = L.polyline(layer.getLatLngs(), {
-                        color: getColor(routegradedict[geomid]),
-                        opacity: 1
-                    });
-                });
-
-                // we make a list of all lowest anchor points of the lines
-                // this is a list because we need a sortable!
-                var anchor = get_anchor(polyline);
-                anchorlist.push([geomid, anchor]);
-                
-                console.log("Creating new feature group with polyline layer with id" + geomids[i]);
-                
-                var featureGroup = L.featureGroup([polyline]);
-                addToLayerdict(geomid, featureGroup);
-            }
-        }
-
-        // sort from left to right
-        anchorlist.sort(function (a, b){
-            a = a[1].lng;
-            b = b[1].lng;
-
-            return a < b ? -1 : (a > b ? 1 : 0);
+        {% for geom in wall_routegeomlist %}
+        // generate polylines with colors
+        // note the custom filter!
+        var coordarray = {{ geom|linestringgeomfilter }};
+        var polyline = L.polyline(coordarray, {
+            color: '{{ geom.route.polylinecolor }}',
+            opacity: 1
         });
+        addToLayerdict({{ geom.label }}, polyline);
 
-                
-        for (var i = 0; i < anchorlist.length; i++) {
-            var geomid = anchorlist[i][0];
-            
-            // generate the table
-                
-            $("#routetable").find('tbody')
-                .append($('<tr>')
-                        .attr('id', 'routegeomid_'+geomid)
-                        .append($('<td>')
-                                .text(i)
-                               )
-                        .append($('<td>')
-                                .text(routenamedict[geomid])
-                               )
-                        .append($('<td>')
-                                .text(routegradelabeldict[geomid])
-                               )
-                        .append($('<td>')
-                                .text(routeratingdict[geomid])
-                               )
-                       );
-
-            // label the routes
-            
-            var myIcon = L.divIcon({
-                iconSize: new L.Point(20, 20),
-                html: i
-            });
-                
-            var routelabel = L.marker(anchorlist[i][1], {
-                icon: myIcon,
-            });
+        // we add a label
+        var myIcon = L.divIcon({
+            iconSize: new L.Point(20, 20),
+            html: {{ geom.label }}
+        });
+        var anchorpoint = {{ geom.anchorpoint }};
+        // careful with reversed coordinates!
+        var routelabel = L.marker([anchorpoint[1]-5, anchorpoint[0]], {
+            icon: myIcon,
+        });
         
-            routelabel.addTo(map);
-
-
-        }   
-        
-        
-
+        routelabel.addTo(map);
+        {% endfor %}
         {% endif %}
-    }
 
-    function get_anchor(polyline){
-        var latlngs = polyline.getLatLngs();
-        var lowest = latlngs[0];
-        for (var i = 0; i < latlngs.length; i++) {
-            if(latlngs[i].lat < lowest.lat){
-                lowest = latlngs[i];
-            }
-        }
-
-        return lowest;
-    }
-
-    function addToLayerdict(geomid, layer) {
+        
+    }   
+        
+    function addToLayerdict(label, polyline) {
         // Utility function to add a pair of geomid and references
-        // to the layer to a dict, add the onClick handler and the layer to the map.
-        layer.routegeomid = geomid;
-        layerdict[geomid] = layer;
-        layer.addTo(map);
-        layer.on('mouseover', on_mouseover_polyline);
+        // to the layer to a dict, add the onClick handler and the polyline to the map.
+        polyline.label = label;
+        layerdict[label] = polyline;
+        polyline.addTo(map);
+        polyline.on('mouseover', on_mouseover_polyline);
+        polyline.on('mouseout', on_mouseout_polyline);
+    }
+
+    function highlight_geometry(geomid){
+        var polyline = layerdict[geomid]
+        polyline.setStyle({
+            weight: 10
+        });
+    }
+
+    function un_highlight_geometry(geomid){
+        var polyline = layerdict[geomid]
+        polyline.setStyle({
+            weight: 5
+        });
+    }
+
+    function highlight_row(label){
+        routetable
+            .rows(label - 1)
+            .nodes()
+            .to$()
+            .addClass('highlight');
+    }
+
+    function un_highlight_row(label){
+        routetable
+            .rows(label-1)
+            .nodes()
+            .to$()
+            .removeClass('highlight');
     }
 
     </script>
@@ -227,7 +201,7 @@
 
     <br><br>
 
-    {% if wall_route_geom_list %}
+    {% if wall_routegeomlist %}
         In {{ wall.name }} there are following routes:
         <br>
         <br>
@@ -242,6 +216,14 @@
               </tr>
             </thead>
             <tbody>
+            {% for geom in wall_routegeomlist %}
+              <tr>
+                <td>{{ geom.label }}</td>
+                <td>{{ geom.route.name }}</td>
+                <td>{{ geom.route.get_grade_display }}</td>
+                <td>{{ geom.rating }}</td>
+              </tr>
+            {% endfor %}
             </tbody>
           </table>
 

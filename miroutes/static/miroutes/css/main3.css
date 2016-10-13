@@ -163,7 +163,9 @@ body {
     border-radius: 25px;
 }
 
-
+tr.highlight {
+    background-color: whitesmoke;
+}
 
 
 

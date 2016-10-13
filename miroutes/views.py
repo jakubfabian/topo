@@ -66,10 +66,18 @@ def wall_detail(request, wall_id, wallview=None, **kwargs):
     if wallview is None:
         wallview = wall.pub_view
 
+    wall.test = 'my magic'
     routegeomlist = wallview.routegeometry_set.all()
+    # sort from left to right
+    routegeomlist = list(routegeomlist)
+    routegeomlist = sorted(routegeomlist, key=lambda x: x.anchorpoint[0])
+    # we annotate with the index
+    for num, geom in enumerate(routegeomlist):
+        geom.label = num + 1 # humans count from 1
+
     context = {'wall': wall,
                'wallview': wallview,
-               'wall_route_geom_list': routegeomlist}
+               'wall_routegeomlist': routegeomlist}
     return render(request, 'miroutes/wall_detail.html', context)
 
 
