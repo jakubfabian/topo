@@ -16,4 +16,4 @@ if [ "$1" == "force" ]; then
 fi
 
 sudo rm -rf */migrations
-sudo rm -rf www/media/wall_pictures/background/*
+sudo rm -rf www/media/wall_pictures/*

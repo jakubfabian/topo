@@ -229,9 +229,9 @@ class Wall(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        super(Wall, self).save(*args, **kwargs)
-        self.create_tiles()
         self.create_thumb()
+        self.create_tiles()
+        super(Wall, self).save(*args, **kwargs)
         if not self.wallview_set.all():
             dev_view = WallView(wall=self, is_dev=True)
             dev_view.save()
@@ -256,7 +256,6 @@ class Wall(models.Model):
         try:
             create_thumb_image.delay(storage.path(self.background_img.name), storage.path(thumb_path))
             self.thumbnail_img = thumb_path
-            self.save()
             return "success"
         except Exception as e:
             print("Error creating thumb_file", e)

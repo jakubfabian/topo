@@ -258,7 +258,7 @@ def get_grade_choices(spot):
     """
     We use the spot's grade system entry to limit the possible grade choices for routes
     """
-    grade_choices = filter(lambda x: x[0]//100 == spot.grade_system+1, GRADE_CHOICES)
+    grade_choices = filter(lambda x: x[0]//100 == spot.grade_system, GRADE_CHOICES)
     return grade_choices
 
 
