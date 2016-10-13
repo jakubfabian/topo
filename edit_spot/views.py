@@ -175,6 +175,7 @@ def edit_wall(request, wall_id, **kwargs):
     """
 
     wall = get_object_or_404(Wall, pk=wall_id)
+    request.session['last_wall_id'] = wall_id
     spot = wall.spot
 
     if request.method == 'POST':
@@ -196,6 +197,10 @@ def edit_wall(request, wall_id, **kwargs):
         'show_edit_pane': True,
         'form': form
     }
+
+    if request.session.get('last_wall_id'):
+        context['last_wall_id'] = request.session['last_wall_id']
+
     return render(request, 'edit_spot/edit_wall.html', context)
 
 

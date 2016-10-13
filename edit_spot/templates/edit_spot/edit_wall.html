@@ -81,28 +81,33 @@ function map_init_basic(map, options) {
 
 {% endblock %}
 
-{% block edit_pane %}
-<a href="{% url "edit_spot" spot_id=spot.pk %}">Edit Spot</a> &nbsp;
-<a href="{% url "add_route" spot_id=spot.pk %}">Routepool</a>&nbsp;
-<a href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">Choose Wall</a>&nbsp;
-{% endblock %}
 
 {% block content %}
+
+{% include "edit_spot/edit_pane.html" %}
+
+<div class="row full-height">
+    <div class="col-md-3 full-height white-background">
+
+        <h1>{{ editing|yesno:"Edit wall, Add new Wall" }} {{ wall.name }}</h1>
+
+        <form method="POST" enctype="multipart/form-data" >
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="save">
+        </form>
+
+            <form method="GET" action="{% url 'edit_spot_wall_index' spot_id=spot.pk %}">
+                {% csrf_token %}
+                <input type="submit" value="cancel">
+            </form>
+
+    </div>
+    <div class="col-md-9 full-height">
+
         {% leaflet_map "wallmap" callback="window.map_init_basic" %}
-{% endblock %}
 
-{% block mapobjects_info %}
-    <h1>{{ editing|yesno:"Edit wall, Add new Wall" }} {{ wall.name }}</h1>
-
-    <form method="POST" enctype="multipart/form-data" >
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="save">
-    </form>
-
-    <form method="GET" action="{% url 'edit_spot_wall_index' spot_id=spot.pk %}">
-        {% csrf_token %}
-        <input type="submit" value="cancel">
-    </form>
+    </div>
+</div>
 
 {% endblock %}

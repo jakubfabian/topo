@@ -1,0 +1,50 @@
+{% comment %}
+  This creates the top panel which holds the links that are used to edit a Spot, the attached Walls, links and draws routes... This should be included in every edit template
+{% endcomment %}
+
+
+{% load staticfiles %}
+
+<div class="row">
+
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                {% url "edit_spot" spot_id=spot.pk as url_page %}
+                <a class="nav-link {% ifequal request.path url_page%}active{% endifequal %}" href="{{ url_page }}">
+                    <span class="glyphicon glyphicon-map-marker spot-icon" aria-hidden="true"></span>
+                    Edit Spot
+                </a>
+            </li>
+            <li class="nav-item">
+                {% url "add_route" spot_id=spot.pk as url_page %}
+                <a class="nav-link {% ifequal request.path url_page%}active{% endifequal %}" href="{{ url_page }}">
+                    <span class="glyphicon glyphicon-sort route-icon" aria-hidden="true"></span>
+                    Routepool
+                </a>
+            </li>
+            <li class="nav-item">
+                {% url "edit_spot_wall_index" spot_id=spot.pk as url_page %}
+                <a class="nav-link {% ifequal request.path url_page%}active{% endifequal %}" href="{{ url_page }}">
+                    <img src="{% static "miroutes/img/leaflet_wall_icon.png" %}" class="img-rounded" height="18">
+                    Choose Wall
+                </a>
+            </li>
+            {% if last_wall_id %}
+                <li class="nav-item">
+                    {% url "link_routes_to_wall" wall_id=last_wall_id as url_page %}
+                    <a class="nav-link {% ifequal request.path url_page%}active{% endifequal %}" href="{{ url_page }}">
+                        <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+                        Link Routes to Wall
+                    </a>
+                </li>
+                <li class="nav-item">
+                    {% url "draw_routes" wall_id=last_wall_id as url_page %}
+                    <a class="nav-link {% ifequal request.path url_page%}active{% endifequal %}" href="{{ url_page }}">
+                        <span class="glyphicon glyphicon-picture" aria-hidden="true"></span>
+                        Draw Routes on Wall
+                    </a> 
+                </li>
+            {% endif %}
+
+        </ul>
+    </div>

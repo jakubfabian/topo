@@ -135,37 +135,19 @@
 {% endblock %}
 
 {% block content %}
-    <div class="row">
-
-        <ul class="nav nav-tabs">
-            <li class="nav-item">
-                <a class="nav-link active" href="{% url "edit_spot" spot_id=spot.pk %}">Edit Spot</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url "add_route" spot_id=spot.pk %}">Routepool</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">Choose Wall</a>
-            </li>
-            {% if last_wall_id %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url "link_routes_to_wall" wall_id=last_wall_id %}">Link Routes to Wall</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url "draw_routes" wall_id=last_wall_id %}">Draw Routes on Wall</a>
-                </li>
-            {% endif %}&nbsp;
-
-        </ul>
-    </div>
+    {% include "edit_spot/edit_pane.html" %}
     <div class="row full-height">
         <div class="col-md-3 white-background full-height">
-            <h1>Edit Spot :: {{ spot.name }}</h1>
-
             <form method="POST" action="{% url "edit_spot" spot_id=spot.pk %}">
               {% csrf_token %}
-              <div class="button" id="spot_locate_button" onclick="toggle_locate_spot();">Locate spot</div>
-              <div class="button" id="parking_locate_button" onclick="toggle_locate_parking();" >Locate parking</div>
+              <div class="button" id="spot_locate_button" onclick="toggle_locate_spot();">
+                  <img src="{% static "miroutes/img/leaflet_edit_marker_icon.png" %}" class="img-rounded" height="20">
+                  Locate spot
+              </div>
+              <div class="button" id="parking_locate_button" onclick="toggle_locate_parking();" >
+                  <img src="{% static "miroutes/img/leaflet_edit_parking_icon.png" %}" class="img-rounded" height="20">
+                  Locate parking
+              </div>
               <br>
               <div>
                 {{ form.as_p }}

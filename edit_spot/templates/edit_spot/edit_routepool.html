@@ -26,30 +26,9 @@
         });
     });
   </script>
-                                                                                                                                                                                                                                        
-    <div class="row">
 
-        <ul class="nav nav-tabs">
-            <li class="nav-item">
-                <a class="nav-link" href="{% url "edit_spot" spot_id=spot.pk %}">Edit Spot</a> &nbsp;
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active" href="{% url "add_route" spot_id=spot.pk %}">Routepool</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url "edit_spot_wall_index" spot_id=spot.pk %}">Choose Wall</a>
-            </li>
-            {% if last_wall_id %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url "link_routes_to_wall" wall_id=last_wall_id %}">Link Routes to Wall</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url "draw_routes" wall_id=last_wall_id %}">Draw Routes on Wall</a>
-                </li>
-            {% endif %}&nbsp;
+    {% include "edit_spot/edit_pane.html" %}
 
-        </ul>
-    </div>
     <div class="row">
         <div class="col-md-6">
             <div class="tb_table">
