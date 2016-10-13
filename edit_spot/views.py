@@ -342,8 +342,6 @@ def draw_routes(request, wall_id, **kwargs):
     request.session['last_wall_id'] = wall_id
     wallview = wall.dev_view
 
-    # also get all geoms asociated with wall routes
-    wallroutegeomlist = wallview.routegeometry_set.all()
 
     if request.POST:
         for key in request.POST.keys():
@@ -360,6 +358,26 @@ def draw_routes(request, wall_id, **kwargs):
                 # import ipdb
                 # ipdb.set_trace()
                 geom_obj.save()
+
+    # also get all geoms asociated with wall routes
+    wallroutegeomlist = list(wallview.routegeometry_set.all())
+
+    # annotate with a label
+    anchorpointlist = []
+    for geom in wallroutegeomlist:
+        try:
+            anchorpointlist.append([geom.anchorpoint[0], geom])
+        except:
+            anchorpointlist.append([None, geom])
+    # sort, None values first
+    anchorpointlist = sorted(anchorpointlist, key=lambda x: (x[0] is not None, x[0]))
+    for pos, entry in enumerate(anchorpointlist):
+        if entry[0]:
+            entry[1].label = pos + 1
+        else:
+            entry[1].label = '*'
+        wallroutegeomlist[pos] = entry[1]
+
 
     context = {'wall': wall,
                'spot': wall.spot,

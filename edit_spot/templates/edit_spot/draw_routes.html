@@ -43,7 +43,9 @@
 
     <link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
 
-{% endblock %}
+  {% endblock %}
+
+{% load miroute_tags %}
 
 {% block content %}
   <script>
@@ -103,39 +105,48 @@
 
         // Now we initialize the existing route geometries
         {% if wall_routegeomlist %}
-        var collection = {{ wall_routegeomlist|geojsonfeature|safe }};
-        var routenames = [];
-        var geomids = [];
+        window.layerdict = {};
+
         {% for geom in wall_routegeomlist %}
-        routenames.push("{{ geom.route.name }}");
-        geomids.push("{{ geom.id }}");
-        {% endfor %}
-        for (var i = 0; i < collection.features.length; i++) {
-            if (collection.features[i].geometry) {
-                var geoJsonFC = L.geoJson(collection.features[i]);
-                var polyline = null;
-                
-                geoJsonFC.eachLayer(function (layer) {
-                    polyline = L.polyline(layer.getLatLngs());
-                });
-                
-                console.log("Creating new feature group with polyline layer with id" + geomids[i]);
-                
-                var featureGroup = L.featureGroup([polyline]);
-                addToLayerdict(geomids[i], featureGroup);
-            }
-        }
+        {% if geom.geom %}
+        // generate polylines with colors
+        // note the custom filter!
+        var coordarray = {{ geom|linestringgeomfilter }};
+        var polyline = L.polyline(coordarray, {
+            color: '{{ geom.route.polylinecolor }}',
+            opacity: 1
+        });
         
+        addToLayerdict({{ geom.id }}, L.featureGroup([polyline]));
+        // we add a label
+        var myIcon = L.divIcon({
+            iconSize: new L.Point(20, 20),
+            html: {{ geom.label }}
+        });
+        var anchorpoint = {{ geom.anchorpoint }};
+        // careful with reversed coordinates!
+        var routelabel = L.marker([anchorpoint[1], anchorpoint[0]], {
+            icon: myIcon,
+        });
+        routelabel.addTo(map);
+
+        {% endif %}
+        {% endfor %}
+
         {% endif %}
 
         // map event handlers
         map.on('draw:created', function (e) {
+            var polyline = L.polyline(e.layer._latlngs, {
+                opacity: 1,
+                color: 'blue'
+            });
 
             // we select the drawn layer and write it to the map
-            var featureGroup = L.featureGroup([e.layer]);
-
+            var featureGroup = L.featureGroup([polyline]);
             // this also adds the line to the map
             addToLayerdict(activeGeomId, featureGroup);
+            
 
             featureGroup.eachLayer(function (layer) {
                 gj = JSON.stringify(layer.toGeoJSON().geometry);
@@ -189,6 +200,8 @@
 
         
     }
+
+
     
     function addToLayerdict(geomid, layer) {
         // Utility function to add a pair of geomid and references
@@ -196,7 +209,43 @@
         layer.routegeomid = geomid;
         layerdict[geomid] = layer;
         layer.addTo(map);
+        // add event handler
         layer.on('click', on_click_polyline);
+        layer.on('mouseover', function (e) {
+            highlight_geometry(e.target.routegeomid);
+            highlight_row(e.target.routegeomid);
+        });
+        layer.on('mouseout', function (e) {
+            un_highlight_geometry(e.target.routegeomid);
+            un_highlight_row(e.target.routegeomid);
+        });
+
+    }
+    function highlight_geometry(geomid){
+        layerdict[geomid].eachLayer( function (layer) {
+            layer.setStyle({
+                weight: 10
+            });
+        });
+
+    }
+
+    function un_highlight_geometry(geomid){
+        layerdict[geomid].eachLayer( function (layer) {
+            layer.setStyle({
+                weight: 5
+            });
+        });
+    }
+
+    function highlight_row(label){
+        $('#routetablerow_'+label)
+            .addClass('highlight');
+    }
+
+    function un_highlight_row(label){
+        $('#routetablerow_'+label)
+            .removeClass('highlight');
     }
 
     function hide_controls (elements) {
@@ -332,14 +381,16 @@
         {% for routegeom in wall_routegeomlist %}
         $("#routetable").find('tbody')
             .append($('<tr>')
+                    .attr('value', {{ routegeom.id }})
+                    .attr('id', 'routetablerow_'+{{ routegeom.id }})
+                    .append($('<td>')
+                            .text('{{ routegeom.label }}')
+                           )
                     .append($('<td>')
                             .text('{{ routegeom.route.name }}')
                            )
                     .append($('<td>')
                             .html('<span class="glyphicon glyphicon-flash route-grade-icon"></span>{{ routegeom.route.get_grade_display }}')
-                           )
-                    .append($('<td>')
-                            .text('{{ routegeom.route.rating }}')
                            )
                     .append($('<td>'))
                     .append($('<td>'))
@@ -370,6 +421,22 @@
                                                            );
         }
         {% endfor %}
+
+        // eventhandler for highlighting
+        $('#routetable tbody')
+            .on( 'mouseenter', 'tr', function () {
+                var geomid = this.getAttribute('value');
+                highlight_geometry(geomid);
+                highlight_row(geomid);
+            });
+        $('#routetable tbody')
+            .on( 'mouseleave', 'tr', function () {
+                var geomid = this.getAttribute('value');
+                un_highlight_geometry(geomid);
+                un_highlight_row(geomid);
+            });
+
+
     }
     
 
@@ -377,10 +444,10 @@
         map_init('wallmap');
         //route_selector_setup();
         generate_routelist();
+
     });
   </script>
-
-    {% include "edit_spot/edit_pane.html" %}
+     {% include "edit_spot/edit_pane.html" %}
 
     <div class="row full-height">
 
@@ -432,9 +499,9 @@
               <table id="routetable" style="width:100%">
                 <thead>
                   <tr>
+                    <th>pos</th>
                     <th>name</th>
                     <th>grade</th>
-                    <th>rating</th>
                     <th></th>
                     <th></th>
                   </tr>
