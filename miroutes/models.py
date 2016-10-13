@@ -6,7 +6,7 @@ from django.db import models
 from djgeojson.fields import LineStringField
 from djgeojson.fields import PointField
 
-from miroutes.tasks import tile_image
+from miroutes.tasks import tile_image, create_thumb_image
 
 from itertools import product
 
@@ -75,17 +75,54 @@ class Spot(models.Model):
         return self.name
 
 
-def get_bg_img_upload_path(wallimage, filename):
+def get_wall_upload_path(wall, fname):
     """
-    Define default basename for where to put wall background images inside media dir
+    Define folder where to put wall images and tiles inside media dir
     Args:
       filename: Filename of image
     """
     import os
     from time import gmtime, strftime
-    time = strftime("%Y-%m-%d-%H-%M-%S", gmtime()) + '_' + filename
-    return os.path.join("wall_pictures", "background", str(time))
+    time = strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+    spot_folder = 'spot' + str(wall.spot.id)
+    basename = time + '_' + os.path.splitext(os.path.basename(fname))[0]
+    path = os.path.join("wall_pictures", spot_folder, basename)
+    # print('get_wall_upload_path', path)
+    return path
 
+def get_bg_img_upload_path(wall, fname):
+    """
+    Define where to put full size image
+    Args:
+      filename: Filename of image
+    """
+    import os
+    path = os.path.join(get_wall_upload_path(wall, fname), os.path.basename(fname))
+    # print('get_bg_img_upload_path', path)
+    return path
+
+def get_thumb_img_upload_path(wall, fname):
+    """
+    Define where to put thumbnail_img
+
+    !!! ATTENTION: bg_img has to be saved before !!!
+
+    Args:
+      filename: Filename of image
+    """
+    import os
+    path = os.path.dirname(wall.background_img.name)
+    return os.path.join(path, 'thumb.png')
+
+def get_tiles_path(wall):
+    """
+    Define folder where to put tile images
+    Args:
+      filename: Filename of image
+    """
+    import os
+    path = os.path.dirname(wall.background_img.name)
+    return os.path.join(path, 'tiles/')
 
 class ActiveWallViewManager(models.Manager):
     """
@@ -177,6 +214,7 @@ class Wall(models.Model):
     active_objects = ActiveWallManager()
 
     background_img = models.ImageField(blank=True, upload_to=get_bg_img_upload_path)
+    thumbnail_img = models.ImageField(blank=True, upload_to=get_thumb_img_upload_path)
 
     @property
     def dev_view(self):
@@ -190,14 +228,38 @@ class Wall(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        update_img = False
         super(Wall, self).save(*args, **kwargs)
+        self.create_tiles()
+        self.create_thumb()
         if not self.wallview_set.all():
             dev_view = WallView(wall=self, is_dev=True)
             dev_view.save()
             pub_view = WallView(wall=self, is_dev=False)
             pub_view.save()
-	    self.save(*args, **kwargs)
+            self.save(*args, **kwargs)
+
+    def create_thumb(self):
+        """
+        Create a thumbnail from original picture
+        """
+        import os
+        from django.core.files.storage import default_storage as storage
+        # print("Creating Tiles")
+        if not self.background_img:
+            print ("No background image to create thumbnail for")
+            return ""
+        thumb_path = get_thumb_img_upload_path(self, self.background_img.name)
+        if storage.exists(thumb_path):
+            print("thumb_file already exists")
+            return "exists"
+        try:
+            create_thumb_image.delay(storage.path(self.background_img.name), storage.path(thumb_path))
+            self.thumbnail_img = thumb_path
+            self.save()
+            return "success"
+        except Exception as e:
+            print("Error creating thumb_file", e)
+            return "error"
 
     def create_tiles(self):
         """
@@ -206,18 +268,19 @@ class Wall(models.Model):
         """
         import os
         from django.core.files.storage import default_storage as storage
+        # print("Creating Tiles")
         if not self.background_img:
             print ("No background image to create tiles for")
             return ""
-        file_path = self.background_img.name
-        filename_base, filename_ext = os.path.splitext(file_path)
-        tiles_file_path = u"%s_tiles" % filename_base
+        bg_img_file_path = self.background_img.name
+        tiles_file_path = get_tiles_path(self)
+        print ("Creating Tiles2",bg_img_file_path, tiles_file_path)
         if storage.exists(tiles_file_path):
             print("tiles_file_path exists")
             return "exists"
         try:
-            print("tiles_file_path does not exist", storage.path(file_path), storage.path(tiles_file_path))
-            tile_image.delay(storage.path(file_path), storage.path(tiles_file_path))
+            print("tiles_file_path does not exist",storage.path(bg_img_file_path), ' :: ',storage.path(tiles_file_path))
+            tile_image.delay(storage.path(bg_img_file_path), storage.path(tiles_file_path))
             return "success"
         except:
             return "error"
@@ -230,14 +293,15 @@ class Wall(models.Model):
         from django.core.files.storage import default_storage as storage
         if not self.background_img:
             return ""
-        file_path = self.background_img.name
-        filename_base, filename_ext = os.path.splitext(file_path)
-        tiles_file_path = u"%s_tiles" % filename_base
-        print "background_img url: {}".format(self.background_img.url)
+
+        bg_img_file_path = self.background_img.name
+        tiles_file_path = get_tiles_path(self)
+
+        print("Return tiles web adress:",tiles_file_path,' :: ', storage.url(tiles_file_path))
         if storage.exists(tiles_file_path):
             return storage.url(tiles_file_path)
         else:
-            print "No tiles found for {}".format(filename_base)
+            print("No tiles found for {}".format(bg_img_file_path))
             return ""
 
     def get_bg_img_size(self):

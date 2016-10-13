@@ -3,6 +3,22 @@ from __future__ import absolute_import
 from celery import shared_task,task
 
 @shared_task(ignore_result=True)
+def create_thumb_image(src, dst, size=(128,128)):
+    from PIL import Image
+    print("Creating thumb for:",src,' => ', dst)
+    try:
+        tmp = Image.open(src)
+        image = tmp.copy()
+        tmp.close()
+        image.thumbnail(size, Image.ANTIALIAS)
+        background = Image.new('RGBA', size)
+        background.paste(image, ((size[0] - image.size[0]) // 2, (size[1] - image.size[1]) // 2))
+        background.save(dst)
+    except Exception,e:
+        print("Error occured creating thumb for:",src,' => ', dst, '::', e)
+        pass
+
+@shared_task(ignore_result=True)
 def tile_image(src, dst, tile_width=256):
     """
     Tile an image for use in leafletjs
@@ -14,7 +30,10 @@ def tile_image(src, dst, tile_width=256):
         import numpy as np
         #import ipdb;ipdb.set_trace()
 
-        image = Image.open(src)
+        print("Tiling Image:", src)
+        tmp = Image.open(src)
+        image = tmp.copy()
+        tmp.close()
 
         # If we are dealing with a jpeg we read the exif data to see if it should be
         # rotated
