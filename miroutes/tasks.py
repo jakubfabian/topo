@@ -30,6 +30,10 @@ def tile_image(src, dst, tile_width=256):
         import numpy as np
         #import ipdb;ipdb.set_trace()
 
+        if os.path.exists(dst):
+            print("Tile directory seems to already exist... will assume I should not do anything and return")
+            return
+
         print("Tiling Image:", src)
         tmp = Image.open(src)
         image = tmp.copy()

@@ -14,15 +14,15 @@ class Command(BaseCommand):
         self.stdout.write("Creating initial database objects")
 
         gKochel = {u'coordinates': [11.344199180603026, 47.632660340454386], u'type': u'Point'}
-        gKochel2 = {u'coordinates': [11.644199180603026, 47.632660340454386], u'type': u'Point'}
+        gPampa = {u'coordinates': [11.644199180603026, 47.632660340454386], u'type': u'Point'}
 
         gWiesenwand = {u'coordinates': [11.347973048686981, 47.63621916824778], u'type': u'Point'}
         gKeltenwand = {u'coordinates': [11.346226930618286, 47.634681075868414], u'type': u'Point'}
 
-        s = Spot(name="testSpot", geom=gKochel)
+        s = Spot(name="Kochel", geom=gKochel)
         s.save()
 
-        s2 = Spot(name="testSpot2", geom=gKochel2)
+        s2 = Spot(name="Pampa", geom=gPampa)
         s2.save()
 
         fname_image = "/code/misc/kochel_wiesenwand.png"
@@ -31,7 +31,7 @@ class Command(BaseCommand):
         w.save()
         w.background_img.save('seewand_pano.png', File(open(fname_image)))
 
-        for j in range(0, 30):
+        for j in range(0, 5):
             r = Route(name="testRoute" + str(j), grade="201", spot=s)
             r.save()
 

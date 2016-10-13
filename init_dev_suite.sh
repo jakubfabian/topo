@@ -8,18 +8,18 @@
 
 # then use docker-compose up to restart all containers and run them in background
 docker-compose up -d
-sleep 2
+sleep 5
 
 # make migrations and migrate to setup db
 docker-compose run web python manage.py makemigrations
 docker-compose run web python manage.py makemigrations miroutes
 docker-compose run web python manage.py migrate
-sleep 3
+sleep 5
 
 # Create root admin user
 echo "from django.contrib.auth.models import User; User.objects.create_superuser('root', 'myemail@example.com', 'root')" | docker-compose run web python manage.py shell
 docker-compose restart
-sleep 3
+sleep 5
 
 sh insertfields.sh
 
