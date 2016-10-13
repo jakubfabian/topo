@@ -513,7 +513,7 @@
             </div>
 
             <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
-            <form method="POST" action="{{ request.path|urlencode }}">
+            <form method="POST" action="{{ request.path|urlencode }}" onsubmit="clean_handles()">
                 {% csrf_token %}
                 
                 {% for routegeom in wall_routegeomlist %}
