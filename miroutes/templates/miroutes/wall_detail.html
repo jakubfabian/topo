@@ -44,15 +44,6 @@
 
     });
 
-    function getColor(x) {
-        var diff = x%100;
-        return diff < 6     ?    '#ffffb2':
-            diff < 10     ?   '#fecc5c':
-            diff < 14     ?   '#fd8d3c':
-            diff < 18     ?   '#f03b20':
-            '#bd0026';
-    };
-
     function on_mouseover_polyline(e){
         highlight_geometry(e.target.label);
         highlight_row(e.target.label);
@@ -131,11 +122,29 @@
         });
         var anchorpoint = {{ geom.anchorpoint }};
         // careful with reversed coordinates!
-        var routelabel = L.marker([anchorpoint[1]-5, anchorpoint[0]], {
+        var routelabel = L.marker([anchorpoint[1], anchorpoint[0]], {
             icon: myIcon,
         });
-        
         routelabel.addTo(map);
+
+        // add popup
+        var popuppoint = {{ geom.popuppoint }};
+        var content =
+            `<div class='popup'>
+            <div class='popup-name'>{{ geom.route.name }}</div>
+            <div class='popup-grade'>{{ geom.route.get_grade_display }}</div>
+            <div class='popup-length'>L: {{ geom.route.length }}m</div>
+            <div class='popup-rating'>{{ geom.route.rating }}</div>
+            <div class='popup-description'>{{ geom.route.description }}</div>
+            </div>`
+            
+        var popup = L.popup()
+            .setContent(content);
+
+        polyline.bindPopup(popup);
+        polyline.popuppoint = [popuppoint[1], popuppoint[0]];
+
+        
         {% endfor %}
         {% endif %}
 
@@ -157,6 +166,7 @@
         polyline.setStyle({
             weight: 10
         });
+        polyline.openPopup(polyline.popuppoint);
     }
 
     function un_highlight_geometry(geomid){

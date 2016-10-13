@@ -167,7 +167,32 @@ tr.highlight {
     background-color: whitesmoke;
 }
 
+.popup{
+    width: 100px;
+}
 
+.popup-name{
+    float: left;
+    width: 70%;
+}
+
+.popup-grade{
+    margin-left: 70%;
+    text-align: right;
+}
+
+.popup-length{
+    float:left;
+    width:50%;
+}
+
+.popup-rating{
+    margin-left:50%;
+    text-align: right;
+}
+
+.popup-description{
+}
 
 
 

@@ -421,18 +421,17 @@ class Route(models.Model):
     @property
     def polylinecolor(self):
         diff = (self.grade % 100)/10
-        colors = ['#FF00FF', # from pink (difficult)
-                  '#FF00C6',
-                  '#FF008D',
-                  '#FF0055',
-                  '#FF001C',
-                  '#FF1C00',
-                  '#FF5400',
-                  '#FF8D00',
-                  '#FFC600',
-                  '#FFFF00', # to yellow (easy)
+        colors = ['#87FF4D', # from green (easy)
+                  '#B3FF44',
+                  '#E3FF3B',
+                  '#FFE533',
+                  '#FFAB2A',
+                  '#FF6D22',
+                  '#FF2A19',
+                  '#FF113F',
+                  '#FF087A',
+                  '#FF00BA', # to pink (hard)
         ]
-        colors = colors[::-1]
         return colors[diff]
 
 
@@ -453,6 +452,15 @@ class RouteGeometry(models.Model):
             geom = literal_eval(self.geom)
             yvals = [coord[1] for coord in geom['coordinates']]
             return geom['coordinates'][yvals.index(min(yvals))]
+    @property
+    def popuppoint(self):
+        """Search the top point of the linestring geometry,
+        if there is any.
+        """
+        if self.geom:
+            geom = literal_eval(self.geom)
+            yvals = [coord[1] for coord in geom['coordinates']]
+            return geom['coordinates'][yvals.index(max(yvals))]
 
 
 
