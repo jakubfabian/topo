@@ -132,7 +132,10 @@
         var content =
             `<div class='popup'>
             <div class='popup-name'>{{ geom.route.name }}</div>
-            <div class='popup-grade'>{{ geom.route.get_grade_display }}</div>
+	    <div class='popup-grade'>
+                 <span class='glyphicon glyphicon-flash route-grade-icon'></span>
+                 {{ geom.route.get_grade_display }}
+            </div>
             <div class='popup-length'>L: {{ geom.route.length }}m</div>
             <div class='popup-rating'>{{ geom.route.rating }}</div>
             <div class='popup-description'>{{ geom.route.description }}</div>
@@ -230,7 +233,10 @@
               <tr>
                 <td>{{ geom.label }}</td>
                 <td>{{ geom.route.name }}</td>
-                <td>{{ geom.route.get_grade_display }}</td>
+                <td>
+                    <span class='glyphicon glyphicon-flash route-grade-icon'></span>
+                    {{ geom.route.get_grade_display }}
+                </td>
                 <td>{{ geom.rating }}</td>
               </tr>
             {% endfor %}
