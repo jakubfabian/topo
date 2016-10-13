@@ -336,7 +336,7 @@
                             .text('{{ routegeom.route.name }}')
                            )
                     .append($('<td>')
-                            .text('{{ routegeom.route.get_grade_display }}')
+                            .html('<span class="glyphicon glyphicon-flash route-grade-icon"></span>{{ routegeom.route.get_grade_display }}')
                            )
                     .append($('<td>')
                             .text('{{ routegeom.route.rating }}')

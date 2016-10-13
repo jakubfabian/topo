@@ -133,6 +133,10 @@ body {
     color: #1fca11;
 }
 
+.route-grade-icon {
+    color: #ff9835;
+}
+
 .counters {
     text-align: center;
     margin-bottom: 20px;

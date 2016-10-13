@@ -97,7 +97,7 @@
                         {% for route in route_list %}
                             <tr>
                                 <td><a href="{% url "route_detail" route_id=route.pk %}">{{ route.name }} </a></td>
-                                <td>{{ route.get_grade_display }}</td>
+                                <td><span class='glyphicon glyphicon-flash route-grade-icon'></span>{{ route.get_grade_display }}</td>
                                 <td>{{ route.length }}</td>
                                 <td>{{ route.rating }}</td>
                                 <td><a href="{% url "edit_route" route_id=route.pk %}">edit</a></td>
