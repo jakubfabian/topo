@@ -9,6 +9,7 @@ html, body {
 
 body {
     background-size: cover;
+    background: url('../../img/wood.jpg');
 }
 
 #header {
