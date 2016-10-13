@@ -94,13 +94,16 @@ function map_init_basic(map, options) {
         <form method="POST" enctype="multipart/form-data" >
             {% csrf_token %}
             {{ form.as_p }}
-            <input type="submit" value="save">
+            <button type="submit" class="btn btn-info btn-xs">
+                <span class="glyphicon glyphicon-floppy-save"></span> Save
+            </button>
+            <a href="{% url 'edit_spot_wall_index' spot_id=spot.pk %}"
+                class="btn btn-info btn-xs" role="button">
+                <span class="glyphicon glyphicon-remove"></span>
+            </a>
+        </form>
         </form>
 
-            <form method="GET" action="{% url 'edit_spot_wall_index' spot_id=spot.pk %}">
-                {% csrf_token %}
-                <input type="submit" value="cancel">
-            </form>
 
     </div>
     <div class="col-md-9 full-height">
