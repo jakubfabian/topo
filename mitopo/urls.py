@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^miroutes/', include('miroutes.urls')),
     url(r'^edit_spot/', include('edit_spot.urls')),
     url(r'^users/', include('users.urls')),
+    url(r'^ratings/', include('star_ratings.urls', namespace='ratings', app_name='ratings')),
 ]
 
 # if in debug mode, redirect static requests to media_ROOT

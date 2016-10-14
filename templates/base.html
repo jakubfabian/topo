@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-{% load static %}
+    {% load static %}
 
 <head>
     <title>
@@ -36,8 +36,10 @@
     <script type="text/javascript"
             src="{% static "miroutes/bower_components/bootstrap/dist/js/bootstrap.min.js" %}"></script>
     <link rel="stylesheet" type="text/css" href="{% static "/miroutes/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css" %}">
-    <script type="text/javascript" charset="utf8"
-            src="{% static "miroutes/bower_components/datatables.net/js/jquery.dataTables.min.js" %}"></script>
+    <script type="text/javascript" charset="utf8" src="{% static "miroutes/bower_components/datatables.net/js/jquery.dataTables.min.js" %}"></script>
+
+    <link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
+    <script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
     
     {% block main-css %}
         <link href='{% static "/miroutes/bower_components/pt-sans/styles/pt_sans.css" %}' rel='stylesheet' type='text/css'>

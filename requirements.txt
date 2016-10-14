@@ -9,3 +9,5 @@ Pillow
 numpy
 celery
 django-dbbackup
+django-ratings
+django-star-ratings

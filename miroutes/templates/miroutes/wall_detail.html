@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load ratings %}
 
 {% block title %}
     Mitopo.de - Wall page
@@ -202,18 +203,10 @@
 {% endblock %}
 
 {% block mapobjects_info %}
-    You're looking at wall {{ wall.name }}.
+    <h4>
+        <b> {{ wall.name }} {% ratings wall %} </b>
+    </h4>
     <br/>
-    {% if wallview.is_dev %}
-        <a href="{% url "wall_detail" wall_id=wall.id %}">Show live wall view</a>
-        <br/>
-    {% endif %}
-
-    <!-- if you are the owner or a manager -->
-    <a href={% url "draw_routes" wall_id=wall.id %}>Edit {{ wall.name }}</a>
-
-    <br><br>
-
     {% if wall_routegeomlist %}
         In {{ wall.name }} there are following routes:
         <br>
@@ -222,10 +215,10 @@
         <table id="routetable">
             <thead>
               <tr>
-                <th>pos</th>
-                <th>name</th>
-                <th>gra</th>
-                <th>rat</th>
+                <th></th>
+                <th>Name</th>
+                <th>Diff</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -237,7 +230,7 @@
                     <span class='glyphicon glyphicon-flash route-grade-icon'></span>
                     {{ geom.route.get_grade_display }}
                 </td>
-                <td>{{ geom.rating }}</td>
+                <td>{% ratings geom.route %}</td>
               </tr>
             {% endfor %}
             </tbody>
@@ -246,6 +239,17 @@
     {% else %}
         <p>Currently no routes are available in {{ wall.name }}</p>
     {% endif %}
+
+    <br><br>
+
+    {% if wallview.is_dev %}
+        <a href="{% url "wall_detail" wall_id=wall.id %}">Show live wall view</a>
+        <br/>
+    {% endif %}
+
+    <!-- if you are the owner or a manager -->
+    <a href={% url "draw_routes" wall_id=wall.id %}>Edit {{ wall.name }}</a>
+
 
 {% endblock %}
 

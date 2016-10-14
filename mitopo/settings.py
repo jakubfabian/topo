@@ -61,6 +61,8 @@ INSTALLED_APPS = [
     'users',
     'reversion',
     'dbbackup',  # django-dbbackup
+    #'djangoratings',
+    'star_ratings',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -159,7 +161,10 @@ STATIC_URL = '/static/'
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder'
-    )
+)
+STATICFILES_DIRS = [
+        os.path.join(BASE_DIR, "static"),
+]
 
 
 EMAIL_USE_TLS = True
@@ -180,3 +185,6 @@ LOGIN_URL="/users/login"
 # Paths for database backups
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join( WEB_ROOT, 'backups')}
+
+# django-star-ratings
+STAR_RATINGS_STAR_HEIGHT=16

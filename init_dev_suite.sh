@@ -24,3 +24,6 @@ sleep 5
 sh insertfields.sh
 
 docker-compose ps
+
+# In order to overwrite the django-star_rating images, we need to call collectstatic at least once
+docker-compose run web python manage.py collectstatic

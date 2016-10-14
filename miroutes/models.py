@@ -103,7 +103,6 @@ class Spot(models.Model):
         default=timedelta(minutes=15))
     grade_system = models.IntegerField(default=0, choices=GRADE_SYSTEMS)
 
-
     def __str__(self):
         return self.name
 

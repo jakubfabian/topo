@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load ratings %}
 
 {% block title %}
     Mitopo.de
@@ -26,7 +27,7 @@
                 var newcoord = L.latLng(coord.lng, coord.lat);
                 var mc = new L.marker(newcoord);
                 var popup_msg=`
-                    <a href={% url "spot_detail" spot_id=spot.id %}>{{spot.name}}</a>
+                    <h4> <a href={% url "spot_detail" spot_id=spot.id %}>{{spot.name}}</a> </h4>
                     <br>
                     <img src='{% static "miroutes/img/leaflet_wall_icon.png" %}' class='img-rounded' height='20'>
                     {{spot.wall_set.count}}
