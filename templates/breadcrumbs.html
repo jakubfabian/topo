@@ -1,31 +1,31 @@
 {% if route %}
 
-    <ol class="breadcrumb">
+    <ul class="breadcrumb">
         <li class="breadcrumb-item"><a href="/miroutes">Home</a></li>
         <li class="breadcrumb-item"><a href=" {% url "spot_detail" spot_id=route.spot.pk %} "> {{ route.spot.name }}</a>
         </li>
         <li class="breadcrumb-item active"><a href=" {% url "route_detail" route_id=route.pk %} "> {{ route.name }}</a>
         </li>
-    </ol>
+    </ul>
 
 {% elif wall %}
-    <ol class="breadcrumb">
+    <ul class="breadcrumb">
         <li class="breadcrumb-item"><a href="/miroutes">Home</a></li>
         <li class="breadcrumb-item"><a href=" {% url "spot_detail" spot_id=wall.spot.pk %} "> {{ wall.spot.name }}</a>
         </li>
         <li class="breadcrumb-item active"><a href=" {% url "wall_detail" wall_id=wall.pk %} "> {{ wall.name }}</a></li>
-    </ol>
+    </ul>
 
 
 {% elif spot %}
-    <ol class="breadcrumb">
+    <ul class="breadcrumb">
         <li class="breadcrumb-item"><a href="/miroutes">Home</a></li>
         <li class="breadcrumb-item active"><a href=" {% url "spot_detail" spot.pk %} "> {{ spot.name }}</a></li>
-    </ol>
+    </ul>
 
 {% else %}
-    <ol class="breadcrumb">
+    <ul class="breadcrumb">
         <li class="breadcrumb-item"><a href="/miroutes">Home</a></li>
-    </ol>
+    </ul>
 
 {% endif %}

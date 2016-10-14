@@ -69,22 +69,7 @@
                     <img id="logo" src="{% static "miroutes/img/logo.png" %}"/>
                 </a>
             </div>
-            <div class="col-xs-9 col-md-2">
-                    {% include 'search_container.html' %}
-            </div>
-
-            <div class="clearfix hidden-md hidden-lg"></div>
-
-            <div class="col-xs-12 col-md-2">
-
-                <div id="breadcrumbs">
-                    {% include "breadcrumbs.html" %}
-                </div>
-            </div>
-
-            <div class="clearfix hidden-md hidden-lg"></div>
-
-            <div id="login-menu" class="col-xs-12 col-md-6">
+            <div id="login-menu" class="col-xs-12 col-md-10">
                 {% if user.is_anonymous %}
                     <a id="login_button" class="btn btn-default"
                        href="{% url 'django.contrib.auth.views.login' %}?next={{ request.path }}">Login</a>
@@ -98,6 +83,19 @@
                     &nbsp;&nbsp;
                 {% endif %}
             </div>
+            <div class="col-xs-9 col-md-12">
+                    {% include 'search_container.html' %}
+            </div>
+
+            <div class="col-xs-12 col-md-12">
+
+                <div id="breadcrumbs">
+                    {% include "breadcrumbs.html" %}
+                </div>
+            </div>
+
+            <div class="clearfix hidden-md hidden-lg"></div>
+
         </div>
     </div>
 
