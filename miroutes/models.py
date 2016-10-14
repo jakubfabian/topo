@@ -377,10 +377,12 @@ class Wall(models.Model):
         # Now we still have to update the RouteGeometries on the
         # new pub_view
         for routegeom in self.dev_view.routegeometry_set.all():
-            new_routegeom = RouteGeometry(route=routegeom.route,
-                                          on_wallview=self.pub_view,
-                                          geom=routegeom.geom)
-            new_routegeom.save()
+            if routegeom.geom:
+                new_routegeom = RouteGeometry(
+                    route=routegeom.route,
+                    on_wallview=self.pub_view,
+                    geom=routegeom.geom)
+                new_routegeom.save()
 
     def reset_dev_view(self):
         """
