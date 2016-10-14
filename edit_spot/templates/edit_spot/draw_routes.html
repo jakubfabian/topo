@@ -92,6 +92,7 @@
         // or created geometry
         window.activeGeomId = null;
         window.layerdict = {};
+        window.routelabeldict = {};
 
         // We define a empty draw control and add it to the map
         // global variable!
@@ -135,7 +136,7 @@
         var routelabel = L.marker([anchorpoint[1], anchorpoint[0]], {
             icon: myIcon,
         });
-        routelabel.addTo(map);
+        add_to_routelabeldict({{ geom.id }}, routelabel);
 
         {% endif %}
         {% endfor %}
@@ -197,6 +198,10 @@
     }
 
         
+    function add_to_routelabeldict(geomid, routelabel){
+        routelabeldict[geomid] = routelabel
+        routelabel.addTo(map);
+    }
 
 
     
@@ -366,6 +371,7 @@
         clean_handles();
         try{
             map.removeLayer(layerdict[activeGeomId]);
+            map.removeLayer(routelabeldict[activeGeomId]);
         }catch(err){
             console.log("Could not delete layer " + activeGeomId)
         }
