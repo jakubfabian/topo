@@ -346,11 +346,13 @@ def draw_routes(request, wall_id, **kwargs):
     if request.POST:
         polyline_forms = []
         for geom in wallroutegeomquery:
-            polyline_forms.append(PolylineForm(request.POST, instance=geom, prefix=geom.pk))
-        for form in polyline_forms:
+            form = PolylineForm(request.POST, instance=geom, prefix=geom.pk)
+
             if form.is_valid():
                 form.save()
-                
+            else:
+                geom.geom = None
+                geom.save()
 
     polyline_forms = []
     for geom in wallroutegeomquery:

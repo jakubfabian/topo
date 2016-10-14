@@ -469,6 +469,7 @@ class RouteGeometry(models.Model):
     """
     The geometry of a route that is specific to a wall.
     """
+
     on_wallview = models.ForeignKey(WallView)
     route = models.ForeignKey(Route)
     geom = LineStringField()
@@ -479,6 +480,7 @@ class RouteGeometry(models.Model):
         if there is any.
         """
         if self.geom:
+
             #geom = literal_eval(self.geom)
             geom = self.geom
             yvals = [coord[1] for coord in geom['coordinates']]

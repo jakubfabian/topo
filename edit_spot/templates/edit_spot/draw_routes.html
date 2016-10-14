@@ -129,6 +129,7 @@
             iconSize: new L.Point(20, 20),
             html: {{ geom.label }}
         });
+
         var anchorpoint = {{ geom.anchorpoint }};
         // careful with reversed coordinates!
         var routelabel = L.marker([anchorpoint[1], anchorpoint[0]], {
@@ -218,20 +219,25 @@
 
     }
     function highlight_geometry(geomid){
-        layerdict[geomid].eachLayer( function (layer) {
-            layer.setStyle({
-                weight: 10
+        if(typeof layerdict[geomid] !== 'undefined'){
+            layerdict[geomid].eachLayer( function (layer) {
+                layer.setStyle({
+                    weight: 10
+                });
+                
             });
-        });
+        }
 
     }
 
     function un_highlight_geometry(geomid){
-        layerdict[geomid].eachLayer( function (layer) {
-            layer.setStyle({
-                weight: 5
+        if(typeof layerdict[geomid] !== 'undefined'){
+            layerdict[geomid].eachLayer( function (layer) {
+                layer.setStyle({
+                    weight: 5
+                });
             });
-        });
+        }
     }
 
     function highlight_row(label){
@@ -364,7 +370,7 @@
             console.log("Could not delete layer " + activeGeomId)
         }
 
-        document.getElementById("geom_inputfield_" + activeGeomId).value = "None";
+        document.getElementById("id_" + activeGeomId + "-geom").value = "null";
         generate_routelist()
 
     }
@@ -393,9 +399,9 @@
                    );
                 
         // Check if there is a geometry string
-        var geomstring = $("#geom_inputfield_{{ routegeom.id }}").val();
+        var geomstring = $("#id_{{ routegeom.id }}-geom").val();
         
-        if(geomstring == "None"){
+        if(geomstring == "null"){
             $("#routetable tr:last td:nth-child(4)").append($('<img>')
                                                             .attr('src', "{% static "edit_spot/img/edit.png" %}")
                                                             .attr('class', 'draw_route_tool_img')

@@ -54,6 +54,10 @@ class PolylineForm(forms.ModelForm):
         # we do not call the parents clean function which seems to be corrupt
         geomjson = self.cleaned_data.get('geom')
 
+        if not geomjson:
+            # if the field is not set we do not care
+            return self.cleaned_data
+
         if geomjson.get('type') == 'LineString':
             if geomjson.has_key('coordinates'):
                 return self.cleaned_data
