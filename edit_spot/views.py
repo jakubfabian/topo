@@ -51,7 +51,7 @@ def publish_wall(request, wall_id):
     wall.publish_dev_view()
     wall.is_active = True
     wall.save()
-    return redirect(reverse('spot_detail', kwargs={'spot_id': wall.spot.id}))
+    return redirect(reverse('wall_detail', kwargs={'wall_id': wall.id}))
 
 
 @permission_required('miroutes.wall.can.change')
