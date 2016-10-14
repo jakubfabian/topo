@@ -111,8 +111,14 @@
         {% if geom.geom %}
         // generate polylines with colors
         // note the custom filter!
-        var coordarray = {{ geom|linestringgeomfilter }};
-        var polyline = L.polyline(coordarray, {
+
+        var polyline = null;
+        var geojsonobject = L.geoJson({{ geom|geojsonfeature|safe }});
+        geojsonobject.eachLayer(function (layer) {
+            polyline = layer; 
+        });
+
+        polyline.setStyle({
             color: '{{ geom.route.polylinecolor }}',
             opacity: 1
         });
@@ -141,26 +147,14 @@
                 opacity: 1,
                 color: 'blue'
             });
-
+     
             // we select the drawn layer and write it to the map
             var featureGroup = L.featureGroup([polyline]);
             // this also adds the line to the map
-            addToLayerdict(activeGeomId, featureGroup);
-            
+            addToLayerdict(activeGeomId, featureGroup);            
 
-            featureGroup.eachLayer(function (layer) {
-                gj = JSON.stringify(layer.toGeoJSON().geometry);
-                console.log(gj);
-            });
-
-
-            // now we store it to the input
-            // var gj_layer = e.layer.toGeoJSON();
-
-            // we add this layer to the lookup table
-            //gj = JSON.stringify(gj_layer.geometry);
-            document.getElementById("geom_inputfield_" + activeGeomId).value = gj;
-
+            // store it to the input
+            store_polyline(activeGeomId, polyline);
                     
             // remove the draw controls
             resetDrawControl();
@@ -183,13 +177,8 @@
             var activeLayer = layerdict[activeGeomId];
 
             activeLayer.eachLayer(function (layer) {
-                gj = JSON.stringify(layer.toGeoJSON().geometry);
-                console.log(gj);
+                store_polyline(activeGeomId, layer);
             });
-
-
-            // TODO: bad hack to find activeGeomId
-            document.getElementById("geom_inputfield_" + activeGeomId).value = gj;
 
             // remove the draw controls
             resetDrawControl();
@@ -200,6 +189,13 @@
 
         
     }
+
+    function store_polyline(geomid, polyline){
+        var geojsonstring = JSON.stringify(polyline.toGeoJSON().geometry);
+        document.getElementById("id_" + activeGeomId + "-geom").value = geojsonstring;
+    }
+
+        
 
 
     
@@ -515,12 +511,12 @@
             <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
             <form method="POST" action="{{ request.path|urlencode }}" onsubmit="clean_handles()">
                 {% csrf_token %}
+              <div>
+                {% for form in polyline_forms %}
+                  {{ form.as_p }}
+                  {% endfor %}
+              </div>
                 
-                {% for routegeom in wall_routegeomlist %}
-                  <input id="geom_inputfield_{{ routegeom.id }}" type="hidden"
-                         name="routegeomid_{{ routegeom.id }}"
-                         value="{{ routegeom.geom }}">                
-                {% endfor %}
                 <input type="submit" value="speichern"/>
             </form>
 

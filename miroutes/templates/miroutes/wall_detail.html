@@ -107,13 +107,17 @@
         window.layerdict = {};
 
         {% for geom in wall_routegeomlist %}
-        // generate polylines with colors
-        // note the custom filter!
-        var coordarray = {{ geom|linestringgeomfilter }};
-        var polyline = L.polyline(coordarray, {
+        var polyline = null;
+        var geojsonobject = L.geoJson({{ geom|geojsonfeature|safe }});
+        geojsonobject.eachLayer(function (layer) {
+            polyline = layer; 
+        });
+
+        polyline.setStyle({
             color: '{{ geom.route.polylinecolor }}',
             opacity: 1
         });
+
         addToLayerdict({{ geom.label }}, polyline);
 
         // we add a label

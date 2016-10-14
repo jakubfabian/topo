@@ -479,7 +479,8 @@ class RouteGeometry(models.Model):
         if there is any.
         """
         if self.geom:
-            geom = literal_eval(self.geom)
+            #geom = literal_eval(self.geom)
+            geom = self.geom
             yvals = [coord[1] for coord in geom['coordinates']]
             return geom['coordinates'][yvals.index(min(yvals))]
     @property
@@ -488,7 +489,8 @@ class RouteGeometry(models.Model):
         if there is any.
         """
         if self.geom:
-            geom = literal_eval(self.geom)
+            #geom = literal_eval(self.geom)
+            geom = self.geom
             yvals = [coord[1] for coord in geom['coordinates']]
             return geom['coordinates'][yvals.index(max(yvals))]
 

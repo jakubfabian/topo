@@ -13,7 +13,7 @@ from miroutes.models import Route
 from miroutes.models import RouteGeometry
 from miroutes.models import GRADE_CHOICES
 
-from .forms import SpotForm, RouteForm, WallForm
+from .forms import SpotForm, RouteForm, WallForm, PolylineForm
 
 
 @permission_required('miroutes.spot.can_change')
@@ -341,24 +341,21 @@ def draw_routes(request, wall_id, **kwargs):
     wall = get_object_or_404(Wall, pk=wall_id)
     request.session['last_wall_id'] = wall_id
     wallview = wall.dev_view
-
+    wallroutegeomquery = wallview.routegeometry_set.all()
 
     if request.POST:
-        for key in request.POST.keys():
-            if key.startswith('routegeomid_'):
-                geomstr = request.POST.get(key)
-                # If the geomstr is empty we set to None
-                if geomstr == 'None' or geomstr == '':
-                    geomstr = None
+        polyline_forms = []
+        for geom in wallroutegeomquery:
+            polyline_forms.append(PolylineForm(request.POST, instance=geom, prefix=geom.pk))
+        for form in polyline_forms:
+            if form.is_valid():
+                form.save()
+                
 
-                print "Geometrystring: {}".format(geomstr)
-                rgid = key.split('_')[1]
-                geom_obj = RouteGeometry.objects.get(pk=rgid)
-                geom_obj.geom = geomstr
-                # import ipdb
-                # ipdb.set_trace()
-                geom_obj.save()
-
+    polyline_forms = []
+    for geom in wallroutegeomquery:
+        polyline_forms.append(PolylineForm(instance=geom, prefix=geom.pk))
+        
     # also get all geoms asociated with wall routes
     wallroutegeomlist = list(wallview.routegeometry_set.all())
 
@@ -383,6 +380,7 @@ def draw_routes(request, wall_id, **kwargs):
                'spot': wall.spot,
                'wallview': wallview,
                'wall_routegeomlist': wallroutegeomlist,
+               'polyline_forms': polyline_forms,
                'show_edit_pane': True}
 
     if request.session.get('last_wall_id'):

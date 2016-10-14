@@ -1,9 +1,11 @@
+import json
 from django import forms
 
 from miroutes.models import Spot
 from miroutes.models import Route
+from miroutes.models import RouteGeometry
 from miroutes.models import Wall
-
+from django.core.exceptions import ValidationError
 
 class SpotForm(forms.ModelForm):
     class Meta:
@@ -40,3 +42,24 @@ class RouteForm(forms.ModelForm):
         model = Route
         exclude = ('climbers','walls')
         widgets = {'spot': forms.HiddenInput()}
+
+
+class PolylineForm(forms.ModelForm):
+    class Meta:
+        model = RouteGeometry
+        fields = ('geom',)
+        widgets = {'geom': forms.HiddenInput()}
+
+    def clean(self):
+        # we do not call the parents clean function which seems to be corrupt
+        geomjson = self.cleaned_data.get('geom')
+
+        if geomjson.get('type') == 'LineString':
+            if geomjson.has_key('coordinates'):
+                return self.cleaned_data
+            else:
+                raise ValidationError(_('JSON contains no coordinates: %s') % geomjson)
+        else:
+            raise ValidationError(_('JSON does not represent a Linestring object: %s') % geomjson)
+
+
