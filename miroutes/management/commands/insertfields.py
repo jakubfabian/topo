@@ -36,6 +36,7 @@ class Command(BaseCommand):
             r.save()
 
             route_geom = {u'coordinates': [[90 + j * 3, -i] for i in xrange(9, 25)], u'type': u'LineString'}
+            route_geom = route_geom.__repr__()
 
             geom_obj = RouteGeometry(route=r, on_wallview=w.dev_view, geom=route_geom)
             geom_obj.save()
