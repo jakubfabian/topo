@@ -11,3 +11,4 @@ celery
 django-dbbackup
 django-ratings
 django-star-ratings
+django-storages

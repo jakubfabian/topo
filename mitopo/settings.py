@@ -183,8 +183,11 @@ LEAFLET_CONFIG = {
 LOGIN_URL="/users/login"
 
 # Paths for database backups
-DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
-DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join( WEB_ROOT, 'backups')}
+#DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+#DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join( WEB_ROOT, 'backups')}
+
+DBBACKUP_STORAGE = 'storages.backends.ftp.FTPStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': 'ftp://mitopo_backup:gucki@129.187.164.4:2221/home/mitopo_backup/backups/' }
 
 # django-star-ratings
 STAR_RATINGS_STAR_HEIGHT=16
