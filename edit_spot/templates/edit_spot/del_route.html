@@ -1,0 +1,40 @@
+{% extends request.is_ajax|yesno:"base_ajax.html,base.html" %}
+{% load staticfiles %}
+
+{% block title %}
+    Mitopo.de - Delete Route
+{% endblock %}
+
+{% block content %}
+{% endblock %}
+
+{% block mapobjects_info %}
+
+Permanently delete <b> {{ route.name }} </b>?
+<br>
+{% if request.is_ajax %}
+    <form method="POST" action="{% url 'del_route' route_id=route.id %}{% if next %}?next={{ next }}{% endif %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">
+            <i class="glyphicon glyphicon-trash"></i>
+        </button>
+    </form>
+
+{% else %}
+
+    <form method="POST" action="{% url 'del_route' route_id=route.id %}{% if next %}?next={{ next }}{% endif %}" style="display: inline-block;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">
+            <i class="glyphicon glyphicon-trash"></i>
+        </button>
+    </form>
+    <form method="GET" action="{{ next }}" style="display: inline-block;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">
+            <i class="glyphicon glyphicon-remove"></i>
+        </button>
+    </form>
+
+{% endif %}
+
+{% endblock %}

@@ -266,6 +266,33 @@ def get_grade_choices(spot):
     grade_choices = filter(lambda x: x[0]//100 == spot.grade_system, GRADE_CHOICES)
     return grade_choices
 
+@permission_required('miroutes.spot.can_delete')
+def del_route(request, route_id, **kwargs):
+    """
+    Delete new Route.
+    """
+    route = get_object_or_404(Route, pk=route_id)
+
+    next_page = request.GET.get('next', None)
+
+    context = {
+        'route': route,
+    }
+    if next_page is not None:
+        context['next'] = next_page
+
+    if request.is_ajax():
+        return render(request, 'edit_spot/del_route.html', context)
+
+    if request.method == 'POST':
+        route.delete()
+        if next_page is not None:
+            return redirect(next_page)
+        else: # we have send them somewhere? this is probably not wanted but lets show the way to /
+            return redirect('/')
+
+
+    return render(request, 'edit_spot/del_route.html', context)
 
 @permission_required('miroutes.spot.can_add')
 def add_route(request, spot_id, **kwargs):

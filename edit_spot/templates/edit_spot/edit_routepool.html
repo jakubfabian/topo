@@ -17,13 +17,38 @@
 
 {% block content %}
   <script type="text/javascript">
-    // This is the widget part
     $(document).ready(function () {
         selectable_table = $('#routetable').DataTable({
             "scrollY": "400px",
             "scrollCollapse": true,
             "paging": false
         });
+
+        $('[data-toggle="del_route_popover"]').each(function (){
+            var i = $(this);
+            var url = i.attr('data-poload')+'?next={{request.path}}';
+            i.popover({
+                html: true,
+                trigger: 'focus',
+                content: function(){
+                    var div_id =  "tmp-id-" + $.now(); // create unique tmp div in which asynchronous ajax will write page
+                    return details_in_popup(url, div_id);
+                }
+            });
+        });
+
+        function details_in_popup(url, div_id){
+            $.ajax({
+                url: url,
+                success: function(response) {
+                    $('#'+div_id).html(response);
+                },
+                error: function(response) {
+                    $('#'+div_id).html("Failed loading page... : "+response);
+                }
+            });
+            return '<div id="'+ div_id +'">Loading...</div>';
+        };
     });
   </script>
 
@@ -68,18 +93,34 @@
                             <th>name</th>
                             <th>grade</th>
                             <th>length</th>
-                            <th>rating</th>
-                            <th></th>
+                            <th>description</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for route in route_list %}
                             <tr>
-                                <td><a href="{% url "route_detail" route_id=route.pk %}">{{ route.name }} </a></td>
+                                <td>
+                                    <a href="{% url "route_detail" route_id=route.pk %}">
+                                        {{ route.name }}
+                                    </a>
+                                    &nbsp;
+                                    <a href="{% url "edit_route" route_id=route.pk %}">
+                                        <span class='glyphicon glyphicon-pencil'></span>
+                                    </a>
+                                    {% comment %}
+                                    This would be a trash can with a link to the del route page -- substituted with the below ajax call in the popover
+                                    <a href="{% url 'del_route' route_id=route.id %}?next={{ request.path }}">
+                                        <span class='glyphicon glyphicon-trash'></span>
+                                    </a>
+                                    {% endcomment %}
+                                    <a href="#" title="Del Route" data-poload="{% url 'del_route' route_id=route.id %}" data-toggle="del_route_popover" data-placement="top"
+                                       data-container="body">
+                                        <span class='glyphicon glyphicon-trash'></span>
+                                    </a>
+                                </td>
                                 <td><span class='glyphicon glyphicon-flash route-grade-icon'></span>{{ route.get_grade_display }}</td>
                                 <td>{{ route.length }}</td>
-                                <td>{{ route.rating }}</td>
-                                <td><a href="{% url "edit_route" route_id=route.pk %}">edit</a></td>
+                                <td>{{ route.description | truncatechars:60 }}</td>
                             </tr>
                           {% endfor %}
                     </tbody>

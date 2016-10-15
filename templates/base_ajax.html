@@ -1,0 +1,62 @@
+{% comment %}
+This base template should be loaded when a view is called with ajax
+write like this:
+
+{% extends request.is_ajax|yesno:"base_ajax.html,base.html" %}
+
+{% endcomment %}
+
+{% load static %}
+
+<html lang="en">
+    <head>
+        <title>
+            {% block title %}{% endblock %}
+        </title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        {% block extra_assets %}{% endblock %}
+
+        {% block main-css %}
+            <link href='{% static "/miroutes/bower_components/pt-sans/styles/pt_sans.css" %}' rel='stylesheet' type='text/css'>
+            <link rel="stylesheet" href={% static "miroutes/css/main3.css" %}/>
+        {% endblock %}
+
+        {% block overwrite_styles %}{% endblock %}
+
+    </head>
+
+    <body>
+
+        {% block header %}{% endblock %}
+        <div id="body-content">
+            <div class="row full-height">
+                <div id="content" class="col-lg-12">
+                    {% block content %}{% endblock %}
+                </div>
+                <div id="info-container" class="col-lg-12">
+                    <div id="infobar">
+                        {% block infobar %}
+                        {% endblock %}
+                    </div>
+                    <div id="messages">
+                        {% if messages %}
+                        <ul class="messages">
+                            {% for message in messages %}
+                            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                    <div id="mapobjects_info">
+                        {% block mapobjects_info %}{% endblock %}
+                    </div>
+                </div>
+
+            </div>
+
+            {% block footer %}{% endblock %}
+        </div>
+    </body>
+</html>
