@@ -28,8 +28,8 @@ class SpotForm(forms.ModelForm):
 class WallForm(forms.ModelForm):
     class Meta:
         model = Wall
-        exclude = ('thumbnail_img', 'is_active', 'spot',)
-        widgets = {'geom': forms.HiddenInput()}
+        exclude = ('thumbnail_img', 'is_active')
+        widgets = {'geom': forms.HiddenInput(), 'spot': forms.HiddenInput()}
 
 
 class RouteForm(forms.ModelForm):
