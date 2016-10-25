@@ -60,7 +60,7 @@ INSTALLED_APPS = [
     'edit_spot',
     'users',
     'reversion',
-    'dbbackup',  # django-dbbackup
+    #'dbbackup',
     #'djangoratings',
     'star_ratings',
 ]
@@ -186,8 +186,23 @@ LOGIN_URL="/users/login"
 #DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 #DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join( WEB_ROOT, 'backups')}
 
-DBBACKUP_STORAGE = 'storages.backends.ftp.FTPStorage'
-DBBACKUP_STORAGE_OPTIONS = {'location': 'ftp://mitopo_backup:gucki@129.187.164.4:2221/home/mitopo_backup/backups/' }
+#DBBACKUP_STORAGE = 'storages.backends.ftp.FTPStorage'
+#DBBACKUP_STORAGE_OPTIONS = {'location': 'ftp://mitopo_backup:guckiwacki@129.187.164.4:2221' }
+#DBBACKUP_TMP_DIR = os.path.join( WEB_ROOT, 'backups')
+
+#DBBACKUP_STORAGE = 'storages.backends.sftpstorage.SFTPStorage'
+#DBBACKUP_STORAGE_OPTIONS = {
+#        'host': '129.187.164.4',
+#        'params': {
+#            # 'hostname': '___hostname___',
+#            'username': 'mitopo_backup',
+#            'password': '__gucki__',
+#            'port': 2200,
+#            },
+#        'known_host_file': os.path.join(BASE_DIR, "mitopo", "known_hosts"),
+#        'root_path': '/home/mitopo_backup/backups/',
+#        }
+
 
 # django-star-ratings
 STAR_RATINGS_STAR_HEIGHT=16

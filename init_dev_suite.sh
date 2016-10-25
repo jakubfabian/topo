@@ -13,6 +13,7 @@ sleep 5
 # make migrations and migrate to setup db
 docker-compose run web python manage.py makemigrations
 docker-compose run web python manage.py makemigrations miroutes
+docker-compose run web python manage.py makemigrations users
 docker-compose run web python manage.py migrate
 sleep 5
 
