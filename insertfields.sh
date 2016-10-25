@@ -12,5 +12,6 @@
 
 rsync --partial --progress -a -v -e "ssh -p 2200" mitopo_backup@129.187.164.4:backup.0/ backup.0
 
-docker-compose run web ./manage.py loaddata backup.0/mitopo_db.json
+#docker-compose run web ./manage.py loaddata backup.0/mitopo_db.json
+docker-compose run web psql -h postgresql -U postgres < backup.0/mitopo_db.pgdump
 mv backup.0/www .
