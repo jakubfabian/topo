@@ -238,8 +238,6 @@ def edit_spot(request, spot_id):
     Alter location and meta info of spot
     """
 
-    request.session.pop('last_wall_id', None)
-
     spot_list = Spot.objects.exclude(pk=spot_id).order_by('name')
     spot = get_object_or_404(Spot, pk=spot_id)
     parking_list = spot.parkinglocation_set.all()
@@ -258,6 +256,9 @@ def edit_spot(request, spot_id):
                'parking_list': parking_list,
                'show_edit_pane': True,
                'form': form}
+
+    if request.session.get('last_wall_id'):
+        context['last_wall_id'] = request.session['last_wall_id']
 
     return render(request, 'edit_spot/edit_spot.html', context)
 
