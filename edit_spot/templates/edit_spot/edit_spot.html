@@ -42,9 +42,12 @@
           var icon = {{ parking.icon }};
           {% endautoescape %}
           var parking_marker = create_marker({{ parking|geojsonfeature|safe }}, icon);
-          parking_marker.eachLayer( function (layer) {
-              layer.options.parking_id = {{ parking.id }};
-          });
+
+          var popup_content = `<button type="button" class="btn btn-default" aria-label="Delete" onclick="on_delete_parking_location({{ parking.id }})">
+              <span class='glyphicon glyphicon-trash' aria-hidden="true"></span>
+              </button>`; 
+          parking_marker.bindPopup(popup_content);
+          parking_marker.on('click', parking_marker.openPopup)
           markers.addLayer(parking_marker);
           {% endfor %}
           
@@ -83,10 +86,6 @@
                 $("#parking_locate_button").removeClass('active');
                 window.map.off('click', on_parking_location);
             }
-            if($("#parking_delete_button").hasClass('active')){
-                $("#parking_delete_button").removeClass('active');
-                window.map.off('click', on_delete_parking_location);
-            }
 
             if($("#spot_locate_button").hasClass('active')){
                 $("#spot_locate_button").removeClass('active')
@@ -102,11 +101,6 @@
                 $("#spot_locate_button").removeClass('active');
                 window.map.off('click', on_spot_location);
             }
-            if($("#parking_delete_button").hasClass('active')){
-                $("#parking_delete_button").removeClass('active');
-                window.map.off('click', on_delete_parking_location);
-            }
-
             if($("#parking_locate_button").hasClass('active')){
                 $("#parking_locate_button").removeClass('active')
                 window.map.off('click', on_parking_location);
@@ -116,26 +110,6 @@
             }
         }
         
-        function toggle_delete_parking(){
-            if($("#spot_locate_button").hasClass('active')){
-                $("#spot_locate_button").removeClass('active');
-                window.map.off('click', on_spot_location);
-            }
-            if($("#parking_locate_button").hasClass('active')){
-                $("#parking_locate_button").removeClass('active');
-                window.map.off('click', on_parking_location);
-            }
-
-            if($("#parking_delete_button").hasClass('active')){
-                $("#parking_delete_button").removeClass('active')
-                window.map.off('click', on_parking_delete_location);
-            } else {
-                $("#parking_delete_button").addClass('active');
-                markers.eachLayer(function (layer){
-                    layer.on('click', on_delete_parking_location);
-                });
-            }
-        }
             
         
         function on_spot_location(e){
@@ -161,11 +135,11 @@
             
         };
 
-        function on_delete_parking_location(e){
+        function on_delete_parking_location(parking_id){
 
             console.log("Deleting parking location!") // sanity check
             var urlstring = "{% url "delete_parking" parking_id=6666 spot_id=spot.id %}";
-            urlstring = urlstring.replace('6666', this.options.parking_id);
+            urlstring = urlstring.replace('6666', parking_id);
 
             httpPostAsync(urlstring+"?next={{ request.path }}");            
             
@@ -205,10 +179,6 @@
               <div class="button" id="parking_locate_button" onclick="toggle_locate_parking();" >
                   <img src="{% static "miroutes/img/leaflet_edit_parking_icon.png" %}" class="img-rounded" height="20">
                   Locate parking
-              </div>
-              <div class="button" id="parking_delete_button" onclick="toggle_delete_parking();" >
-                <i class="glyphicon glyphicon-erase"></i>
-                Delete Parking
               </div>
               <br>
               <div>
