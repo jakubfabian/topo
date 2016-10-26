@@ -37,33 +37,38 @@
                 markerArray.push(mc);
             {% endfor %}
 
+
+            {% for parking in parking_list %}
+            {% autoescape off %}
+            var icon = {{ parking.icon }};
+            {% endautoescape %}
+            var parking_marker = create_marker({{ parking|geojsonfeature|safe }}, icon);
+            markerArray.push(parking_marker);
+            {% endfor %}
+
             var group = L.featureGroup(markerArray);
 
             map.options.maxZoom = 17;
             markers = new L.MarkerClusterGroup();
             markers.addLayer(group);
 
-            {% if spot.parking_geom %}
-
-            var editing_Parking = {{ spot|geojsonfeature:":parking_geom"|safe }};
-            var editParkingLayer = L.geoJson(editing_Parking, {
-                pointToLayer: function (feature, latlng) {
-                    park_marker = L.marker(latlng, {icon: LeafletParkingIcon});
-                    return park_marker;
-                }
-            });
-
-            markers.addLayer(editParkingLayer);
-            {% endif %}
-            
             map.addLayer(markers);
             if (markerArray.length > 1) {
-                map.fitBounds(group.getBounds());
+                map.fitBounds(markers.getBounds());
             } else {
                 map.setView(markerArray[0].getLatLng(), 15);
             }
         }
-    </script>
+
+        function create_marker(location, icon){
+            return L.geoJson(location, {
+                pointToLayer: function (feature, latlng) {
+                    return L.marker(latlng, {icon: icon});
+                }
+            });
+        }
+
+        </script>
 
 
 {% endblock %}

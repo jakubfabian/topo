@@ -29,6 +29,7 @@ def spot_detail(request, spot_id, **kwargs):
     Decide if all or just active ones are given to the template to render.
     """
     spot = get_object_or_404(Spot, pk=spot_id)
+    parking_list = spot.parkinglocation_set.all()
     walllist = spot.wall_set.all()
     print walllist
 
@@ -37,7 +38,10 @@ def spot_detail(request, spot_id, **kwargs):
 
     walllist = walllist.order_by('name')
 
-    context = {'spot': spot, 'spot_wall_list': walllist}
+    context = {
+        'spot': spot,
+        'spot_wall_list': walllist,
+        'parking_list': parking_list}
     return render(request, 'miroutes/spot_detail.html', context)
 
 
