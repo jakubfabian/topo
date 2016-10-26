@@ -14,6 +14,7 @@ from miroutes.models import RouteGeometry
 from miroutes.models import GRADE_CHOICES
 from miroutes.models import ParkingLocation
 
+from .forms import SpotForm, RouteForm, WallForm, PolylineForm
 
 
 @permission_required('miroutes.spot.can_change')
