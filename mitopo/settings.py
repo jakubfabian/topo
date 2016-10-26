@@ -205,4 +205,4 @@ LOGIN_URL="/users/login"
 
 
 # django-star-ratings
-STAR_RATINGS_STAR_HEIGHT=16
+STAR_RATINGS_STAR_HEIGHT=12
