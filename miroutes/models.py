@@ -1,15 +1,19 @@
 from datetime import date
+import os
 from datetime import timedelta
 from ast import literal_eval
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.conf import settings
+
 from djgeojson.fields import LineStringField
 from djgeojson.fields import PointField
 
+from itertools import product
+
 from miroutes.tasks import tile_image, create_thumb_image
 
-from itertools import product
 
 RATING_CHOICES = (
     (1, 'poor'),
@@ -517,3 +521,36 @@ class Ascent(models.Model):
     style = models.CharField(max_length=10, blank=True, null=True, choices=STYLE_CHOICES)
     rating = models.IntegerField(blank=True, null=True, choices=RATING_CHOICES)
     comment = models.TextField(blank=True, null=True)
+
+
+class MapLocation(models.Model):
+    """Standard map decorator."""
+    geom = PointField()
+    _icon_url = 'miroutes/img/leaflet_edit_marker_icon.png'
+
+    @property
+    def icon_url(self):
+        """Obtain the url to the icon."""
+        return os.path.join(settings.STATIC_URL, self._icon_url)
+
+    @property
+    def icon(self):
+        """Javascript snippet to create a marker.
+
+        In the variable locations, the leaflet feature group has to be stored.
+        """
+        snippet = """L.icon({{iconUrl: "{}", iconSize: [24, 24], iconAnchor: [12, 12], popupAnchor: [0, -5]}})""".format(self.icon_url)
+        return snippet
+
+    class Meta:
+        abstract = True
+
+class ParkingLocation(MapLocation):
+    """Marks a parking spot on a map."""
+    spot = models.ForeignKey(Spot)
+    _icon_url = 'miroutes/img/leaflet_parking_icon.png'
+
+class BoltLocation(MapLocation):
+    """Marks a bolt on a wall view."""
+    wall = models.ForeignKey(Wall)
+    _icon_url = 'miroutes/img/leaflet_parking_icon.png'

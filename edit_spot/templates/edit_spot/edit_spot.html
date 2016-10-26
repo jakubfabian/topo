@@ -20,56 +20,72 @@
           // we want to override the on-click handler later
           window.map = map;
           
-            map.options.maxZoom = 17;
-            map.zoomControl.setPosition("topright");
+          map.options.maxZoom = 17;
+          map.zoomControl.setPosition("topright");
 
-            var existingSpots = {{ spot_list|geojsonfeature|safe }};
+          var existingSpots = {{ spot_list|geojsonfeature|safe }};
 
-            existingSpotsLayer = L.geoJson(existingSpots, {
-                pointToLayer: function (feature, latlng) {
-                    return L.marker(latlng);
-                }
-            });
+          existingSpotsLayer = L.geoJson(existingSpots, {
+              pointToLayer: function (feature, latlng) {
+                  return L.marker(latlng);
+              }
+          });
+          
+          map.addLayer(existingSpotsLayer);
 
-            markers = new L.MarkerClusterGroup();
-            markers.addLayer(existingSpotsLayer);
-            map.addLayer(markers);
+          var editing_Spot = {{ spot|geojsonfeature|safe }};
+          
+          window.markers = new L.MarkerClusterGroup();
 
-            var editing_Spot = {{ spot|geojsonfeature|safe }};
-            var editing_Parking = {{ spot|geojsonfeature:":parking_geom"|safe }};
+          {% for parking in parking_list %}
+          {% autoescape off %}
+          var icon = {{ parking.icon }};
+          {% endautoescape %}
+          var parking_marker = create_marker({{ parking|geojsonfeature|safe }}, icon);
+          parking_marker.eachLayer( function (layer) {
+              layer.options.parking_id = {{ parking.id }};
+          });
+          markers.addLayer(parking_marker);
+          {% endfor %}
+          
+          map.addLayer(markers);
           
           // edit and park marker are make available globally
           edit_marker = null;
-          park_marker = null;
             
-            editSpotLayer = L.geoJson(editing_Spot, {
-                pointToLayer: function (feature, latlng) {
-                    edit_marker = L.marker(latlng, {icon: LeafletEditSpotIcon});
-                    return edit_marker;
-                }
-            });
+          editSpotLayer = L.geoJson(editing_Spot, {
+              pointToLayer: function (feature, latlng) {
+                  edit_marker = L.marker(latlng, {icon: LeafletEditSpotIcon});
+                  return edit_marker;
+              }
+          });
+          
+          map.addLayer(editSpotLayer);
+          
+          if(markers){
+              map.fitBounds([edit_marker.getLatLng(), markers.getBounds()])
+          }else{
+              map.setView(edit_marker.getLatLng(), 15);
+          }
 
-            editParkingLayer = L.geoJson(editing_Parking, {
-                pointToLayer: function (feature, latlng) {
-                    park_marker = L.marker(latlng, {icon: LeafletEditParkingIcon});
-                    return park_marker;
-                }
-            });
+      }
 
-            map.addLayer(editSpotLayer);
-            map.addLayer(editParkingLayer);
-            if(park_marker){
-                map.fitBounds([edit_marker.getLatLng(), park_marker.getLatLng()])
-            }else{
-                map.setView(edit_marker.getLatLng(), 15);
-            }
+      function create_marker(location, icon){
+          return L.geoJson(location, {
+              pointToLayer: function (feature, latlng) {
+                  return L.marker(latlng, {icon: icon});
+              }
+          });
+      }
 
-        }
-
-        function toggle_locate_spot(){
+      function toggle_locate_spot(){
             if($("#parking_locate_button").hasClass('active')){
                 $("#parking_locate_button").removeClass('active');
                 window.map.off('click', on_parking_location);
+            }
+            if($("#parking_delete_button").hasClass('active')){
+                $("#parking_delete_button").removeClass('active');
+                window.map.off('click', on_delete_parking_location);
             }
 
             if($("#spot_locate_button").hasClass('active')){
@@ -86,6 +102,10 @@
                 $("#spot_locate_button").removeClass('active');
                 window.map.off('click', on_spot_location);
             }
+            if($("#parking_delete_button").hasClass('active')){
+                $("#parking_delete_button").removeClass('active');
+                window.map.off('click', on_delete_parking_location);
+            }
 
             if($("#parking_locate_button").hasClass('active')){
                 $("#parking_locate_button").removeClass('active')
@@ -93,6 +113,27 @@
             } else {
                 $("#parking_locate_button").addClass('active')
                 window.map.on('click', on_parking_location);
+            }
+        }
+        
+        function toggle_delete_parking(){
+            if($("#spot_locate_button").hasClass('active')){
+                $("#spot_locate_button").removeClass('active');
+                window.map.off('click', on_spot_location);
+            }
+            if($("#parking_locate_button").hasClass('active')){
+                $("#parking_locate_button").removeClass('active');
+                window.map.off('click', on_parking_location);
+            }
+
+            if($("#parking_delete_button").hasClass('active')){
+                $("#parking_delete_button").removeClass('active')
+                window.map.off('click', on_parking_delete_location);
+            } else {
+                $("#parking_delete_button").addClass('active');
+                markers.eachLayer(function (layer){
+                    layer.on('click', on_delete_parking_location);
+                });
             }
         }
             
@@ -108,22 +149,39 @@
         }
         
         function on_parking_location(e){
+
+            console.log("Selecting parking location!") // sanity check
+
+            // constructing url
+            var urlstring = "{% url "add_parking" spot_id=spot.pk lat=9999.9999 lng=9999.8888 %}";
+            urlstring = urlstring.replace('9999.9999', e.latlng.lat.toString());
+            urlstring = urlstring.replace('9999.8888', e.latlng.lng.toString());
+
+            httpPostAsync(urlstring+"?next={{ request.path }}");
             
-            if(window.park_marker){
-                window.park_marker.setLatLng(e.latlng);
-            }else{
-                window.park_marker = L.marker(e.latlng, {icon: LeafletEditParkingIcon}).addTo(window.map);
+        };
+
+        function on_delete_parking_location(e){
+
+            console.log("Deleting parking location!") // sanity check
+            var urlstring = "{% url "delete_parking" parking_id=6666 spot_id=spot.id %}";
+            urlstring = urlstring.replace('6666', this.options.parking_id);
+
+            httpPostAsync(urlstring+"?next={{ request.path }}");            
+            
+        };
+
+        function httpPostAsync(theUrl)
+        {
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function() { 
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+                    document.forms["edit_spot_form"].submit();
             }
-            var geojson = {
-                "type": "Point",
-                "coordinates": L.GeoJSON.latLngToCoords(e.latlng)
-            };
-            
-            document.getElementById("id_parking_geom").value = JSON.stringify(geojson);
+            xmlHttp.open("POST", theUrl, true); // true for asynchronous 
+            xmlHttp.send(null);
         }
-                            
-            
-        
+
 
         </script>
 {% endblock %}
@@ -138,7 +196,7 @@
     {% include "edit_spot/edit_pane.html" %}
     <div class="row full-height">
         <div class="col-md-3 white-background full-height">
-            <form method="POST" action="{% url "edit_spot" spot_id=spot.pk %}">
+            <form id="edit_spot_form" method="POST" action="{% url "edit_spot" spot_id=spot.pk %}">
               {% csrf_token %}
               <div class="button" id="spot_locate_button" onclick="toggle_locate_spot();">
                   <img src="{% static "miroutes/img/leaflet_edit_marker_icon.png" %}" class="img-rounded" height="20">
@@ -147,6 +205,10 @@
               <div class="button" id="parking_locate_button" onclick="toggle_locate_parking();" >
                   <img src="{% static "miroutes/img/leaflet_edit_parking_icon.png" %}" class="img-rounded" height="20">
                   Locate parking
+              </div>
+              <div class="button" id="parking_delete_button" onclick="toggle_delete_parking();" >
+                <span class='glyphicon glyphicon-eraser' aria-hidden="true"></span>
+                Delete Parking
               </div>
               <br>
               <div>

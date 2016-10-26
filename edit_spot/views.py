@@ -4,7 +4,7 @@ route/wall/spot-related content is modified.
 from django.shortcuts import get_object_or_404, render, redirect
 
 from django.contrib.auth.decorators import permission_required, login_required
-
+from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
 
 from miroutes.models import Spot
@@ -12,8 +12,8 @@ from miroutes.models import Wall
 from miroutes.models import Route
 from miroutes.models import RouteGeometry
 from miroutes.models import GRADE_CHOICES
+from miroutes.models import ParkingLocation
 
-from .forms import SpotForm, RouteForm, WallForm, PolylineForm
 
 
 @permission_required('miroutes.spot.can_change')
@@ -241,6 +241,7 @@ def edit_spot(request, spot_id):
 
     spot_list = Spot.objects.exclude(pk=spot_id).order_by('name')
     spot = get_object_or_404(Spot, pk=spot_id)
+    parking_list = spot.parkinglocation_set.all()
 
     if request.method == 'POST':
         form = SpotForm(request.POST, instance=spot)
@@ -253,10 +254,47 @@ def edit_spot(request, spot_id):
 
     context = {'spot': spot,
                'spot_list': spot_list,
+               'parking_list': parking_list,
                'show_edit_pane': True,
                'form': form}
 
     return render(request, 'edit_spot/edit_spot.html', context)
+
+@permission_required('miroutes.spot.can_change')
+@csrf_exempt
+def add_parking(request, spot_id, lat, lng):
+    """Add a parking location to a spot."""
+
+    print "lat: {}, lng {}".format(lat, lng)
+    next_page = request.GET.get('next', '/')
+    print "next page is {}".format(next_page)
+
+    spot = get_object_or_404(Spot, pk=spot_id)
+
+    if request.method == 'POST':
+
+        #geom = {u'coordinates': [float(lat), float(lng)], u'type': u'Point'}
+        geom = {u'coordinates': [float(lng), float(lat)], u'type': u'Point'}
+        #geom = {u'coordinates': [11.347973048686981, 47.63621916824778], u'type': u'Point'}
+
+        parking = ParkingLocation(spot=spot, geom=geom)
+        parking.save()
+
+        return redirect(next_page)
+
+@permission_required('miroutes.spot.can_change')
+@csrf_exempt
+def delete_parking(request, spot_id, parking_id):
+    """Delete a parking position."""
+
+    next_page = request.GET.get('next', '/')
+
+    if request.method == 'POST':
+        print "Deleting parking object with id {}".format(parking_id)
+        parking = get_object_or_404(ParkingLocation, pk=parking_id)
+
+        parking.delete()
+        return redirect(next_page)
 
 
 def get_grade_choices(spot):
