@@ -9,13 +9,14 @@ html, body {
 
 body {
     background-size: cover;
-    background: url('../../img/wood.jpg');
+    background-color: #d5d5d5;
+    /* background: url('../../img/wood.jpg'); */
 }
 
 #header {
-    background: url('../../img/header2.jpg');
-    background-position: right;
-    border-bottom: 3px solid black;
+    background: url('../../img/header3.jpg');
+    background-position: left;
+    border-bottom: 2px solid black;
 }
 
 #logo {
@@ -95,8 +96,9 @@ body {
     box-sizing: border-box;
 }
 
-.loginname {
+.login {
     font-weight: bold;
+    color: #ffffff;
 }
 
 #breadcrumbs {
@@ -109,7 +111,7 @@ body {
     padding-top: 8px;
     padding-right: 30px;
     color: #ffffff;
-    text-shadow: #000000 2px 2px;
+    /* text-shadow: #000000 2px 2px; */
 }
 
 .breadcrumb {
@@ -119,7 +121,7 @@ body {
 }
 
 .btn {
-    font-size: 120%;
+    font-size: 100%;
 }
 
 .spot-icon {

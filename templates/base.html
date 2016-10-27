@@ -70,15 +70,16 @@
             </div>
             <div id="login-menu" class="col-xs-12 col-md-10">
                 {% if user.is_anonymous %}
-                    <a id="login_button" class="btn btn-primary btn-xs"
-                       href="{% url 'django.contrib.auth.views.login' %}?next={{ request.path }}">Login</a>
-                    <a id="register_button" class="btn btn-primary btn-xs"
-                       href="{% url 'users.views.register' %}">Register</a>
+                    <a id="login-button" class="login"
+                       href="{% url 'django.contrib.auth.views.login' %}?next={{ request.path }}">(login)</a>
+                    <a id="register_button" class="login"
+                       href="{% url 'users.views.register' %}">(register)</a>
+                    &nbsp;&nbsp;
                 {% else %}
-                    <span class="loginname">User: {{ user }} &lt;{{ user.email }}&gt;</span>
+                    <span class="login">User: {{ user }} &lt;{{ user.email }}&gt;</span>
                     &nbsp;
-                    <a id="logout_button" class="btn btn-primary btn-xs"
-                       href="{% url 'django.contrib.auth.views.logout' %}?next={{ request.path }}">logout</a>
+                    <a id="logout-button" class="login"
+                       href="{% url 'django.contrib.auth.views.logout' %}?next={{ request.path }}">(logout)</a>
                     &nbsp;&nbsp;
                 {% endif %}
             </div>
