@@ -15,19 +15,12 @@
 
     {% block extra_assets %}{% endblock %}
 
-    {% include "leaflet_custom_icons.html" %}
-
+    
     <link href="{% static "miroutes/bower_components/select2/dist/css/select2.min.css" %}" type="text/css"
           rel="stylesheet"/>
-    <link href="{% static "miroutes/bower_components/leaflet.markercluster/dist/MarkerCluster.css" %}"
-          type="text/css" rel="stylesheet"/>
-    <link href="{% static "miroutes/bower_components/leaflet.markercluster/dist/MarkerCluster.Default.css" %}"
-          type="text/css" rel="stylesheet"/>
     <script type="text/javascript" src={% static "miroutes/bower_components/jquery/dist/jquery.min.js" %}></script>
     <script type="text/javascript" src={% static "miroutes/bower_components/jquery-ui/jquery-ui.min.js" %}></script>
     <script type="text/javascript" src="{% static "miroutes/bower_components/select2/dist/js/select2.js" %}"></script>
-    <script type="text/javascript"
-            src="{% static "miroutes/bower_components/leaflet.markercluster/dist/leaflet.markercluster.js" %}"></script>
     <link href="{% static "miroutes/bower_components/bootstrap/dist/css/bootstrap.min.css" %}" type="text/css"
           rel="stylesheet"/>
     <link href="{% static "miroutes/bower_components/bootstrap/dist/css/bootstrap-theme.min.css" %}" type="text/css"

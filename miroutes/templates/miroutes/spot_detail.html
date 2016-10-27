@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% load ratings %}
+{% load leaflet_tags %}
+{% load geojson_tags %}
 
 {% block title %}
     Mitopo.de - Spot Detail
@@ -8,11 +10,7 @@
 
 {% block extra_assets %}
 
-    {% load leaflet_tags %}
-    {% load geojson_tags %}
-    {% leaflet_js %}
-    {% leaflet_css %}
-
+    {% include "leaflet_base.html" %}
 
     <script type="text/javascript">
 

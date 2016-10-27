@@ -1,24 +1,24 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load leaflet_tags %}
+{% load geojson_tags %}
+
 
 {% block title %}
     Wall list on spot, available for editing
 {% endblock %}
 
+
 {% block extra_assets %}
-
-    {% load leaflet_tags %}
-    {% load geojson_tags %}
-    {% leaflet_js %}
-    {% leaflet_css %}
-
+    {% include "leaflet_base.html" %}
 {% endblock %}
+
 
 {% block overwrite_styles %}
-
     <link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
-
 {% endblock %}
+
+
 {% block content %}
 
     <script type="text/javascript">

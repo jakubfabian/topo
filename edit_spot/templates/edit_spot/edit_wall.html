@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load leaflet_tags %}
+{% load geojson_tags %}
 
 {% block title %}
   
@@ -7,12 +9,8 @@
 {% endblock %}
 
 {% block extra_assets %}
-<link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
-
-    {% load leaflet_tags %}
-    {% load geojson_tags %}
-    {% leaflet_js plugins="forms" %}
-    {% leaflet_css plugins="forms" %}
+    <link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
+    {% include "leaflet_base.html" %}
 
     <script type="text/javascript">
 

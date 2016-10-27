@@ -1,17 +1,14 @@
 {% extends "base.html" %}
 {% load ratings %}
+{% load leaflet_tags %}
+{% load geojson_tags %}
 
 {% block title %}
     Mitopo.de - Wall page
 {% endblock %}
 
 {% block extra_assets %}
-
-    {% load leaflet_tags %}
-    {% load geojson_tags %}
-    {% leaflet_js %}
-    {% leaflet_css %}
-
+    {% include "leaflet_base.html" %}
 {% endblock %}
 
 {% load miroute_tags %}

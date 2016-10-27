@@ -1,20 +1,18 @@
 {% extends "base.html" %}
-{% load staticfiles %}
+{% load static %}
+{% load leaflet_tags %}
+{% load geojson_tags %}
+{% load miroute_tags %}
 
 {% block title %}
     Mitopo.de - Publish the Wall
 {% endblock %}
 
+
 {% block extra_assets %}
-    {% load leaflet_tags %}
-    {% load geojson_tags %}
-    {% leaflet_js %}
-    {% leaflet_css %}
-    {% leaflet_js plugins="forms" %}
-    {% leaflet_css plugins="forms" %}
+    {% include "leaflet_base.html" %}
 
     <style>
-
         #route_list .ui-selecting {
             background: #FECA40;
         }
@@ -34,18 +32,13 @@
             padding: 0.4em;
             font-size: 1.0em;
             height: 18px; }
-
-
     </style>
 {% endblock %}
 
 {% block overwrite_styles %}
-
     <link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
+{% endblock %}
 
-  {% endblock %}
-
-{% load miroute_tags %}
 
 {% block content %}
   <script>
@@ -244,7 +237,6 @@
         map_init('dev_wallmap');
         map_init('pub_wallmap');
         generate_routelist();
-
     });
   </script>
      {% include "edit_spot/edit_pane.html" %}

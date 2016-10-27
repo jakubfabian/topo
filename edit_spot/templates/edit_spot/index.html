@@ -1,18 +1,14 @@
 {% extends "base.html" %}
 {% load static %}
+{% load leaflet_tags %}
+{% load geojson_tags %}
 
 {% block title %}
     Mitopo.de
 {% endblock %}
 
 {% block extra_assets %}
-
-    {% load leaflet_tags %}
-    {% load geojson_tags %}
-    {% leaflet_js %}
-    {% leaflet_css %}
-
-
+    {% include "leaflet_base.html" %}
 
     <script type="text/javascript">
 
