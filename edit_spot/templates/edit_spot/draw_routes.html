@@ -144,32 +144,15 @@
 
         // map event handlers
         map.on('draw:created', function (e) {
-            var polyline = L.polyline(e.layer._latlngs, {
-                opacity: 1,
-                color: 'blue'
-            });
-     
-            // we select the drawn layer and write it to the map
-            var featureGroup = L.featureGroup([polyline]);
-            // this also adds the line to the map
-            addToLayerdict(activeGeomId, featureGroup);            
-
-            // store it to the input
-            store_polyline(activeGeomId, polyline);
-                    
-            // remove the draw controls
-            resetDrawControl();
-            activeGeomId = null;
-            generate_routelist();
-
+            finish_edit(e); 
         });
+
 
         map.on('draw:drawstop', function (e) {
             clean_handles();
         });
 
         map.on('draw:editstop', function (e) {
-        
             //var layer = L.geoJson(e.layers.getLayers()[0].toGeoJSON());
             //var layer = e.layers.getLayers()[0];
             //var gj = JSON.stringify(layer.feature.geometry);
@@ -187,8 +170,26 @@
             generate_routelist();
         
         });
+    }
 
-        
+    function finish_edit(e) {
+        var polyline = L.polyline(e.layer._latlngs, {
+            opacity: 1,
+            color: 'blue'
+        });
+
+        // we select the drawn layer and write it to the map
+        var featureGroup = L.featureGroup([polyline]);
+        // this also adds the line to the map
+        addToLayerdict(activeGeomId, featureGroup);            
+
+        // store it to the input
+        store_polyline(activeGeomId, polyline);
+
+        // remove the draw controls
+        resetDrawControl();
+        activeGeomId = null;
+        generate_routelist();
     }
 
     function store_polyline(geomid, polyline){
@@ -300,8 +301,7 @@
         clean_handles();
 
         $("#edit_route_img_id_" + geomid)
-            .attr('src', "{% static "edit_spot/img/save.png" %}")
-            .attr('class', 'draw_route_tool_img')
+            .attr('class', 'glyphicon glyphicon-ok draw_route_tool_img')
             .attr('onclick', 'clean_handles()');
     
 
@@ -362,6 +362,14 @@
         // polylinecontrol = new L.Draw.Polyline(map, drawControl.options.polyline);
         polylinecontrol.enable();
 
+        $("#edit_route_img_id_accept_new_route")
+            .attr('class', 'glyphicon glyphicon-ok draw_route_tool_img')
+            .attr('onclick', "finish_edit(layerdict[geomid])"); // TODO: this should save the route -- can we trigger this programmatically here?
+
+        $("#edit_route_img_id_cancel_new_route")
+            .attr('class', 'glyphicon glyphicon-remove draw_route_tool_img')
+            .attr('onclick', 'clean_handles()'); // TODO: this should save the route -- can we trigger this programmatically here?
+
     }
 
     function on_del_route (geomid) {
@@ -377,7 +385,6 @@
 
         document.getElementById("id_" + activeGeomId + "-geom").value = "null";
         generate_routelist()
-
     }
 
     function generate_routelist(){
@@ -400,30 +407,31 @@
                             .html('<span class="glyphicon glyphicon-flash route-grade-icon"></span>{{ routegeom.route.get_grade_display }}')
                            )
                     .append($('<td>'))
-                    .append($('<td>'))
                    );
                 
         // Check if there is a geometry string
         var geomstring = $("#id_{{ routegeom.id }}-geom").val();
         
         if(geomstring == "null"){
-            $("#routetable tr:last td:nth-child(4)").append($('<img>')
-                                                            .attr('src', "{% static "edit_spot/img/edit.png" %}")
-                                                            .attr('class', 'draw_route_tool_img')
+            $("#routetable tr:last td:nth-child(4)").append($('<i>')
+                                                            .attr('id', "edit_route_img_id_accept_new_route")
+                                                            .attr('class', 'glyphicon glyphicon-pencil draw_route_tool_img')
                                                             .attr('onclick', "on_new_route({{ routegeom.id }})")
+                                                           );
+            $("#routetable tr:last td:nth-child(4)").append($('<i>')
+                                                            .attr('id', "edit_route_img_id_cancel_new_route")
+                                                            .attr('onclick', 'clean_handles()')
                                                            );
         }else{
             // Note that we choose a id for the image tag
             // to find it easily in the on_edit_route func and change the img.
-            $("#routetable tr:last td:nth-child(4)").append($('<img>')
+            $("#routetable tr:last td:nth-child(4)").append($('<i>')
                                                             .attr('id', "edit_route_img_id_{{ routegeom.id }}")
-                                                            .attr('src', "{% static "edit_spot/img/edit-1.png" %}")
-                                                            .attr('class', 'draw_route_tool_img')
+                                                            .attr('class', 'glyphicon glyphicon-pencil draw_route_tool_img')
                                                             .attr('onclick', "on_edit_route({{ routegeom.id }})")
                                                            );
-            $("#routetable tr:last td:nth-child(5)").append($('<img>')
-                                                            .attr('src', "{% static "edit_spot/img/garbage.png" %}")
-                                                            .attr('class', 'draw_route_tool_img')
+            $("#routetable tr:last td:nth-child(4)").append($('<i>')
+                                                            .attr('class', 'glyphicon glyphicon-erase draw_route_tool_img')
                                                             .attr('onclick', "on_del_route({{ routegeom.id }})")
                                                            );
         }
@@ -509,7 +517,6 @@
                     <th>pos</th>
                     <th>name</th>
                     <th>grade</th>
-                    <th></th>
                     <th></th>
                   </tr>
                 </thead>
