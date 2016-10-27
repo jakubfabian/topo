@@ -130,28 +130,3 @@ def search(request, **kwargs):
                         "url": reverse('route_detail', kwargs={'route_id': route.id})} for route in query_results]
 
     return JsonResponse({"results": search_results})
-
-
-@login_required
-def route_del(request, route_id, **kwargs):
-    """
-    Delete route from route list and redirect to the page
-    provided in the from tag.
-    
-    Args:
-      request: HTTP request
-      route_id: id of route to delete
-    Returns:
-      Redirect to the page url saved in the from tag of the HTTP GET request.
-    """
-    from django.shortcuts import redirect
-
-    route = get_object_or_404(Route, pk=route_id)
-    for routegeom in route.routegeometry_set.all():
-        routegeom.delete()
-    routename = route.name
-    route.delete()
-
-    messages.add_message(request, messages.SUCCESS, 'Successfully deleted route {}.'.format(routename))
-
-    return redirect(request.GET.get('from', '/'))
