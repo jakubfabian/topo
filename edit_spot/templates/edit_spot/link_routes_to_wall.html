@@ -1,151 +1,156 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load edit_spot_tags %}
 
 {% block title %}
-    Mitopo.de - Relate routes to the wall
+Mitopo.de - Relate routes to the wall
 {% endblock %}
 
 {% block extra_assets %}
-  <link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
+<link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
 {% endblock %}
-
-{% load edit_spot_tags %}
 
 {% block content %}
 
-
-  <script type="text/javascript">
-    // This is the widget part
-    $(document).ready(function () {
-        selectable_table = $('#selectable').DataTable({
-            "scrollY": "400px",
-            "scrollCollapse": true,
-            "paging": false
-        });
-        selected_table = $('#selected').DataTable({
-            "scrollY": "400px",
-            "scrollCollapse": true,
-            "paging": false
-        });        
-
-        $('#selected tbody').on( 'click', 'tr', function () {
-            var row = selected_table.row( $(this) );
-            var rowNode = row.node();
-            row.remove();
- 
-            selectable_table
-                .row.add( rowNode )
-                .draw();
-        });  
-        $('#selectable tbody').on( 'click', 'tr', function () {
-            var row = selectable_table.row( $(this) );
-            var rowNode = row.node();
-            row.remove();
- 
-            selected_table
-                .row.add( rowNode )
-                .draw();
-        });  
+<script type="text/javascript">
+// This is the widget part
+$(document).ready(function () {
+    selectable_table = $('#selectable').DataTable({
+        "scrollY": "400px",
+        "scrollCollapse": true,
+        "paging": false
     });
+    selected_table = $('#selected').DataTable({
+        "scrollY": "400px",
+        "scrollCollapse": true,
+        "paging": false
+    });        
 
-    function generate_input_table(){
-        // now we loop through the #selected list and use
-        // the route ids to create the input list
-        selected_table.column(0).data().each(function (value, index) {
-            // the value in the input elements is given by the route id
-            var text = '<input type="hidden" name="routes_onwall" value="'.concat(value).concat('" />');
-            $(".route_chooser").append(text);
-        });
-    }
+    $('#selected tbody').on( 'click', 'tr', function () {
+        var row = selected_table.row( $(this) );
+        var rowNode = row.node();
+        row.remove();
+
+        selectable_table
+            .row.add( rowNode )
+            .draw();
+    });  
+    $('#selectable tbody').on( 'click', 'tr', function () {
+        var row = selectable_table.row( $(this) );
+        var rowNode = row.node();
+        row.remove();
+
+        selected_table
+            .row.add( rowNode )
+            .draw();
+    });  
+});
+
+function generate_input_table(){
+    // now we loop through the #selected list and use
+    // the route ids to create the input list
+    selected_table.column(0).data().each(function (value, index) {
+        // the value in the input elements is given by the route id
+        var text = '<input type="hidden" name="routes_onwall" value="'.concat(value).concat('" />');
+    $(".route_chooser").append(text);
+    });
+}
 
 
-    </script>
+</script>
 
-    {% include "edit_spot/edit_pane.html" %}
+{% include "edit_spot/edit_pane.html" %}
 
 <div class="row">
-  <div class="col-md-12 white-background">
+    <div class="col-md-12 white-background">
+        <br>
+
+        <h4>Link routes to wall "*{{ wall.name }}"</h4>
+        (*) Walls with asterisks denote draft version.
+        <br>
+        Click on a route to link or unlink
+        <br>
+        <br>
+
+        <!-- css styles for the selectable list. TODO: put tags in css files -->
+        <!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
+        <div class="left_pane">
+            <div class="routelist_title">
+                All Routes available at "{{ spot.name }}"
+            </div>
+        </div>
+        <div class="right_pane">
+            <div class="routelist_title">
+                Routes linked to "{{ wall.name }}"
+            </div>
+        </div>
+
+        <div class="left_pane">
+            <table id="selectable" class="hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Grade</th>
+                        <th>on Walls</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for route in spot_routelist %}
+                    <tr>
+                        <td>{{ route.id }}</td>
+                        <td>{{ route.name }}</td>
+                        <td><span class='glyphicon glyphicon-flash route-grade-icon'></span>{{ route.get_grade_display }}</td>
+                        <td>
+                            {{ active_walldict|get_item:route.id }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>                            
+
+        </div>
+        <div class="right_pane">
+            <table id="selected">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Grade</th>
+                        <th>on Wall</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for route in wall_routelist %}
+                    <tr>
+                        <td>{{ route.id }}</td>
+                        <td>{{ route.name }}</td>
+                        <td><span class='glyphicon glyphicon-flash route-grade-icon'></span>{{ route.get_grade_display }}</td>
+                        <td>
+                            {{ active_walldict|get_item:route.id }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>                            
+        </div>
+    </div>
     <br>
 
-    <h1>Link routes to wall "*{{ wall.name }}"</h1>
-    (*) This is the draft version of the wall.
-    <br>
-    Click route to link or unlink
-    <br>
-    <br>
-
-    <!-- css styles for the selectable list. TODO: put tags in css files -->
-    <!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
-    <div class="left_pane">
-      <div class="routelist_title">
-        Routepool on spot "{{ spot.name }}"
-      </div>
-    </div>
-    <div class="right_pane">
-      <div class="routelist_title">
-        Routes linked to wall "{{ wall.name }}"
-      </div>
-    </div>
-
-    <div class="left_pane">
-      <table id="selectable">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Grade</th>
-            <th>on Walls</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for route in spot_routelist %}
-            <tr>
-              <td>{{ route.id }}</td>
-              <td>{{ route.name }}</td>
-              <td><span class='glyphicon glyphicon-flash route-grade-icon'></span>{{ route.get_grade_display }}</td>
-              <td>
-                {{ active_walldict|get_item:route.id }}
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>                            
-
-    </div>
-    <div class="right_pane">
-      <table id="selected">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Grade</th>
-            <th>on Wall</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for route in wall_routelist %}
-            <tr>
-              <td>{{ route.id }}</td>
-              <td>{{ route.name }}</td>
-              <td><span class='glyphicon glyphicon-flash route-grade-icon'></span>{{ route.get_grade_display }}</td>
-              <td>
-                {{ active_walldict|get_item:route.id }}
-              </td>
-              </tr>
-        {% endfor %}
-        </tbody>
-      </table>                            
-    </div>
-  </div>
-  <br>
-    
-  <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
-  <form method="POST" action="{{ request.path|urlencode }}" onsubmit="generate_input_table()">
-      {% csrf_token %}
-      <div class="route_chooser"></div>
-      <input type="submit" value="speichern"/>
+    <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
+    <form method="POST" action="{{ request.path|urlencode }}" onsubmit="generate_input_table()">
+        {% csrf_token %}
+        <div class="route_chooser"></div>
+        <button type="submit" class="btn btn-success btn-xs">
+            <i class="glyphicon glyphicon-floppy-save"></i> Save
+        </button>
     </form>
-  </div>
+    <form method="GET">
+        {% csrf_token %}
+        <input type="submit" class="btn btn-danger btn-xs" value="Reset">
+    </form>
+
+</div>
 </div>
 {% endblock %}
 

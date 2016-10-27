@@ -180,19 +180,17 @@
               <div>
                 {{ form.as_p }}
               </div>
-              <input type="submit" value="save">
+                <button type="submit" class="btn btn-success btn-xs">
+                      <i class="glyphicon glyphicon-floppy-save"></i> Submit
+                </button>
             </form>
 
-            <form method="GET" action="{% url "edit_spot_index" %}">
+            <form method="GET">
                 {% csrf_token %}
-                <input type="submit" value="cancel">
+                <button type="submit" class="btn btn-danger btn-xs">
+                      <i class="glyphicon glyphicon-backward"></i> Reset
+                </button>
             </form>
-            <p>
-            <form method="GET" action="{% url "add_route" spot_id=spot.pk %}">
-                {% csrf_token %}
-                <input type="submit" value="Add routes">
-            </form>
-            </p>
         </div>
         <div class="col-md-9 full-height">
             {% leaflet_map "spotmap" callback="window.map_init_basic" %}

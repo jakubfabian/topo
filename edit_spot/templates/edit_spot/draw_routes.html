@@ -533,7 +533,16 @@
                   {% endfor %}
               </div>
                 
-                <input type="submit" class="btn btn-primary btn-xs" value="save">
+                <button type="submit" class="btn btn-success btn-xs">
+                      <i class="glyphicon glyphicon-floppy-save"></i> Save
+                </button>
+            </form>
+
+            <form method="GET">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-xs">
+                      <i class="glyphicon glyphicon-backward"></i> Reset
+                </button>
             </form>
         </div>
     </div>

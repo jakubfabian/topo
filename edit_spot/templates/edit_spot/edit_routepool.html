@@ -68,12 +68,16 @@
                         <form method="POST">
                             {% csrf_token %}
                             {{ form.as_p }}
-                            <input type="submit" value="save">
+                            <button type="submit" class="btn btn-success btn-xs">
+                                <i class="glyphicon glyphicon-floppy-save"></i> Submit
+                            </button>
                         </form>
 
-                        <form method="GET" action="{% url 'edit_spot' spot_id=spot.pk %}">
+                        <form method="GET">
                             {% csrf_token %}
-                            <input type="submit" value="cancel">
+                            <button type="submit" class="btn btn-danger btn-xs">
+                                <i class="glyphicon glyphicon-backward"></i> Reset
+                            </button>
                         </form>
                     </div>
 

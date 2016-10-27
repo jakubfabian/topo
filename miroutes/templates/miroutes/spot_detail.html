@@ -121,7 +121,13 @@
     <!-- if you are a spot manager -->
     {% if perms.miroutes.change_spot %}
     <span style="position:absolute;bottom:5px;right:5px;margin:0;padding:5px 3px; text-align:right">
-        <a class="btn btn-default btn-xs" href="{% url 'edit_spot' spot_id=spot.id %}">Edit Spot</a>
+
+            <a href="{% url 'edit_spot' spot_id=spot.pk %}"
+                class="btn btn-info btn-xs" role="button">
+                <span class="glyphicon glyphicon-pencil"></span>{{spot.name}}
+            </a>
+            
+        </a>
 
         <br>
         Show Walls under construction ::

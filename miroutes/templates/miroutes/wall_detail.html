@@ -248,7 +248,21 @@
     {% endif %}
 
     <!-- if you are the owner or a manager -->
-    <a href={% url "draw_routes" wall_id=wall.id %}>Edit {{ wall.name }}</a>
+    {% if perms.miroutes.change_spot %}
+    <span style="position:absolute;bottom:5px;right:5px;margin:0;padding:5px 3px; text-align:right">
+
+            <a href="{% url "edit_spot" spot_id=wall.spot.id %}"
+                class="btn btn-info btn-xs" role="button">
+                <span class="glyphicon glyphicon-pencil"></span>{{ wall.spot.name }}
+            </a>
+            <a href="{% url "draw_routes" wall_id=wall.id %}"
+                class="btn btn-info btn-xs" role="button">
+                <span class="glyphicon glyphicon-pencil"></span>{{ wall.name }}
+            </a>
+            
+        </a>
+    </span>
+    {% endif %}
 
 
 {% endblock %}
