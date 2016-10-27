@@ -20,7 +20,8 @@ url(r'^spot(?P<spot_id>\d+)/wall_index$', views.wall_index, name='edit_spot_wall
  url(r'^wall(?P<wall_id>\d+)/link_routes_to_wall$', views.link_routes_to_wall, name='link_routes_to_wall'),
  url(r'^wall(?P<wall_id>\d+)/draw_routes$', views.draw_routes, name='draw_routes'),
  url(r'^wall(?P<wall_id>\d+)/publish_wall$', views.publish_wall, name='publish_wall'),
-# 
+ url(r'^wall(?P<wall_id>\d+)/reset_dev_wall$', views.reset_dev_wall, name='reset_dev_wall'),
+ 
 # url(r'^route(?P<route_id>\d+)$', views.route_detail, name='route_detail'),
 # url(r'^spot(?P<spot_id>\d+)/route_add$', views.route_add, name='route_add'),
 # url(r'^route(?P<route_id>\d+)/edit$', views.route_edit, name='route_edit'),

@@ -57,13 +57,12 @@
 
     function map_init() {
         
-        var img_dim_string = '{{ wall.get_bg_img_size }}';
+        var img_dim = {{ wall.get_bg_img_size }};
         
-        var img_dim = img_dim_string.split(',', 4);
-        var img_dim_x = parseFloat(img_dim[0]);
-        var img_dim_y = parseFloat(img_dim[1]);
-        var xzoom = parseFloat(img_dim[2]);
-        var yzoom = parseFloat(img_dim[3]);
+        var img_dim_x = img_dim[0];
+        var img_dim_y = img_dim[1];
+        var xzoom     = img_dim[2];
+        var yzoom     = img_dim[3];
 
         var maxzoom = Math.max(xzoom, yzoom);
 

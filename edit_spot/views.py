@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import permission_required, login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 
 from miroutes.models import Spot
 from miroutes.models import Wall
@@ -43,16 +44,55 @@ def wall_index(request, spot_id):
     return render(request, 'edit_spot/wall_index.html', context)
 
 
-@permission_required('miroutes.wall.can_change')
-def publish_wall(request, wall_id):
+@permission_required('miroutes.wall.can_delete')
+def publish_wall(request, wall_id, **kwargs):
     """
         Publish Wall
     """
     wall = get_object_or_404(Wall, pk=wall_id)
-    wall.publish_dev_view()
-    wall.is_active = True
-    wall.save()
-    return redirect(reverse('wall_detail', kwargs={'wall_id': wall.id}))
+
+
+    if request.POST:
+        wall.publish_dev_view()
+        wall.is_active = True
+        wall.save()
+        # return redirect(reverse('wall_detail', kwargs={'wall_id': wall.id}))
+
+    dev_view = wall.dev_view
+    pub_view = wall.pub_view
+
+    request.session['last_wall_id'] = wall_id
+        
+    context = {'wall': wall,
+               'spot': wall.spot,
+               'pubview': pub_view,
+               'devview': dev_view,
+               'show_edit_pane': True}
+
+    if request.session.get('last_wall_id'):
+        context['last_wall_id'] = request.session['last_wall_id']
+
+    return render(request, 'edit_spot/publish_wall.html', context)
+
+
+@permission_required('miroutes.wall.can_add')
+def reset_dev_wall(request, wall_id, **kwargs):
+    """
+        reset dev Wall
+    """
+    wall = get_object_or_404(Wall, pk=wall_id)
+
+    dev_view = wall.dev_view
+    pub_view = wall.pub_view
+
+    next_page = request.GET.get('next', '/')
+
+    if request.POST:
+        wall.reset_dev_view()
+        wall.save()
+        return redirect(next_page)
+
+    return HttpResponse("reset_dev_view has to be called as HTTP POST")
 
 
 @permission_required('miroutes.wall.can.change')

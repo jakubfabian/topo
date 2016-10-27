@@ -360,7 +360,8 @@ class Wall(models.Model):
             zoom_levels = [np.int(np.ceil(zl)) for zl in np.log(np.array(newdim) / tile_width) / np.log(2)]
 
             res = list(dim) + zoom_levels
-            return ' ,'.join([str(d) for d in res])
+            return res # return as list
+            # return ' ,'.join([str(d) for d in res]) # or should we return it as one string?
         return ''
 
     def publish_dev_view(self):

@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}
+    Mitopo.de - Publish the Wall
+{% endblock %}
+
+{% block extra_assets %}
+    {% load leaflet_tags %}
+    {% load geojson_tags %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+    {% leaflet_js plugins="forms" %}
+    {% leaflet_css plugins="forms" %}
+
+    <style>
+
+        #route_list .ui-selecting {
+            background: #FECA40;
+        }
+
+        #route_list .ui-selected {
+            background: #F39814;
+            color: black;
+        }
+        #route_list {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            width: 60%; }
+        
+        #selectable li {
+            margin: 3px;
+            padding: 0.4em;
+            font-size: 1.0em;
+            height: 18px; }
+
+
+    </style>
+{% endblock %}
+
+{% block overwrite_styles %}
+
+    <link rel="stylesheet" href={% static "edit_spot/css/main.css" %}/>
+
+  {% endblock %}
+
+{% load miroute_tags %}
+
+{% block content %}
+  <script>
+    function map_init(mapdiv_id) {
+        // Map init paperworks...
+        var img_dim = {{ wall.get_bg_img_size }};
+        
+        var img_dim_x = img_dim[0];
+        var img_dim_y = img_dim[1];
+        var xzoom     = img_dim[2];
+        var yzoom     = img_dim[3];
+
+        var maxzoom = Math.max(xzoom, yzoom);
+
+        // we choose a default zoom level of 2 that matches either the width (approx.) or the
+        // height of the container
+        var minzoom = 1;
+        var startzoom = 1;
+
+        // global map object
+        window.map = L.map(mapdiv_id, {
+            minZoom: minzoom,
+            maxZoom: maxzoom,
+            crs: L.CRS.Simple
+        });
+        map.zoomControl.setPosition("topright");
+
+        var southWest = map.unproject([0, img_dim_y], map.getMaxZoom());
+        var northEast = map.unproject([img_dim_x, 0], map.getMaxZoom());
+        var imBounds = new L.LatLngBounds(southWest, northEast);
+        map.setMaxBounds(imBounds);
+        map.fitBounds(imBounds);
+
+        var wall_layer = L.tileLayer('{{ wall.get_tiles_url }}/{z}/{x}/{y}.png', {
+            minZoom: minzoom, maxZoom: maxzoom,
+            noWrap: false,
+            tileSize: 256,
+            continuousWorld: true,
+        });
+
+        wall_layer.addTo(map);
+        // the activeGeomId is used to denote the id of the currently edited
+        // or created geometry
+        window.activeGeomId = null;
+        window.layerdict = {};
+        window.routelabeldict = {};
+
+        // Now we initialize the existing route geometries
+        window.layerdict = {};
+
+        console.log(mapdiv_id, mapdiv_id === 'dev_wallmap');
+
+        if(mapdiv_id === 'dev_wallmap') {
+        {% for geom in devview.routegeometry_set.all %}
+        {% if geom.geom %}
+            // generate polylines with colors
+            // note the custom filter!
+        add_route({{ geom|geojsonfeature|safe }}, {{geom.id}}, '{{geom.label}}', {{geom.anchorpoint}}, '{{geom.route.polylinecolor}}');
+
+        {% endif %}
+        {% endfor %}
+        }
+
+        if(mapdiv_id === 'pub_wallmap') {
+        {% for geom in pubview.routegeometry_set.all %}
+        {% if geom.geom %}
+            // generate polylines with colors
+            // note the custom filter!
+        add_route({{ geom|geojsonfeature|safe }}, {{geom.id}}, '{{geom.label}}', {{geom.anchorpoint}}, '{{geom.route.polylinecolor}}');
+
+        {% endif %}
+        {% endfor %}
+        }
+
+    }
+
+    function add_route(geom, id, label, anchor, color) {
+            var polyline = null;
+            var geojsonobject = L.geoJson(geom);
+            geojsonobject.eachLayer(function (layer) {
+                polyline = layer; 
+            });
+
+            polyline.setStyle({
+                color: color ,
+                opacity: 1
+            });
+            
+            addToLayerdict(id, L.featureGroup([polyline]));
+            // we add a label
+            var myIcon = L.divIcon({
+                iconSize: new L.Point(20, 20),
+                html: label
+            });
+
+            var anchorpoint = anchor;
+            // careful with reversed coordinates!
+            var routelabel = L.marker([anchorpoint[1], anchorpoint[0]], {
+                icon: myIcon,
+            });
+            add_to_routelabeldict(id, routelabel);
+    }
+
+    function store_polyline(geomid, polyline){
+        var geojsonstring = JSON.stringify(polyline.toGeoJSON().geometry);
+        document.getElementById("id_" + activeGeomId + "-geom").value = geojsonstring;
+    }
+
+        
+    function add_to_routelabeldict(geomid, routelabel){
+        routelabeldict[geomid] = routelabel
+        routelabel.addTo(map);
+    }
+
+
+    
+    function addToLayerdict(geomid, layer) {
+        // Utility function to add a pair of geomid and references
+        // to the layer to a dict, add the onClick handler and the layer to the map.
+        layer.routegeomid = geomid;
+        layerdict[geomid] = layer;
+        layer.addTo(map);
+        // add event handler
+        layer.on('mouseover', function (e) {
+            highlight_geometry(e.target.routegeomid);
+            highlight_row(e.target.routegeomid);
+        });
+        layer.on('mouseout', function (e) {
+            un_highlight_geometry(e.target.routegeomid);
+            un_highlight_row(e.target.routegeomid);
+        });
+
+    }
+    function highlight_geometry(geomid){
+        if(typeof layerdict[geomid] !== 'undefined'){
+            layerdict[geomid].eachLayer( function (layer) {
+                layer.setStyle({
+                    weight: 10
+                });
+                
+            });
+        }
+
+    }
+
+    function un_highlight_geometry(geomid){
+        if(typeof layerdict[geomid] !== 'undefined'){
+            layerdict[geomid].eachLayer( function (layer) {
+                layer.setStyle({
+                    weight: 5
+                });
+            });
+        }
+    }
+
+    function highlight_row(label){
+        $('#routetablerow_'+label)
+            .addClass('highlight');
+    }
+
+    function un_highlight_row(label){
+        $('#routetablerow_'+label)
+            .removeClass('highlight');
+    }
+
+    function generate_routelist(){
+        // generate a list of routes in the list with id #routelist
+        // clear table
+        $("#routetable tbody").remove();
+        $("#routetable").append($('<tbody>'));
+        {% for routegeom in devview.routegeometry_set.all %}
+        $("#routetable").find('tbody')
+            .append($('<tr>')
+                    .attr('value', {{ routegeom.id }})
+                    .attr('id', 'routetablerow_'+{{ routegeom.id }})
+                    .append($('<td>') .text('{{ routegeom.label }}'))
+                    .append($('<td>') .text('{{ routegeom.route.name }}'))
+                    .append($('<td>') .html('<span class="glyphicon glyphicon-flash route-grade-icon"></span>{{ routegeom.route.get_grade_display }}'))
+                   );
+        {% endfor %}
+
+        // eventhandler for highlighting
+        $('#routetable tbody')
+            .on( 'mouseenter', 'tr', function () {
+                var geomid = this.getAttribute('value');
+                highlight_geometry(geomid);
+                highlight_row(geomid);
+            });
+        $('#routetable tbody')
+            .on( 'mouseleave', 'tr', function () {
+                var geomid = this.getAttribute('value');
+                un_highlight_geometry(geomid);
+                un_highlight_row(geomid);
+            });
+    }
+
+    $(document).ready(function () {
+        map_init('dev_wallmap');
+        map_init('pub_wallmap');
+        generate_routelist();
+
+    });
+  </script>
+     {% include "edit_spot/edit_pane.html" %}
+
+    <div class="row full-height">
+
+        <div class="col-lg-4 white-background full-height">
+            <p> Dude, You're looking at wall {{ wall.name }} </p>
+            <p> First panel shows dev map, second map shows published map. </p>
+            <br><br>
+            <!-- css styles for the selectable list. TODO: put tags in css files -->
+            <!-- We populate the list of routes on the spot. TODO: Generate this list dynamically and sort it by wall name -->
+            <br><br>
+
+            <div id="routelist_div">
+              <br>
+              <table id="routetable" style="width:100%">
+                <thead>
+                  <tr>
+                    <th>pos</th>
+                    <th>name</th>
+                    <th>grade</th>
+                    <th></th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+                      
+            </div>
+        
+
+            <br><br>
+            <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
+            <form method="POST">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary btn-xs" value="publish">
+            </form>
+
+            <form method="POST" action="{% url 'reset_dev_wall' wall_id=wall.pk %}?next={{request.path}}">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-warning btn-xs" value="reset dev wall">
+            </form>
+        </div>
+
+
+        {% if wall.get_bg_img_size.0 >= wall.get_bg_img_size.1 %}
+        <div class="col-lg-8 half-height">
+            <h4><span class="label label-info">staging</span></h4>
+            <div id="dev_wallmap" class="half-height"></div>
+        </div>
+        <div class="col-lg-8 half-height">
+            <h4><span class="label label-info">published</span></h4>
+            <div id="pub_wallmap" class="half-height"></div>
+        </div>
+        {% else %}
+        <div class="col-lg-4 full-height">
+            <h4><span class="label label-info">staging</span></h4>
+            <div id="dev_wallmap" class="full-height"></div>
+        </div>
+        <div class="col-lg-4 full-height">
+            <h4><span class="label label-info">published</span></h4>
+            <div id="pub_wallmap" class="full-height"></div>
+        </div>
+        {% endif %}
+    </div>
+
+
+{% endblock %}
+
