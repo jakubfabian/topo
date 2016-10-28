@@ -90,7 +90,7 @@
         window.layerdict = {};
 
         if(mapdiv_id === 'dev_wallmap') {
-        {% for geom in devview.routegeometry_set.all %}
+        {% for geom in dev_geomlist %}
         {% if geom.geom %}
             // generate polylines with colors
             // note the custom filter!
@@ -101,7 +101,7 @@
         }
 
         if(mapdiv_id === 'pub_wallmap') {
-        {% for geom in pubview.routegeometry_set.all %}
+        {% for geom in pub_geomlist %}
         {% if geom.geom %}
             // generate polylines with colors
             // note the custom filter!

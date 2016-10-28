@@ -45,6 +45,31 @@ def wall_index(request, spot_id):
     return render(request, 'edit_spot/wall_index.html', context)
 
 
+def create_annotated_and_sorted_geomlist(view):
+    """Annotate the geometries on the view with their position from left to right."""
+    # also get all geoms asociated with wall routes
+    wallroutegeomlist = list(view.routegeometry_set.all())
+
+    # annotate with a label
+    anchorpointlist = []
+    for geom in wallroutegeomlist:
+        try:
+            anchorpointlist.append([geom.anchorpoint[0], geom])
+        except:
+            anchorpointlist.append([None, geom])
+    # sort, None values first
+    anchorpointlist = sorted(anchorpointlist, key=lambda x: (x[0] is not None, x[0]))
+    none_num = [anchor[0] for anchor in anchorpointlist].count(None)
+    for pos, entry in enumerate(anchorpointlist):
+        if entry[0]:
+            entry[1].label = pos + 1 - none_num
+        else:
+            entry[1].label = '*'
+        wallroutegeomlist[pos] = entry[1]
+
+    return wallroutegeomlist
+
+
 @permission_required('miroutes.wall.can_delete')
 def publish_wall(request, wall_id, **kwargs):
     """
@@ -62,12 +87,18 @@ def publish_wall(request, wall_id, **kwargs):
     dev_view = wall.dev_view
     pub_view = wall.pub_view
 
+
+    dev_geomlist = create_annotated_and_sorted_geomlist(dev_view)
+    pub_geomlist = create_annotated_and_sorted_geomlist(pub_view)
+
     request.session['last_wall_id'] = wall_id
         
     context = {'wall': wall,
                'spot': wall.spot,
                'pubview': pub_view,
                'devview': dev_view,
+               'pub_geomlist': pub_geomlist,
+               'dev_geomlist': dev_geomlist,
                'show_edit_pane': True}
 
     if request.session.get('last_wall_id'):
@@ -458,27 +489,9 @@ def draw_routes(request, wall_id, **kwargs):
     polyline_forms = []
     for geom in wallroutegeomquery:
         polyline_forms.append(PolylineForm(instance=geom, prefix=geom.pk))
+
+    wallroutegeomlist = create_annotated_and_sorted_geomlist(wallview)
         
-    # also get all geoms asociated with wall routes
-    wallroutegeomlist = list(wallview.routegeometry_set.all())
-
-    # annotate with a label
-    anchorpointlist = []
-    for geom in wallroutegeomlist:
-        try:
-            anchorpointlist.append([geom.anchorpoint[0], geom])
-        except:
-            anchorpointlist.append([None, geom])
-    # sort, None values first
-    anchorpointlist = sorted(anchorpointlist, key=lambda x: (x[0] is not None, x[0]))
-    for pos, entry in enumerate(anchorpointlist):
-        if entry[0]:
-            entry[1].label = pos + 1
-        else:
-            entry[1].label = '*'
-        wallroutegeomlist[pos] = entry[1]
-
-
     context = {'wall': wall,
                'spot': wall.spot,
                'wallview': wallview,

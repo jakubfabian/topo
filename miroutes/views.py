@@ -78,7 +78,6 @@ def wall_detail(request, wall_id, wallview=None, **kwargs):
     if wallview is None:
         wallview = wall.pub_view
 
-    wall.test = 'my magic'
     routegeomlist = wallview.routegeometry_set.all()
     # sort from left to right
     routegeomlist = list(routegeomlist)
