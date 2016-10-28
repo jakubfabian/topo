@@ -34,8 +34,17 @@
                         results: data.items
                     };
                 }
-            }
+            }, //ajax
+            templateResult: formatState
         });
+
+        function formatState (state) {
+              if (!state.icon) { return state.text; }
+                var $state = $(
+                            '<span>' + state.icon + state.text + '</span>'
+                              );
+                  return $state;
+        };
 
         $search_field.on("select2:select", function (entry) {
             location.href = entry.params.data.url

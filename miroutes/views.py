@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.core.urlresolvers import reverse
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib.staticfiles.templatetags.staticfiles import static
 
 from miroutes.models import Route
 from miroutes.models import RouteGeometry
@@ -166,16 +167,36 @@ def search(request, **kwargs):
 
     query_results = Wall.objects.filter(name__icontains=query).order_by('name')[:20]
     search_results += [
-        {"text": "Wall - " + wall.name, "id": wall.id, "url": reverse('wall_detail', kwargs={'wall_id': wall.id})}
+        {   
+            "icon": "<img src='" +
+                    static("miroutes/img/leaflet_wall_icon.png") +
+                    "' class='img-rounded' height='20'>",
+            "text": wall.name,
+            "id": wall.id,
+            "url": reverse('wall_detail', kwargs={'wall_id': wall.id})
+        }
         for wall in query_results]
+
 
     query_results = Spot.objects.filter(name__icontains=query).order_by('name')[:20]
     search_results += [
-        {"text": "Spot - " + spot.name, "id": spot.id, "url": reverse('spot_detail', kwargs={'spot_id': spot.id})}
+        {
+            "icon": '<span class="glyphicon glyphicon-map-marker spot-icon" aria-hidden="true"></span>',
+            "text": spot.name,
+            "id": spot.id,
+            "url": reverse('spot_detail', kwargs={'spot_id': spot.id})
+        }
         for spot in query_results]
 
+
     query_results = Route.objects.filter(name__icontains=query).order_by('name')[:20]
-    search_results += [{"text": "Route - " + route.name, "id": route.id,
-                        "url": reverse('route_detail', kwargs={'route_id': route.id})} for route in query_results]
+    search_results += [
+            {
+                "icon": '<span class="glyphicon glyphicon-sort route-icon" aria-hidden="true"></span>',
+                "text": route.name,
+                "id": route.id,
+                "url": reverse('route_detail', kwargs={'route_id': route.id})
+            }
+            for route in query_results]
 
     return JsonResponse({"results": search_results})
