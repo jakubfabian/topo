@@ -63,9 +63,12 @@ GRADE_CHOICES = [
     (183, 'X-'),
     (186, 'X'),
     (189, 'X+'),
-    (193, 'XI-'),
-    (196, 'XI'),
-    (199, 'XI+'),
+    (191, 'XI-'),
+    (193, 'XI'),
+    (195, 'XI+'),
+    (197, 'XII-'),
+    (198, 'XII'),
+    (199, 'XII+'),
     # GB system
     (201, 'S, 4a'),
     (202, 'HS, 4b'),
@@ -79,6 +82,18 @@ GRADE_CHOICES = [
     (304, '5.7'),
     (305, '5.8')]
 
+# Line Colors for plotting depending on difficulty
+LINE_COLORS = ['#87FF4D', # from green (easy)
+        '#B3FF44',
+        '#E3FF3B',
+        '#FFE533',
+        '#FFAB2A',
+        '#FF6D22',
+        '#FF2A19',
+        '#FF113F',
+        '#FF087A',
+        '#FF00BA', # to pink (hard)
+        ]
 
 class Spot(models.Model):
     """A spot denotes a region with multiple associated walls.
@@ -457,19 +472,8 @@ class Route(models.Model):
 
     @property
     def polylinecolor(self):
-        diff = (self.grade % 100)/10
-        colors = ['#87FF4D', # from green (easy)
-                  '#B3FF44',
-                  '#E3FF3B',
-                  '#FFE533',
-                  '#FFAB2A',
-                  '#FF6D22',
-                  '#FF2A19',
-                  '#FF113F',
-                  '#FF087A',
-                  '#FF00BA', # to pink (hard)
-        ]
-        return colors[diff]
+        diff = (self.grade % 100)//10
+        return LINE_COLORS[diff]
 
 
 class RouteGeometry(models.Model):

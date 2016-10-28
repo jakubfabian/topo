@@ -10,6 +10,14 @@ from miroutes.models import RouteGeometry
 from miroutes.models import Spot
 from miroutes.models import Wall
 
+def get_grade_choices(spot):
+    from miroutes.models import GRADE_CHOICES
+    """
+    We use the spot's grade system entry to limit the possible grade choices for routes
+    """
+    grade_choices = filter(lambda x: x[0]//100 == spot.grade_system, GRADE_CHOICES)
+    return grade_choices
+
 
 def index(request):
     """
@@ -83,6 +91,47 @@ def wall_detail(request, wall_id, wallview=None, **kwargs):
                'wallview': wallview,
                'wall_routegeomlist': routegeomlist}
     return render(request, 'miroutes/wall_detail.html', context)
+
+def wall_route_hist(request, wall_id, **kwargs):
+    """
+    Plot a histogram of route difficulties
+    """
+    from collections import Counter
+    from os.path import commonprefix
+    from miroutes.models import LINE_COLORS
+
+    wall = get_object_or_404(Wall, pk=wall_id)
+
+    reduc_func = lambda grade_id: grade_id%100//10  # reduce number of possible ratings to decimal values
+
+    c = Counter([reduc_func(r.grade) for r in wall.pub_view.route_set.all()])
+
+    # Populate counter will all possible entries:
+    grade_ids, grade_names = zip(*get_grade_choices(wall.spot))
+    reduc_grade_ids = [reduc_func(gid) for gid in grade_ids]
+    unique_reduc_ids = set(reduc_grade_ids)
+
+    unique_reduc=[]
+    for uid in unique_reduc_ids:
+        ind = [ i for i,r in enumerate(reduc_grade_ids) if r == uid ]
+        filtered_grade_names = [grade_names[i] for i in ind]
+        prefix = commonprefix(filtered_grade_names)
+
+        if prefix is '':  # if we cant find a common prefix, just use the middle entry
+            prefix = filtered_grade_names[len(filtered_grade_names)/2]
+
+        color = LINE_COLORS[uid]
+
+        count = c[uid]
+        unique_reduc.append([prefix, count, color])
+
+    context = {
+        'wall': wall,
+        'diff_hist': unique_reduc
+        }
+
+    return render(request, 'miroutes/wall_route_hist.html', context)
+
 
 
 @login_required

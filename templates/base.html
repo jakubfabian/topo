@@ -32,6 +32,10 @@
 
     <link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
     <script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
+
+    <link media="all" href="{% static "miroutes/bower_components/nvd3/build/nv.d3.min.css"%}" type="text/css" rel="stylesheet" />
+    <script src="{% static "miroutes/bower_components/d3/d3.min.js" %}" type="text/javascript" charset="utf-8"></script>
+    <script src="{% static "miroutes/bower_components/nvd3/build/nv.d3.min.js" %}" type="text/javascript" charset="utf-8"></script>
     
     {% block main-css %}
         <link href='{% static "/miroutes/bower_components/pt-sans/styles/pt_sans.css" %}' rel='stylesheet' type='text/css'>
