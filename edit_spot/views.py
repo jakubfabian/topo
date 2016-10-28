@@ -462,6 +462,7 @@ def add_route(request, spot_id, **kwargs):
         form = RouteForm(request.POST, grade_choices=get_grade_choices(spot))
         if form.is_valid():
             form.save()
+            return redirect(request.path)
     else:
         form = RouteForm(initial={'spot': spot}, grade_choices=get_grade_choices(spot))
 
