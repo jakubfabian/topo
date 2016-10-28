@@ -191,7 +191,7 @@
 
     function zoom_on_geometry(geomid){
         var polyline = layerdict[geomid];
-        map.fitBounds(polyline.getBounds());
+        map.fitBounds(polyline.getBounds(),{paddingTopLeft:[0,150]});
         polyline.openPopup(polyline.popuppoint);
     }
 
