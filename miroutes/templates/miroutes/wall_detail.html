@@ -192,6 +192,7 @@
     function zoom_on_geometry(geomid){
         var polyline = layerdict[geomid];
         map.fitBounds(polyline.getBounds());
+        polyline.openPopup(polyline.popuppoint);
     }
 
     function highlight_row(label){
