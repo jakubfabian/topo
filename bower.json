@@ -20,6 +20,7 @@
     "bootstrap": "3.3.7",
     "datatables.net": "^1.10.12",
     "datatables.net-bs": "^1.10.12",
-    "pt-sans": "latest"
+    "pt-sans": "latest",
+    "nvd3": "latest"
   }
 }

@@ -12,8 +12,9 @@ from miroutes.models import Spot
 from miroutes.models import Wall
 from miroutes.models import Route
 from miroutes.models import RouteGeometry
-from miroutes.models import GRADE_CHOICES
 from miroutes.models import ParkingLocation
+
+from miroutes.views import get_grade_choices
 
 from .forms import SpotForm, RouteForm, WallForm, PolylineForm
 
@@ -338,13 +339,6 @@ def delete_parking(request, spot_id, parking_id):
         parking.delete()
         return redirect(next_page)
 
-
-def get_grade_choices(spot):
-    """
-    We use the spot's grade system entry to limit the possible grade choices for routes
-    """
-    grade_choices = filter(lambda x: x[0]//100 == spot.grade_system, GRADE_CHOICES)
-    return grade_choices
 
 @permission_required('miroutes.spot.can_delete')
 def del_route(request, route_id, **kwargs):
