@@ -37,11 +37,18 @@ def wall_index(request, spot_id):
     spot = get_object_or_404(Spot, pk=spot_id)
 
     wall_listing = Wall.objects.filter(spot__id=spot_id).order_by('name')
-    context = {'wall_listing': wall_listing,
-               'spot': spot,
-               'show_edit_pane': True}
+    parking_list = spot.parkinglocation_set.all()
+
+    context = {
+            'wall_listing': wall_listing,
+            'parking_list': parking_list,
+            'spot': spot,
+            'show_edit_pane': True,
+            }
+
     if request.session.get('last_wall_id'):
         context['last_wall_id'] = request.session['last_wall_id']
+
     return render(request, 'edit_spot/wall_index.html', context)
 
 
@@ -261,12 +268,14 @@ def edit_wall(request, wall_id, **kwargs):
         form = WallForm(initial={'spot': spot}, instance=wall)
 
     wall_list = spot.wall_set.exclude(pk=wall_id).order_by('name')
+    parking_list = spot.parkinglocation_set.all()
 
     context = {
         'editing': True,
         'wall': wall,
         'spot': spot,
         'wall_list': wall_list,
+        'parking_list': parking_list,
         'show_edit_pane': True,
         'form': form
     }

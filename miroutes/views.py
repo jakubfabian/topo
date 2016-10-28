@@ -45,11 +45,8 @@ def spot_detail(request, spot_id, **kwargs):
     if not request.session.get('show_inactive', False):
         walllist = walllist.filter(is_active=True)
 
-    walllist = walllist.order_by('name')
-
     context = {
         'spot': spot,
-        'spot_wall_list': walllist,
         'parking_list': parking_list}
     return render(request, 'miroutes/spot_detail.html', context)
 
