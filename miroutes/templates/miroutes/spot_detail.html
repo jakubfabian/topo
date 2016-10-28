@@ -45,29 +45,18 @@ function map_init(map, options) {
     {% for wall in spot.wall_set.all %}
     var coord = L.latLng({{ wall.geom.coordinates }});
     var newcoord = L.latLng(coord.lng, coord.lat);
-    var link_url = "{% url "link_routes_to_wall" wall_id=wall.id %}";
-    var draw_url = "{% url "draw_routes" wall_id=wall.id %}";
+    var url = "{% url "wall_detail" wall_id=wall.id %}";
     var mc = new L.marker(newcoord, {
         icon: LeafletWallIcon,
-        url: draw_url,
+        url: url,
     });
     var popup_msg=`
         <img src='{% static "miroutes/img/leaflet_wall_icon.png" %}' class='img-rounded' height='20'>
-        <a href='` + draw_url + `'>{{ wall.name }}</a>
+        <a href='` + url + `'>{{ wall.name }}</a>
         <span class='glyphicon glyphicon-sort route-icon' aria-hidden='true'></span>
         {{wall.pub_view.route_set.count}}
     <br>
         <img src='{{ wall.thumbnail_img.url }}' class='img-rounded' width='128' height='128'>
-        <br>
-        <a href="`+link_url+`">
-        <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
-        Link Routes to Wall
-        </a>
-        <br>
-        <a href="`+draw_url+`">
-        <span class="glyphicon glyphicon-picture" aria-hidden="true"></span>
-        Draw Routes on Wall
-        </a> 
         `;
     mc.bindPopup(popup_msg);
     mc.on('mouseover', function (e) { this.openPopup(); });
