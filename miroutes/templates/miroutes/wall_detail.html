@@ -38,12 +38,17 @@
                 un_highlight_geometry(pos);
                 un_highlight_row(pos);
             });
+        $('#routetable tbody')
+            .on( 'click', 'tr', function () {
+                var pos = this.firstElementChild.innerHTML;
+                zoom_on_geometry(pos);
+            });
         
 
     });
 
     function on_mouseover_polyline(e){
-        highlight_geometry(e.target.label);
+        highlight_geometry(e.target.label, e.latlng);
         highlight_row(e.target.label);
     };
     function on_mouseout_polyline(e){
@@ -165,19 +170,28 @@
         polyline.on('mouseout', on_mouseout_polyline);
     }
 
-    function highlight_geometry(geomid){
-        var polyline = layerdict[geomid]
+    function highlight_geometry(geomid, latlng){
+    var polyline = layerdict[geomid]
         polyline.setStyle({
             weight: 10
         });
-        polyline.openPopup(polyline.popuppoint);
     }
 
     function un_highlight_geometry(geomid){
-        var polyline = layerdict[geomid]
+        var polyline = layerdict[geomid];
         polyline.setStyle({
             weight: 5
         });
+    }
+
+    function on_click_polyline(e){
+        var label = e.target.label;
+        layerdict[label].openPopup(e.latlng);
+    }
+
+    function zoom_on_geometry(geomid){
+        var polyline = layerdict[geomid];
+        map.fitBounds(polyline.getBounds());
     }
 
     function highlight_row(label){
@@ -208,8 +222,8 @@
     </h4>
     <br/>
     {% if wall_routegeomlist %}
-        In {{ wall.name }} there are following routes:
-        <br>
+        Routes on {{ wall.name }}
+        (click on the routes in the map for details):
         <br>
 
         <table id="routetable">
