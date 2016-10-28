@@ -41,7 +41,7 @@
         function formatState (state) {
               if (!state.icon) { return state.text; }
                 var $state = $(
-                            '<span>' + state.icon + state.text + '</span>'
+                            '<span>' + state.icon + '&nbsp;' + state.text + '</span>'
                               );
                   return $state;
         };
