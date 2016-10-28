@@ -39,8 +39,9 @@ def register(request):
       email_subject = u'Neuer Nutzer bei Mi-Topo.de'
       email_body = u'Hallo, %s, Vielen Dank dass Sie sich entschieden haben Ihren Teil zu MiTopo beizutragen. \
       Um Ihre Benutzerkennung zu aktivieren, klicken Sie bitte innerhalb der naechsten 2 Tage auf folgenden Link. \
-      \n\nhttp://localhost:8000/users/confirm/%s' % (
+      \n\nhttp://%s/users/confirm/%s' % (
       new_user.email,
+      request.get_host(),
       new_user.userprofile.activation_key,
       )
 
