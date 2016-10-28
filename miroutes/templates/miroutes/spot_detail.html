@@ -14,62 +14,114 @@
 
     <script type="text/javascript">
 
-        function map_init(map, options) {
-            map.zoomControl.setPosition("topright");
+function map_init(map, options) {
+    map.zoomControl.setPosition("topright");
 
-            var markerArray = [];
+    // Other Spots in the vicinity
+    var spot_markers = new L.MarkerClusterGroup();
+    {% for spot in spot_list %}
+    var coord = L.latLng({{ spot.geom.coordinates }});
+    var newcoord = L.latLng(coord.lng, coord.lat);
+    var url = '{% url "edit_spot" spot_id=spot.id %}';
+    var mc = new L.marker(newcoord, { url: url, });
+    var popup_msg=`
+        <h4> <a href='` + url + `'>{{spot.name}}</a> </h4>
+        <br>
+        <img src='{% static "miroutes/img/leaflet_wall_icon.png" %}' class='img-rounded' height='20'>
+        {{spot.wall_set.count}}
+    <br>
+        <span class='glyphicon glyphicon-sort route-icon' aria-hidden='true'></span>
+        {{spot.route_set.count}}`;
 
-            {% for wall in spot.wall_set.all %}
-                var coord = L.latLng({{ wall.geom.coordinates }});
-                var newcoord = L.latLng(coord.lng, coord.lat);
-                var url = '{% url "wall_detail" wall_id=wall.pk%}';
-                var mc = new L.marker(newcoord, {
-                    icon: LeafletWallIcon,
-                    url: url,
-                });
-                var popup_msg=`
-                        <img src='{% static "miroutes/img/leaflet_wall_icon.png" %}' class='img-rounded' height='20'>
-                        <a href='` + url + `'>{{ wall.name }}</a>
-                        <span class='glyphicon glyphicon-sort route-icon' aria-hidden='true'></span>
-                        {{wall.pub_view.route_set.count}}
-                        <img src='{{ wall.thumbnail_img.url }}' class='img-rounded' width='128' height='128'>`;
-                mc.bindPopup(popup_msg, {maxWidth:132});
-                mc.on('mouseover', function (e) { this.openPopup(); });
-                mc.on('click', function () {window.location.href = this.options.url;});
-                markerArray.push(mc);
-            {% endfor %}
+    mc.bindPopup(popup_msg);
+    mc.on('mouseover', function (e) { this.openPopup(); });
+    mc.on('click', function () {window.location.href = this.options.url;});
+    spot_markers.addLayer(mc);
+    {% endfor %}
+    map.addLayer(spot_markers);
 
+    // Add wall markers to map
+    var wall_markers = new L.MarkerClusterGroup();
+    {% for wall in spot.wall_set.all %}
+    var coord = L.latLng({{ wall.geom.coordinates }});
+    var newcoord = L.latLng(coord.lng, coord.lat);
+    var link_url = "{% url "link_routes_to_wall" wall_id=wall.id %}";
+    var draw_url = "{% url "draw_routes" wall_id=wall.id %}";
+    var mc = new L.marker(newcoord, {
+        icon: LeafletWallIcon,
+        url: draw_url,
+    });
+    var popup_msg=`
+        <img src='{% static "miroutes/img/leaflet_wall_icon.png" %}' class='img-rounded' height='20'>
+        <a href='` + draw_url + `'>{{ wall.name }}</a>
+        <span class='glyphicon glyphicon-sort route-icon' aria-hidden='true'></span>
+        {{wall.pub_view.route_set.count}}
+    <br>
+        <img src='{{ wall.thumbnail_img.url }}' class='img-rounded' width='128' height='128'>
+        <br>
+        <a href="`+link_url+`">
+        <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+        Link Routes to Wall
+        </a>
+        <br>
+        <a href="`+draw_url+`">
+        <span class="glyphicon glyphicon-picture" aria-hidden="true"></span>
+        Draw Routes on Wall
+        </a> 
+        `;
+    mc.bindPopup(popup_msg);
+    mc.on('mouseover', function (e) { this.openPopup(); });
+    mc.on('click', function () {window.location.href = this.options.url;});
+    wall_markers.addLayer(mc);
+    {% endfor %}
+    map.addLayer(wall_markers);
 
-            {% for parking in parking_list %}
-            {% autoescape off %}
-            var icon = {{ parking.icon }};
-            {% endautoescape %}
-            var parking_marker = create_marker({{ parking|geojsonfeature|safe }}, icon);
-            markerArray.push(parking_marker);
-            {% endfor %}
+    // Add parking markers to map
+    var parking_markers = new L.layerGroup();
+    {% for parking in parking_list %}
+        {% autoescape off %}
+        var icon = {{ parking.icon }};
+        {% endautoescape %}
+        var parking_marker = create_marker({{ parking|geojsonfeature|safe }}, icon);
 
-            var group = L.featureGroup(markerArray);
-
-            map.options.maxZoom = 17;
-            markers = new L.MarkerClusterGroup();
-            markers.addLayer(group);
-
-            map.addLayer(markers);
-            if (markerArray.length > 1) {
-                map.fitBounds(markers.getBounds());
+        parking_markers.addLayer(parking_marker);
+        map.on('zoomend', function (e) {
+            if(map.getZoom() >= {{parking.leaflet_minzoom}}) {
+                map.addLayer(parking_markers);
             } else {
-                map.setView(markerArray[0].getLatLng(), 15);
-            }
-        }
+                map.removeLayer(parking_markers);
+            };
+        });
+    {% endfor %}
 
-        function create_marker(location, icon){
-            return L.geoJson(location, {
-                pointToLayer: function (feature, latlng) {
-                    return L.marker(latlng, {icon: icon});
-                }
-            });
-        }
 
+    map.options.maxZoom = 17;
+    // Set bounds so that we see everything here
+    var all_marker_bounds = [];
+    // all_marker_bounds.push(parking_markers.getBounds());
+    all_marker_bounds.push(wall_markers.getBounds());
+
+
+    try {
+        map.fitBounds(all_marker_bounds)
+    }
+    catch(err) {
+        var coord = L.latLng({{ spot.geom.coordinates }});
+        coord = L.latLng(coord.lng, coord.lat); // flip values
+        map.setView(coord, 15);
+    }
+
+
+}
+
+function create_marker(location, icon){
+    return L.geoJson(location, {
+        pointToLayer: function (feature, latlng) {
+            return L.marker(latlng, {icon: icon});
+        }
+    });
+
+}
         </script>
 
 

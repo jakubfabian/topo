@@ -40,13 +40,16 @@ def spot_detail(request, spot_id, **kwargs):
     spot = get_object_or_404(Spot, pk=spot_id)
     parking_list = spot.parkinglocation_set.all()
     walllist = spot.wall_set.all()
-    print walllist
+
+    # Also get all surrounding other spots...
+    spot_list = Spot.objects.exclude(pk=spot_id).order_by('name')
 
     if not request.session.get('show_inactive', False):
         walllist = walllist.filter(is_active=True)
 
     context = {
         'spot': spot,
+        'spot_list': spot_list,
         'parking_list': parking_list}
     return render(request, 'miroutes/spot_detail.html', context)
 

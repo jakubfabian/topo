@@ -81,7 +81,7 @@
 
 
           // Add parking markers to map
-          var parking_markers = new L.MarkerClusterGroup();
+          var parking_markers = new L.layerGroup();
           {% for parking in parking_list %}
               {% autoescape off %}
               var icon = {{ parking.icon }};
@@ -98,8 +98,11 @@
               parking_marker.bindPopup(popup_content);
               parking_marker.on('click', parking_marker.openPopup)
               parking_markers.addLayer(parking_marker);
+              map.on('zoomend', function (e) {
+                  if(map.getZoom() >= {{parking.leaflet_minzoom}}) { map.addLayer(parking_markers); } 
+                  else { map.removeLayer(parking_markers); };
+              });
           {% endfor %}
-          map.addLayer(parking_markers);
           
           // edit_marker is made available globally
           edit_marker = null;
@@ -115,11 +118,18 @@
           map.addLayer(editSpotLayer);
           
           // Set bounds so that we see everything here
-          var all_marker_bounds = [edit_marker.getLatLng(),];
-          all_marker_bounds.push(parking_markers.getBounds());
-          all_marker_bounds.push(wall_markers.getBounds());
+          try {
+              var all_marker_bounds = [edit_marker.getLatLng(),];
+              all_marker_bounds.push(parking_markers.getBounds());
+              all_marker_bounds.push(wall_markers.getBounds());
 
-          map.fitBounds(all_marker_bounds)
+              map.fitBounds(all_marker_bounds)
+          }
+          catch(err) {
+              var coord = L.latLng({{ spot.geom.coordinates }});
+              coord = L.latLng(coord.lng, coord.lat); // flip values
+              map.setView(coord, 15);
+          }
       }
 
       function create_marker(location, icon){

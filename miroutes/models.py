@@ -555,6 +555,10 @@ class ParkingLocation(MapLocation):
     spot = models.ForeignKey(Spot)
     _icon_url = 'miroutes/img/leaflet_parking_icon.png'
 
+    @property
+    def leaflet_minzoom(self):
+        return 13 
+
 class BoltLocation(MapLocation):
     """Marks a bolt on a wall view."""
     wall = models.ForeignKey(Wall)

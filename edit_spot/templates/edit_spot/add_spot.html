@@ -17,26 +17,37 @@
 
             map.options.maxZoom = 17;
 
-            var existingSpots = {{ spot_list|geojsonfeature|safe }};
-            existingSpotsLayer = L.geoJson(existingSpots, {
-                pointToLayer: function (feature, latlng) {
-                    return L.marker(latlng);
-                }
-            });
+            // Other Spots in the vicinity
+            var spot_markers = new L.MarkerClusterGroup();
+            {% for spot in spot_list %}
+            var coord = L.latLng({{ spot.geom.coordinates }});
+            var newcoord = L.latLng(coord.lng, coord.lat);
+            var url = '{% url "edit_spot" spot_id=spot.id %}';
+            var mc = new L.marker(newcoord, { url: url, });
+            var popup_msg=`
+                <h4> <a href='` + url + `'>{{spot.name}}</a> </h4>
+                <br>
+                <img src='{% static "miroutes/img/leaflet_wall_icon.png" %}' class='img-rounded' height='20'>
+                {{spot.wall_set.count}}
+            <br>
+                <span class='glyphicon glyphicon-sort route-icon' aria-hidden='true'></span>
+                {{spot.route_set.count}}`;
 
-            markers = new L.MarkerClusterGroup();
-            markers.addLayer(existingSpotsLayer);
-            map.addLayer(markers);
+            mc.bindPopup(popup_msg);
+            mc.on('mouseover', function (e) { this.openPopup(); });
+            mc.on('click', function () {window.location.href = this.options.url;});
+            spot_markers.addLayer(mc);
+            {% endfor %}
+            map.addLayer(spot_markers);
 
             var newSpot;
 
-            if (existingSpots.features.length === 0) {
+            if (spot_markers.getLayers().length === 0) {
                 munich = new L.marker([48.137154, 11.576124]);
                 map.setView(munich.getLatLng(), 10);
             } else {
-                map.fitBounds(markers.getBounds().pad(0.5))
+                map.fitBounds(spot_markers.getBounds().pad(0.5))
             }
-            ;
 
             map.on('click', function (e) {
                 if (newSpot === undefined) {

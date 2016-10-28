@@ -85,38 +85,34 @@
           {% endfor %}
           map.addLayer(wall_markers);
 
+
           // Add parking markers to map
-          var parking_markers = new L.MarkerClusterGroup();
+          var parking_markers = new L.layerGroup();
           {% for parking in parking_list %}
-              {% autoescape off %}
-              var icon = {{ parking.icon }};
-              {% endautoescape %}
-              var parking_marker = create_marker({{ parking|geojsonfeature|safe }}, icon);
+          {% autoescape off %}
+          var icon = {{ parking.icon }};
+          {% endautoescape %}
+          var parking_marker = create_marker({{ parking|geojsonfeature|safe }}, icon);
 
-              var popup_content = `
-                  <button type="button"
-                      class="btn btn-default"
-                      aria-label="Delete"
-                      onclick="on_delete_parking_location({{ parking.id }})">
-                      <span class='glyphicon glyphicon-trash' aria-hidden="true"></span>
-                  </button>`;
-              parking_marker.bindPopup(popup_content);
-              parking_marker.on('click', parking_marker.openPopup)
-              parking_markers.addLayer(parking_marker);
+          parking_markers.addLayer(parking_marker);
+          map.on('zoomend', function (e) {
+              if(map.getZoom() >= {{parking.leaflet_minzoom}}) {
+                  map.addLayer(parking_markers);
+              } else {
+                  map.removeLayer(parking_markers);
+              };
+          });
           {% endfor %}
-          map.addLayer(parking_markers);
 
-            map.options.maxZoom = 17;
+          map.options.maxZoom = 17;
 
           // Set bounds so that we see everything here
-          var all_marker_bounds = [];
-          all_marker_bounds.push(parking_markers.getBounds());
-          all_marker_bounds.push(wall_markers.getBounds());
-
-
           try {
-              map.fitBounds(all_marker_bounds)
-          }
+              var all_marker_bounds = [edit_marker.getLatLng(),];
+              all_marker_bounds.push(parking_markers.getBounds());
+              all_marker_bounds.push(wall_markers.getBounds());
+
+              map.fitBounds(all_marker_bounds)}
           catch(err) {
               var coord = L.latLng({{ spot.geom.coordinates }});
               coord = L.latLng(coord.lng, coord.lat); // flip values
