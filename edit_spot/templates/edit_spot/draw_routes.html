@@ -1,14 +1,17 @@
 {% extends "base.html" %}
 {% load staticfiles %}
-{% load leaflet_tags %}
-{% load geojson_tags %}
 
 {% block title %}
     Mitopo.de - Draw Routes on the Wall
 {% endblock %}
 
 {% block extra_assets %}
-    {% include "leaflet_base.html" %}
+    {% load leaflet_tags %}
+    {% load geojson_tags %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+    {% leaflet_js plugins="forms" %}
+    {% leaflet_css plugins="forms" %}
 
     <style>
 
@@ -141,7 +144,24 @@
 
         // map event handlers
         map.on('draw:created', function (e) {
-            finish_edit(e); 
+
+            var polyline = L.polyline(e.layer._latlngs, {
+                opacity: 1,
+                color: 'blue'
+            });
+
+            // we select the drawn layer and write it to the map
+            var featureGroup = L.featureGroup([polyline]);
+            // this also adds the line to the map
+            addToLayerdict(activeGeomId, featureGroup);            
+
+            // store it to the input
+            store_polyline(activeGeomId, polyline);
+
+            // remove the draw controls
+            resetDrawControl();
+            activeGeomId = null;
+            generate_routelist();
         });
 
 
@@ -167,26 +187,6 @@
             generate_routelist();
         
         });
-    }
-
-    function finish_edit(e) {
-        var polyline = L.polyline(e.layer._latlngs, {
-            opacity: 1,
-            color: 'blue'
-        });
-
-        // we select the drawn layer and write it to the map
-        var featureGroup = L.featureGroup([polyline]);
-        // this also adds the line to the map
-        addToLayerdict(activeGeomId, featureGroup);            
-
-        // store it to the input
-        store_polyline(activeGeomId, polyline);
-
-        // remove the draw controls
-        resetDrawControl();
-        activeGeomId = null;
-        generate_routelist();
     }
 
     function store_polyline(geomid, polyline){
@@ -360,8 +360,8 @@
         polylinecontrol.enable();
 
         $("#edit_route_img_id_accept_new_route")
-            .attr('class', 'glyphicon glyphicon-ok draw_route_tool_img')
-            .attr('onclick', "finish_edit(layerdict[geomid])"); // TODO: this should save the route -- can we trigger this programmatically here?
+            .removeClass();
+
 
         $("#edit_route_img_id_cancel_new_route")
             .attr('class', 'glyphicon glyphicon-remove draw_route_tool_img')
@@ -533,16 +533,7 @@
                   {% endfor %}
               </div>
                 
-                <button type="submit" class="btn btn-success btn-xs">
-                      <i class="glyphicon glyphicon-floppy-save"></i> Save
-                </button>
-            </form>
-
-            <form method="GET">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger btn-xs">
-                      <i class="glyphicon glyphicon-backward"></i> Reset
-                </button>
+                <input type="submit" class="btn btn-primary btn-xs" value="save">
             </form>
         </div>
     </div>
