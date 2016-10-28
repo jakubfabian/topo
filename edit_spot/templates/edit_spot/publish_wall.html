@@ -273,43 +273,50 @@
             <br><br>
             <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
             <form method="POST">
-                {% csrf_token %}
-                <input type="submit" class="btn btn-primary btn-xs" value="publish">
+                <span id="buttons" style="float:left;">
+                    {% csrf_token %}
+                    <input type="submit" class="btn btn-success btn-xs" value="publish">
+                </span>
             </form>
 
             <form method="POST" action="{% url 'reset_dev_wall' wall_id=wall.pk %}?next={{request.path}}">
-                {% csrf_token %}
-                <input type="submit" class="btn btn-warning btn-xs" value="reset dev wall">
+                <span id="buttons" style="float:left;">
+                    {% csrf_token %}
+                    <input type="submit" class="btn btn-warning btn-xs" value="reset dev wall">
+                </span>
             </form>
         </div>
 
-
         {% if wall.get_bg_img_size.0 >= wall.get_bg_img_size.1 %}
-		<div class="col-lg-8 half-height">
-			<div id="dev_wallmap" class="half-height"></div>
-			<span style="position: absolute;top:0px;left:15px;z-index:1;">
-			<h4><span class="label label-info">staging <a href={% url 'draw_routes' wall_id=wall.pk %}><span class='glyphicon glyphicon-picture'></span></a> </span>  </h4>
-			</span>
-		</div>
-		<div class="col-lg-8 half-height">
-			<div id="pub_wallmap" class="half-height"></div>
-			<span style="position: absolute;top:0px;left:15px;z-index:1;">
-			<h4><span class="label label-info">published <a href={% url 'wall_detail' wall_id=wall.pk %}><span class='glyphicon glyphicon-eye-open'></span></a> </span>  </h4>
-			</span>
-		</div>
+
+            <div class="col-lg-8 half-height">
+                <div id="dev_wallmap" class="half-height"></div>
+                <span style="position: absolute;top:0px;left:15px;z-index:1;">
+                <h4><span class="label label-info">staging <a href={% url 'draw_routes' wall_id=wall.pk %}><span class='glyphicon glyphicon-picture'></span></a> </span>  </h4>
+                </span>
+            </div>
+            <div class="col-lg-8 half-height">
+                <div id="pub_wallmap" class="half-height"></div>
+                <span style="position: absolute;top:0px;left:15px;z-index:1;">
+                <h4><span class="label label-info">published <a href={% url 'wall_detail' wall_id=wall.pk %}><span class='glyphicon glyphicon-eye-open'></span></a> </span>  </h4>
+                </span>
+            </div>
+
         {% else %}
-        <div class="col-lg-4 full-height">
-            <div id="dev_wallmap" class="full-height"></div>
-			<span style="position: absolute;top:0px;left:15px;z-index:1;">
-			<h4><span class="label label-info">staging <a href={% url 'draw_routes' wall_id=wall.pk %}><span class='glyphicon glyphicon-picture'></span></a> </span>  </h4>
-			</span>
-        </div>
-        <div class="col-lg-4 full-height">
-            <div id="pub_wallmap" class="full-height"></div>
-			<span style="position: absolute;top:0px;left:15px;z-index:1;">
-			<h4><span class="label label-info">published <a href={% url 'wall_detail' wall_id=wall.pk %}><span class='glyphicon glyphicon-eye-open'></span></a> </span>  </h4>
-			</span>
-        </div>
+
+            <div class="col-lg-4 full-height">
+                <div id="dev_wallmap" class="full-height"></div>
+                <span style="position: absolute;top:0px;left:15px;z-index:1;">
+                <h4><span class="label label-info">staging <a href={% url 'draw_routes' wall_id=wall.pk %}><span class='glyphicon glyphicon-picture'></span></a> </span>  </h4>
+                </span>
+            </div>
+            <div class="col-lg-4 full-height">
+                <div id="pub_wallmap" class="full-height"></div>
+                <span style="position: absolute;top:0px;left:15px;z-index:1;">
+                <h4><span class="label label-info">published <a href={% url 'wall_detail' wall_id=wall.pk %}><span class='glyphicon glyphicon-eye-open'></span></a> </span>  </h4>
+                </span>
+            </div>
+
         {% endif %}
     </div>
 

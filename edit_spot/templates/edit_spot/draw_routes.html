@@ -527,13 +527,20 @@
             <!-- The form redirects to the original url. The route_chooser dif is populated by hidden input elements -->
             <form method="POST" action="{{ request.path|urlencode }}" onsubmit="clean_handles()">
                 {% csrf_token %}
-              <div>
-                {% for form in polyline_forms %}
-                  {{ form.as_p }}
-                  {% endfor %}
-              </div>
-                
-                <input type="submit" class="btn btn-primary btn-xs" value="save">
+                <div>
+                    {% for form in polyline_forms %}
+                    {{ form.as_p }}
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="btn btn-success btn-xs">
+                    <i class="glyphicon glyphicon-floppy-save"></i> Save
+                </button>
+
+            </form>
+            <form method="GET">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-danger btn-xs" value="Reset">
             </form>
         </div>
     </div>
