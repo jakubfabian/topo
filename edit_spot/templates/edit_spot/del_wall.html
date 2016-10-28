@@ -1,0 +1,118 @@
+{% extends request.is_ajax|yesno:"base_ajax.html,base.html" %}
+{% load staticfiles %}
+
+{% block title %}
+    Mitopo.de - Delete Wall
+{% endblock %}
+
+{% block mapobjects_info %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //  FJ, TODO: The tables have a too small width when rendered here 
+            // -- this is maybe because the container is collapsed and Datatable computes the size of the table accordingly.. 
+            // but someone with more Javascript knowledge should get back here ... 
+            pubtable = $('#pubtable').DataTable({
+                "scrollY": "300px",
+                "scrollCollapse": true,
+                "paging": false,
+                "searching": false,
+            });
+            devtable = $('#devtable').DataTable({
+                "scrollY": "300px",
+                "scrollCollapse": true,
+                "paging": false,
+                "searching": false,
+            });
+        });
+    </script>
+
+    <h4>
+        <b> {{ wall.name }}</b>
+    </h4>
+    <br/>
+    {% if wall.pub_view.routegeometry_set.all|length %}
+			<h4><span class="label label-info">published routes<a href={% url 'wall_detail' wall_id=wall.pk %}><span class='glyphicon glyphicon-eye-open'></span></a> </span>  </h4>
+        <table id="pubtable">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Diff</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for geom in wall.pub_view.routegeometry_set.all %}
+              <tr>
+                <td>{{ geom.route.name }}</td>
+                <td>
+                    <span class='glyphicon glyphicon-flash route-grade-icon'></span>
+                    {{ geom.route.get_grade_display }}
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+
+    {% else %}
+        <p>Currently no published routes are available in {{ wall.name }}</p>
+    {% endif %}
+
+    <br/>
+    <br/>
+    {% if wall.dev_view.routegeometry_set.all|length %}
+    <h4><span class="label label-info">staged routes <a href={% url 'draw_routes' wall_id=wall.pk %}><span class='glyphicon glyphicon-picture'></span></a> </span>  </h4>
+        <table id="devtable">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Diff</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for geom in wall.dev_view.routegeometry_set.all %}
+              <tr>
+                <td>{{ geom.route.name }}</td>
+                <td>
+                    <span class='glyphicon glyphicon-flash route-grade-icon'></span>
+                    {{ geom.route.get_grade_display }}
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+
+    {% else %}
+        <p>Currently no staged routes are available in {{ wall.name }}</p>
+    {% endif %}
+
+{% endblock %}
+
+{% block content %}
+
+<h3>Permanently delete <b> {{ wall.name }} </b>?</h3>
+<br>
+{% if request.is_ajax %}
+    <form method="POST" action="{% url 'del_route' route_id=route.id %}{% if next %}?next={{ next }}{% endif %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-warning">
+            <i class="glyphicon glyphicon-trash"></i>
+        </button>
+    </form>
+
+{% else %}
+
+    <form method="POST" action="{% url 'del_wall' wall_id=wall.id %}{% if next %}?next={{ next }}{% endif %}" style="display: inline-block;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-warning btn-lg">
+            <i class="glyphicon glyphicon-trash"></i>
+        </button>
+    </form>
+    <form method="GET" action="{{ next }}" style="display: inline-block;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-info btn-lg">
+            <i class="glyphicon glyphicon-remove"></i>
+        </button>
+    </form>
+
+{% endif %}
+
+{% endblock %}
