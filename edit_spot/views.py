@@ -91,14 +91,27 @@ def publish_wall(request, wall_id, **kwargs):
     dev_geomlist = create_annotated_and_sorted_geomlist(dev_view)
     pub_geomlist = create_annotated_and_sorted_geomlist(pub_view)
 
+    # get all routes that are linked to any of the two views
+    # and annotate them accordingly
+    union_routelist = list(set(dev_view.route_set.all()) | set(pub_view.route_set.all()))
+    for route in union_routelist:
+        if route in dev_view.route_set.all():
+            geom = dev_view.routegeometry_set.get(route=route)
+            if geom.geom:
+                route.on_dev = True
+        if route in pub_view.route_set.all():
+            route.on_pub = True
+
+
     request.session['last_wall_id'] = wall_id
-        
+
     context = {'wall': wall,
                'spot': wall.spot,
                'pubview': pub_view,
                'devview': dev_view,
                'pub_geomlist': pub_geomlist,
                'dev_geomlist': dev_geomlist,
+               'union_routelist': union_routelist,
                'show_edit_pane': True}
 
     if request.session.get('last_wall_id'):

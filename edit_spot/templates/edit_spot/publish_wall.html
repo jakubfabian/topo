@@ -42,6 +42,7 @@
 
 {% block content %}
   <script>
+    window.layerdict = {};
     function map_init(mapdiv_id) {
         // Map init paperworks...
         var img_dim = {{ wall.get_bg_img_size }};
@@ -80,21 +81,21 @@
         });
 
         wall_layer.addTo(map);
-        // the activeGeomId is used to denote the id of the currently edited
-        // or created geometry
-        window.activeGeomId = null;
-        window.layerdict = {};
-        window.routelabeldict = {};
+
 
         // Now we initialize the existing route geometries
-        window.layerdict = {};
 
         if(mapdiv_id === 'dev_wallmap') {
         {% for geom in dev_geomlist %}
         {% if geom.geom %}
             // generate polylines with colors
             // note the custom filter!
-        add_route({{ geom|geojsonfeature|safe }}, {{geom.id}}, '{{geom.label}}', {{geom.anchorpoint}}, '{{geom.route.polylinecolor}}');
+            add_route(
+                {{ geom|geojsonfeature|safe }},
+                {{geom.route.id}},
+                '{{geom.label}}',
+                {{geom.anchorpoint}},
+                '{{geom.route.polylinecolor}}');
 
         {% endif %}
         {% endfor %}
@@ -105,7 +106,12 @@
         {% if geom.geom %}
             // generate polylines with colors
             // note the custom filter!
-        add_route({{ geom|geojsonfeature|safe }}, {{geom.id}}, '{{geom.label}}', {{geom.anchorpoint}}, '{{geom.route.polylinecolor}}');
+            add_route(
+                {{ geom|geojsonfeature|safe }},
+                {{geom.route.id}},
+                '{{geom.label}}',
+                {{geom.anchorpoint}},
+                '{{geom.route.polylinecolor}}');
 
         {% endif %}
         {% endfor %}
@@ -114,80 +120,83 @@
     }
 
     function add_route(geom, id, label, anchor, color) {
-            var polyline = null;
-            var geojsonobject = L.geoJson(geom);
-            geojsonobject.eachLayer(function (layer) {
-                polyline = layer; 
-            });
+        var polyline = null;
+        var geojsonobject = L.geoJson(geom);
+        geojsonobject.eachLayer(function (layer) {
+            polyline = layer; 
+        });
 
-            polyline.setStyle({
-                color: color ,
-                opacity: 1
-            });
+        polyline.setStyle({
+            color: color ,
+            opacity: 1
+        });
             
-            addToLayerdict(id, L.featureGroup([polyline]));
-            // we add a label
-            var myIcon = L.divIcon({
-                iconSize: new L.Point(20, 20),
-                html: label
-            });
-
-            var anchorpoint = anchor;
-            // careful with reversed coordinates!
-            var routelabel = L.marker([anchorpoint[1], anchorpoint[0]], {
-                icon: myIcon,
-            });
-            add_to_routelabeldict(id, routelabel);
-    }
-
-    function store_polyline(geomid, polyline){
-        var geojsonstring = JSON.stringify(polyline.toGeoJSON().geometry);
-        document.getElementById("id_" + activeGeomId + "-geom").value = geojsonstring;
-    }
-
+        addToLayerdict(id, L.featureGroup([polyline]));
+        // we add a label
+        var myIcon = L.divIcon({
+            iconSize: new L.Point(20, 20),
+            html: label
+        });
         
-    function add_to_routelabeldict(geomid, routelabel){
-        routelabeldict[geomid] = routelabel
+        var anchorpoint = anchor;
+        // careful with reversed coordinates!
+        var routelabel = L.marker([anchorpoint[1], anchorpoint[0]], {
+            icon: myIcon,
+        });
+
         routelabel.addTo(map);
     }
 
-
-    
-    function addToLayerdict(geomid, layer) {
+        
+    function addToLayerdict(routeid, featureGroup) {
         // Utility function to add a pair of geomid and references
         // to the layer to a dict, add the onClick handler and the layer to the map.
-        layer.routegeomid = geomid;
-        layerdict[geomid] = layer;
-        layer.addTo(map);
-        // add event handler
-        layer.on('mouseover', function (e) {
-            highlight_geometry(e.target.routegeomid);
-            highlight_row(e.target.routegeomid);
-        });
-        layer.on('mouseout', function (e) {
-            un_highlight_geometry(e.target.routegeomid);
-            un_highlight_row(e.target.routegeomid);
-        });
+        if(routeid in layerdict){
+            featureGroup.routeid = routeid;
+            layerdict[routeid] = [layerdict[routeid][0], featureGroup];
+        }else{
+            featureGroup.routeid = routeid;
+            layerdict[routeid] = [featureGroup];
+            // add event handler
+            featureGroup.on('mouseover', function (e) {
+                highlight_geometry(e.target.routeid);
+                highlight_row(e.target.routeid);
+            });
+            featureGroup.on('mouseout', function (e) {
+                un_highlight_geometry(e.target.routeid);
+                un_highlight_row(e.target.routeid);
+            });
+        }
+        featureGroup.addTo(map);
 
     }
-    function highlight_geometry(geomid){
-        if(typeof layerdict[geomid] !== 'undefined'){
-            layerdict[geomid].eachLayer( function (layer) {
-                layer.setStyle({
-                    weight: 10
-                });
+    
+    function highlight_geometry(routeid){
+        routeid=Number(routeid);
+        if(typeof layerdict[routeid] !== 'undefined'){
+            layerdict[routeid].forEach(function (featureGroup){
+                featureGroup.eachLayer( function (layer) {
+                    layer.setStyle({
+                        weight: 8
+                    });
+                })
                 
             });
+            
         }
 
     }
 
-    function un_highlight_geometry(geomid){
-        if(typeof layerdict[geomid] !== 'undefined'){
-            layerdict[geomid].eachLayer( function (layer) {
-                layer.setStyle({
-                    weight: 5
-                });
+    function un_highlight_geometry(routeid){
+        routeid=Number(routeid);
+        if(typeof layerdict[routeid] !== 'undefined'){
+            layerdict[routeid].forEach(function (featureGroup){
+                featureGroup.eachLayer( function (layer) {
+                    layer.setStyle({
+                        weight: 5
+                    });
+                })
+                
             });
         }
     }
@@ -203,40 +212,27 @@
     }
 
     function generate_routelist(){
-        // generate a list of routes in the list with id #routelist
-        // clear table
-        $("#routetable tbody").remove();
-        $("#routetable").append($('<tbody>'));
-        {% for routegeom in devview.routegeometry_set.all %}
-        $("#routetable").find('tbody')
-            .append($('<tr>')
-                    .attr('value', {{ routegeom.id }})
-                    .attr('id', 'routetablerow_'+{{ routegeom.id }})
-                    .append($('<td>') .text('{{ routegeom.label }}'))
-                    .append($('<td>') .text('{{ routegeom.route.name }}'))
-                    .append($('<td>') .html('<span class="glyphicon glyphicon-flash route-grade-icon"></span>{{ routegeom.route.get_grade_display }}'))
-                   );
-        {% endfor %}
 
-        // eventhandler for highlighting
-        $('#routetable tbody')
-            .on( 'mouseenter', 'tr', function () {
-                var geomid = this.getAttribute('value');
-                highlight_geometry(geomid);
-                highlight_row(geomid);
-            });
-        $('#routetable tbody')
-            .on( 'mouseleave', 'tr', function () {
-                var geomid = this.getAttribute('value');
-                un_highlight_geometry(geomid);
-                un_highlight_row(geomid);
-            });
     }
 
     $(document).ready(function () {
         map_init('dev_wallmap');
         map_init('pub_wallmap');
-        generate_routelist();
+        
+        // eventhandler for highlighting
+        $('#routetable tbody')
+            .on( 'mouseenter', 'tr', function () {
+                var routeid = this.getAttribute('value');
+                highlight_geometry(routeid);
+                highlight_row(routeid);
+            });
+        $('#routetable tbody')
+            .on( 'mouseleave', 'tr', function () {
+                var routeid = this.getAttribute('value');
+                un_highlight_geometry(routeid);
+                un_highlight_row(routeid);
+            });
+
     });
   </script>
      {% include "edit_spot/edit_pane.html" %}
@@ -256,16 +252,38 @@
               <table id="routetable" style="width:100%">
                 <thead>
                   <tr>
-                    <th>pos</th>
                     <th>name</th>
                     <th>grade</th>
-                    <th></th>
-                    <th></th>
+                    <th>staged</th>
+                    <th>published</th>
                   </tr>
                 </thead>
                 <tbody>
+                  {% for route in union_routelist %}
+                    <tr id="routetablerow_{{ route.id }}" value="{{ route.id }}">
+                      <td>{{ route.name }}</td>
+                      <td>
+                        <span class="glyphicon glyphicon-flash route-grade-icon"></span>
+                        {{ route.get_grade_display }}
+                      </td>
+                      <td>
+                      {% if route.on_dev %}
+                        <span class="glyphicon glyphicon-ok"></span>
+                      {% else %}
+                        <span class="glyphicon glyphicon-remove"></span>
+                      {% endif %}
+                      </td>
+                      <td>
+                      {% if route.on_pub %}
+                        <span class="glyphicon glyphicon-ok"></span>
+                      {% else %}
+                        <span class="glyphicon glyphicon-remove"></span>
+                      {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
                 </tbody>
-              </table>
+              </table>              
                       
             </div>
         
