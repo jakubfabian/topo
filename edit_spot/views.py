@@ -37,11 +37,18 @@ def wall_index(request, spot_id):
     spot = get_object_or_404(Spot, pk=spot_id)
 
     wall_listing = Wall.objects.filter(spot__id=spot_id).order_by('name')
-    context = {'wall_listing': wall_listing,
-               'spot': spot,
-               'show_edit_pane': True}
+    parking_list = spot.parkinglocation_set.all()
+
+    context = {
+            'wall_listing': wall_listing,
+            'parking_list': parking_list,
+            'spot': spot,
+            'show_edit_pane': True,
+            }
+
     if request.session.get('last_wall_id'):
         context['last_wall_id'] = request.session['last_wall_id']
+
     return render(request, 'edit_spot/wall_index.html', context)
 
 
@@ -226,6 +233,34 @@ def link_routes_to_wall(request, wall_id, **kwargs):
     return render(request, 'edit_spot/link_routes_to_wall.html', context)
 
 
+@permission_required('miroutes.wall.can_delete')
+def del_wall(request, wall_id, **kwargs):
+    """
+    Delete a Wall
+    """
+    wall = get_object_or_404(Wall, pk=wall_id)
+
+    request.session.pop('last_wall_id', None)
+
+    next_page = request.GET.get('next', None)
+
+    context = {
+        'wall': wall,
+    }
+    if next_page is not None:
+        context['next'] = next_page
+
+    if request.method == 'POST':
+        wall.delete()
+        if next_page is not None:
+            return redirect(next_page)
+        else: # we have send them somewhere? this is probably not wanted but lets show the way to /
+            return redirect('/')
+
+
+    return render(request, 'edit_spot/del_wall.html', context)
+
+
 @permission_required('miroutes.wall.can_add')
 def add_wall(request, spot_id, **kwargs):
     """
@@ -238,7 +273,8 @@ def add_wall(request, spot_id, **kwargs):
 
         form = WallForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            wall = form.save()
+            request.session['last_wall_id'] = wall.pk
             return wall_index(request, spot.pk)
     else:
         form = WallForm(initial={'spot': spot})
@@ -274,12 +310,14 @@ def edit_wall(request, wall_id, **kwargs):
         form = WallForm(initial={'spot': spot}, instance=wall)
 
     wall_list = spot.wall_set.exclude(pk=wall_id).order_by('name')
+    parking_list = spot.parkinglocation_set.all()
 
     context = {
         'editing': True,
         'wall': wall,
         'spot': spot,
         'wall_list': wall_list,
+        'parking_list': parking_list,
         'show_edit_pane': True,
         'form': form
     }

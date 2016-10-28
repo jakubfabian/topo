@@ -13,6 +13,7 @@ url(r'^spot(?P<spot_id>\d+)/wall_index$', views.wall_index, name='edit_spot_wall
 url(r'^spot(?P<spot_id>\d+)/add_wall$', views.add_wall, name='add_wall'),
 
 url(r'^wall(?P<wall_id>\d+)/edit_wall$', views.edit_wall, name='edit_wall'),
+url(r'^wall(?P<wall_id>\d+)/del_wall$', views.del_wall, name='del_wall'),
 url(r'^wall(?P<wall_id>\d+)/link_routes_to_wall$', views.link_routes_to_wall, name='link_routes_to_wall'),
 url(r'^wall(?P<wall_id>\d+)/draw_routes$', views.draw_routes, name='draw_routes'),
 url(r'^wall(?P<wall_id>\d+)/publish_wall$', views.publish_wall, name='publish_wall'),
