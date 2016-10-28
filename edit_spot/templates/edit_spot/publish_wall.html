@@ -157,16 +157,16 @@
         }else{
             featureGroup.routeid = routeid;
             layerdict[routeid] = [featureGroup];
-            // add event handler
-            featureGroup.on('mouseover', function (e) {
-                highlight_geometry(e.target.routeid);
-                highlight_row(e.target.routeid);
-            });
-            featureGroup.on('mouseout', function (e) {
-                un_highlight_geometry(e.target.routeid);
-                un_highlight_row(e.target.routeid);
-            });
         }
+        // add event handler
+        featureGroup.on('mouseover', function (e) {
+            highlight_geometry(e.target.routeid);
+            highlight_row(e.target.routeid);
+        });
+        featureGroup.on('mouseout', function (e) {
+            un_highlight_geometry(e.target.routeid);
+            un_highlight_row(e.target.routeid);
+        });
         featureGroup.addTo(map);
 
     }
